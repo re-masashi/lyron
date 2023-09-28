@@ -1,0 +1,10 @@
+def count(curr: i32, end:i32) ->Any{
+	if(curr<=end){
+		print(curr);
+		curr = curr +1;
+		count(curr, end);
+	}else{
+	}
+}
+
+count(0,100);

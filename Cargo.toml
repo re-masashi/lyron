@@ -1,0 +1,20 @@
+[package]
+name = "lyronc"
+version = "0.0.1"
+authors = ["Nafi Amaan Hossain"]
+edition = "2018"
+
+description = "A simple 'TOY' language."
+license = "MIT"
+readme = "README.md"
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libc = "0.2.70"
+
+clap = "2.33.0"
+
+log = "0.4.8"
+env_logger = "0.7.1"

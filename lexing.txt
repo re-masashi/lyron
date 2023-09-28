@@ -1,0 +1,41 @@
+# extern next_int() -> i32;
+# extern hello_world() -> i32;
+# extern println(a: i32) -> i32;
+
+# def main2() ->None{
+# 	if(1==1){
+# 		1;
+# 	}else{
+# 		3;
+# 	};
+# };
+
+def count(curr: i32, end:i32) ->Any{
+	if(curr<=end){
+		print(curr);
+		curr = curr +1;
+		count(curr, end);
+	}else{
+	}
+}
+
+class ABC{
+	def ABC(self:Self)->ABC{ # constuctor
+		1+2+3;
+	};
+}
+
+# a=1;
+# b=3;
+# print(a,b);
+# a=a+b;
+# b=a-b;
+# a=a-b;
+# print(a,b);
+# count(1,10);
+
+# use "err.txt";
+# print(pi);
+myobj = ABC();
+print(myobj);
+count(1,10);

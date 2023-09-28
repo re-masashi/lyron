@@ -1,0 +1,44 @@
+program := (
+	|function SEMICOLON?
+	|EXTERN IDENTIFIER LPAREN 
+		(IDENTIFIER COLON IDENTIFIER)? 
+		(COMMA TYPE_ANNOT)* RPAREN ARROW IDENTIFIER
+)*
+
+function := 
+	DEF IDENTIFIER LPAREN 
+	(
+		IDENTIFIER COLON IDENTIFIER 
+		(COMMA TYPE_ANNOT)* RPAREN ARROW IDENTIFIER LBRACE) 
+		|(IDENTIFIER COLON IDENTIFIER)?
+	) (
+		|expression SEMICOLON
+	)* RBRACE
+
+expression :=
+	|(MINUS | PLUS | NOT) expression # Unary
+	|LPAREN expression RPAREN # Parenthesised expr
+	|expression (
+		|PLUS|MINUS
+		|DIV|MUL
+		|LESS|LESSEQ
+		|GREATER|GREATEREQ
+		|NOTEQ|EQUAL
+		|PLUSEQ|MINUSEQ
+		|DIVEQ|MULEQ
+		|ASSIGN
+		) expression # Binary Op
+	|IF LPAREN expression RPAREN expression (ELSE expression)? # If else
+	|INT
+	|STR
+	|IDENTIFIER LPAREN expression? (COMMA expression)* RPAREN # Function call
+	|IDENTIFIER
+	|TRUE
+	|FALSE
+	|LET expression COLON IDENTIFIER
+	|RETURN expression
+
+
+
+class :=
+	CLASS LBRACE *(function) RBRACE
