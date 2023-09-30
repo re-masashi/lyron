@@ -1,7 +1,6 @@
 use crate::codegen::{VMFunction, Value, Visitor};
 
-use crate::parser::{Class};
-
+use crate::parser::Class;
 
 use std::collections::HashMap;
 
@@ -10,9 +9,10 @@ impl Visitor {
         let mut fns: HashMap<String, VMFunction> = HashMap::new();
         for fun in c.fns {
             match fun {
-                (f, _)=>fns.insert(f.name.clone(),self.visit_fn(f)),
-            };            
+                (f, _) => fns.insert(f.name.clone(), self.visit_fn(f)),
+            };
         }
-        self.variables.insert(c.name.clone(), Value::Class(c.name, fns));
+        self.variables
+            .insert(c.name.clone(), Value::Class(c.name, fns, HashMap::new()));
     }
 }

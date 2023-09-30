@@ -1,8 +1,9 @@
-use crate::codegen::{Callable, VMError, Value, Visitor};
+use crate::codegen::{Callable, VMError, VMFunction, Value, Visitor};
 use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
 use crate::parser::{ExprValue, Parser};
 use log::error;
+use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::process;
 
@@ -40,17 +41,20 @@ impl Visitor {
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(self.clone().visit_expr(a).unwrap());
                         }
-                        let c = f.clone()(myargs.len() as i32, myargs);
+                        let c = f.clone()(myargs, self.clone());
                         return Ok(c);
                     }
-                    Some(Value::Class(n, cl))=>{
-                        let mut myargs: Vec<Value> = vec![Value::Object(n.clone(), cl.clone())];
+                    Some(Value::Class(n, cl, _)) => {
+                        let mut myargs: Vec<Value> =
+                            vec![Value::Object(n.clone(), base_obj_hashmap(), HashMap::new())];
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(self.clone().visit_expr(a).unwrap());
                         }
                         match cl.get(n) {
                             Some(f) => f.clone().call_(&mut self.clone(), myargs.clone()),
-                            None => return Ok(Value::Object(n.to_string(), cl.clone())),
+                            None => {
+                                return Ok(Value::Object(n.to_string(), cl.clone(), HashMap::new()))
+                            }
                         };
                         return Ok(myargs[0].clone());
                     }
@@ -84,9 +88,19 @@ impl Visitor {
             },
             ExprValue::BinOp(lhs, op, rhs) => Ok(match *op {
                 TokenType::Plus => match ((*lhs).clone(), (*rhs).clone()) {
-                    (ExprValue::Str(_),_) | (_, ExprValue::Str(_)) => {
-                        Value::Str(self.visit_expr(*lhs).unwrap().clone().to_string().to_owned()+&self.visit_expr(*rhs).unwrap().clone().to_string().to_owned())
-                    }
+                    (ExprValue::Str(_), _) | (_, ExprValue::Str(_)) => Value::Str(
+                        self.visit_expr(*lhs)
+                            .unwrap()
+                            .clone()
+                            .to_string()
+                            .to_owned()
+                            + &self
+                                .visit_expr(*rhs)
+                                .unwrap()
+                                .clone()
+                                .to_string()
+                                .to_owned(),
+                    ),
                     _ => Value::Float64(
                         f64::try_from(self.visit_expr((*lhs).clone()).unwrap()).unwrap()
                             + f64::try_from(self.visit_expr((*rhs).clone()).unwrap()).unwrap(),
@@ -120,51 +134,70 @@ impl Visitor {
                     Value::Boolean(self.visit_expr(*lhs).unwrap() == self.visit_expr(*rhs).unwrap())
                 }
                 TokenType::Dot => {
-                    let classname: String;
-                    if let ExprValue::Identifier(i) = *lhs{
-                        classname = i;
-                    }else{
-                        return Err(VMError{type_:"InvalidInvocation".to_string(), cause: "IDK".to_string()});
-                    }
-                    let class = self.variables.get(&classname);
-                    if let Some(Value::Class(_n, c)) = class  {
+                    let obj = self.visit_expr(*lhs).unwrap();
+                    if let Value::Object(_n, c, a) = obj {
                         match *rhs {
-                            ExprValue::Identifier(n)=>{
-                                match c.get(&n){
-                                    Some(s)=>{
-                                        return Ok(Value::Function("".to_string(),s.clone()));
-                                    },
-                                    None=> {return Err(VMError{type_:"InvalidInvocation".to_string(), cause: "IDK".to_string()});}
+                            ExprValue::Identifier(n) => match c.get(&n) {
+                                Some(s) => {
+                                    return Ok(Value::Function(n, s.clone()));
                                 }
-                            }
-                            ExprValue::FnCall(n, args)=>{
-                                match c.get(&n){
-                                    Some(s)=>{
-                                        let mut myargs = Vec::new();
-                                        for (_i, a) in args.into_iter().enumerate() {
-                                            myargs.push(self.clone().visit_expr(a).unwrap());
-                                        }
-                                        let c = s.clone().call_(&mut self.clone(), myargs).unwrap();
-                                        return Ok(c);
-                                    },
-                                    None=> {return Err(VMError{type_:"InvalidInvocation".to_string(), cause: "IDK".to_string()});}
+                                None => match a.get(&n) {
+                                    Some(expr) => return Ok(expr.clone()),
+                                    None => {
+                                        return Err(VMError {
+                                            type_: "InvalidInvocation".to_string(),
+                                            cause: "Not founf".to_string(),
+                                        })
+                                    }
+                                },
+                            },
+                            ExprValue::FnCall(n, args) => match c.get(&n) {
+                                Some(s) => {
+                                    let mut myargs = Vec::new();
+                                    for (_i, a) in args.into_iter().enumerate() {
+                                        myargs.push(self.clone().visit_expr(a).unwrap());
+                                    }
+                                    let c = s.clone().call_(&mut self.clone(), myargs).unwrap();
+                                    return Ok(c);
                                 }
+                                None => {
+                                    println!("err");
+                                    return Err(VMError {
+                                        type_: "InvalidInvocation".to_string(),
+                                        cause: "IDK".to_string(),
+                                    });
+                                }
+                            },
+                            _ => {
+                                return Err(VMError {
+                                    type_: "InvalidInvocation".to_string(),
+                                    cause: "IDK".to_string(),
+                                })
                             }
-                            _=>return Err(VMError{type_:"InvalidInvocation".to_string(), cause: "IDK".to_string()})
                         }
-                    }else{
-                        return Err(VMError{type_:"InvalidInvocation".to_string(), cause: "IDK".to_string()})
+                    } else {
+                        return Err(VMError {
+                            type_: "InvalidInvocation".to_string(),
+                            cause: "IDK".to_string(),
+                        });
                     }
                 }
+                // TokenType::Walrus => {
+                //     let obj = self.visit_expr(*lhs).unwrap();
+                //     println!("rsh{:?}", rhs);
+                //     match *rhs {
+                //         // ExprValue::BinOp=>{}
+                //         _ => {}
+                //     }
+                //     todo!();
+                // }
                 _ => todo!(),
             }),
             ExprValue::Boolean(b) => return Ok(Value::Boolean(b)),
             ExprValue::Integer(b) => return Ok(Value::Float64(b as f64)),
             ExprValue::Str(s) => return Ok(Value::Str(s.clone())),
             ExprValue::Identifier(i) => match self.variables.get(&i) {
-                Some(expr) => {
-                    Ok(expr.clone())
-                },
+                Some(expr) => Ok(expr.clone()),
                 None => Err(VMError {
                     type_: "UnderclaredVariable".to_string(),
                     cause: i,
@@ -213,9 +246,36 @@ impl Visitor {
                 self.variables.extend(visitor.variables.clone());
                 return Ok(Value::None);
             }
-            x => {
-                panic!("{:?}", x);
+            ExprValue::While(cond, exprs)=>{
+                let mut retval: Result<Value> = Ok(Value::None);
+                while bool::from(self.visit_expr((*cond).clone()).unwrap()) {
+                    for expr in &exprs {
+                        retval = self.visit_expr(expr.clone());
+                    }
+                }
+                return retval
             }
+            // ExprValue::Walrus(obj, attr, val) => {
+            //     let obj =self.visit_expr(*obj).unwrap();
+            //     match obj {
+            //         Value::Object(n, c, mut a) => {
+            //             a.insert(n.clone(), self.visit_expr(*val).unwrap());
+            //             Ok(Value::Object(n.to_string(), c, a))
+            //         },
+            //         _ => return Err(VMError {
+            //             type_: "ValueError".to_string(),
+            //             cause: "IDDDKKK".to_string(),
+            //         }),
+            //     }
+            // }
+            x => panic!("{:?}", x),
         }
     }
+}
+
+fn base_obj_hashmap() -> HashMap<String, VMFunction> {
+    let base = HashMap::new();
+    // base.insert("getattr".to_string(), Value::NativeFunction("getattr".to_string(), stdlib::__getattr));
+    // base.insert("setattr".to_string(), Value::NativeFunction("setattr".to_string(), stdlib::__setattr));
+    base
 }

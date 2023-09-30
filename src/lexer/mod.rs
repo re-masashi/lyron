@@ -254,6 +254,9 @@ impl Iterator for Lexer {
             if self.raw_data.peek() == Some(&'=') {
                 self.raw_data.next(); // Eat =
                 token = Ok(TokenType::Equal);
+            } else if self.raw_data.peek() == Some(&':') {
+                self.raw_data.next();
+                token = Ok(TokenType::Walrus);
             } else {
                 token = Ok(TokenType::Assign);
             }

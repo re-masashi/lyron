@@ -7,13 +7,13 @@ use std::fmt;
 use std::fmt::Debug;
 use std::rc::Rc;
 
+pub mod class;
 pub mod expression;
 pub mod function;
 pub mod program;
 pub mod stdlib;
-pub mod class;
 
-type NativeFn = fn(i32, Vec<Value>) -> Value;
+type NativeFn = fn(Vec<Value>, Visitor) -> Value;
 // (arity, args)->return value
 
 pub trait Callable: Debug {
@@ -52,8 +52,9 @@ pub enum Value {
     Boolean(bool),
     Function(String, VMFunction),
     NativeFunction(String, NativeFn),
-    Class(String, HashMap<String, VMFunction>),
-    Object(String, HashMap<String, VMFunction>),
+    Class(String, HashMap<String, VMFunction>, HashMap<String, Value>),
+    Object(String, HashMap<String, VMFunction>, HashMap<String, Value>),
+    Dict(HashMap<String, Value>),
     None,
 }
 
@@ -94,7 +95,7 @@ impl fmt::Display for Value {
             &Value::Float32(n) => write!(f, "{}", n),
             &Value::Float64(n) => write!(f, "{}", n),
             &Value::Boolean(ref b) => write!(f, "{}", b),
-            Value::Class(name, ..)=>write!(f,"<class {}>", name.clone()),
+            Value::Class(name, ..) => write!(f, "<class {}>", name.clone()),
             _ => Ok(()),
         }
     }
@@ -147,8 +148,11 @@ impl TryFrom<Value> for String {
                 return Ok(format!("Native function <{:#}>", n).to_string())
             }
             Value::None => return Ok("None".to_string()),
-            Value::Class(name, _) => return Ok(format!("Class <{:#}>", name).to_string()),
-            Value::Object(classname, _) => return Ok(format!("Object of class <{:#}>", classname).to_string())
+            Value::Class(name, _, _) => return Ok(format!("Class <{:#}>", name).to_string()),
+            Value::Object(classname, _, _) => {
+                return Ok(format!("Object of class <{:#}>", classname).to_string())
+            }
+            Value::Dict(d) => return Ok("Dict ".to_string()),
         }
     }
 }
@@ -224,10 +228,9 @@ impl Callable for VMFunction {
             _ => panic!("Tried to call an invalid function"),
         };
         if args.name.len() == 0 {
-            2;
-        }else if arguments.len()!=self.arity(){
+        } else if arguments.len() != self.arity() {
             panic!("Tried to call an invalid function");
-        }else {
+        } else {
             for (i, arg) in args.name.clone().into_iter().enumerate() {
                 visitor.variables.insert(arg, arguments[i].clone());
             }
@@ -237,6 +240,13 @@ impl Callable for VMFunction {
         for ex in expressions {
             // println!("{:#?}", ex);
             last = visitor.visit_expr(ex.clone());
+            match last {
+                Ok(ref _v) => {}
+                Err(e) => {
+                    println!("err {:?}", e);
+                    return Err(e);
+                }
+            }
         }
         match last {
             Ok(v) => return Ok(v),
@@ -279,6 +289,18 @@ impl Visitor {
         self.variables.insert(
             "input".to_string(),
             Value::NativeFunction("input".to_string(), stdlib::input),
+        );
+        self.variables.insert(
+            "getattr".to_string(),
+            Value::NativeFunction("getattr".to_string(), stdlib::__getattr),
+        );
+        self.variables.insert(
+            "setattr".to_string(),
+            Value::NativeFunction("setattr".to_string(), stdlib::__setattr),
+        );
+        self.variables.insert(
+            "dict".to_string(),
+            Value::NativeFunction("dict".to_string(), stdlib::__dict),
         );
     }
     fn _unwrap(&self, expr: Result<Value, VMError>) -> Value {

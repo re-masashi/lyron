@@ -9,13 +9,13 @@ impl Visitor {
         for (node, _pos) in astnodes {
             match node {
                 AstNode::Expression(e) => {
-                    let _ = self.visit_expr(e);
+                    let _ = self.visit_expr(e).unwrap();
                 }
                 AstNode::FunctionDef(f) => {
                     let _ = self.visit_fn(f);
                 }
-                AstNode::Class(c)=>{self.visit_class(c)},
-                _=>todo!(),
+                AstNode::Class(c) => self.visit_class(c),
+                _ => todo!(),
             }
         }
         ()

@@ -64,6 +64,8 @@ pub enum ExprValue {
     },
     Return(Box<ExprValue>),
     Use(String),
+    // Walrus(Box<ExprValue>, String, Box<ExprValue>),
+    While(Box<ExprValue>, Vec<ExprValue>),
 }
 
 // 'extern' name (args) '->' return_type

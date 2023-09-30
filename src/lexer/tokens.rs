@@ -36,7 +36,7 @@ pub enum TokenType {
     Arrow,  // ->
 
     /// Operators
-    Minus,     // -
+    Minus, // -
     Plus,      // +
     Div,       // /
     Mul,       // *
@@ -55,11 +55,12 @@ pub enum TokenType {
     MinusEq, // -=
     MulEq,   // *=
     DivEq,   // /=
+    Walrus,  // =:
 
     Unknown,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub type_: TokenType,
     pub pos: i32,

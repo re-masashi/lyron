@@ -21,7 +21,6 @@ impl Parser {
             _ => unreachable!(),
         };
         // Check if colon exists.
-        loop {
             match unwrap_some!(self.tokens.peek()) {
                 Token {
                     type_: TokenType::Colon,
@@ -29,11 +28,9 @@ impl Parser {
                     line_no: _,
                     file: _,
                 } => {
-                    break;
-                } //ugly but works..
+                } 
                 _ => return Err("expected ':' .".to_string()),
             }
-        }
         self.advance();
         self.tokens.next(); // Eat ':'
                             // Check if type exists
@@ -52,7 +49,7 @@ impl Parser {
             TokenType::Identifier(s) => s,
             _ => unreachable!(),
         };
-        return Ok((name, type_));
+        Ok((name, type_))
     }
 
     pub fn parse_extern(&mut self) -> Result<(External, NodePosition)> {
@@ -178,22 +175,19 @@ impl Parser {
                 self.advance();
                 self.tokens.next(); // Eat Def
 
-                loop {
-                    match unwrap_some!(self.tokens.peek()) {
-                        Token {
-                            type_: TokenType::Identifier(_),
-                            pos: _,
-                            line_no: _,
-                            file: _,
-                        } => {
-                            break;
-                        }
-                        _ => {
-                            return Err("Syntax Error: expected Identifier after keyword 'extern'"
-                                .to_string())
-                        }
+                match unwrap_some!(self.tokens.peek()) {
+                    Token {
+                        type_: TokenType::Identifier(_),
+                        pos: _,
+                        line_no: _,
+                        file: _,
+                    } => {}
+                    _ => {
+                        return Err(
+                            "Syntax Error: expected Identifier after keyword 'extern'".to_string()
+                        )
                     }
-                } // This is ugly, but works. `loop` just to use break in match
+                }
                 self.advance();
                 // Eat and store
                 match unwrap_some!(self.tokens.next()).type_ {

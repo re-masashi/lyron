@@ -9,9 +9,10 @@
 # 		3;
 # 	};
 # };
+a = 1;
 
 def count(curr: i32, end:i32) ->Any{
-	if(curr<=end){
+	if curr<=end{
 		print(curr);
 		curr = curr +1;
 		count(curr, end);
@@ -20,8 +21,8 @@ def count(curr: i32, end:i32) ->Any{
 }
 
 class ABC{
-	def ABC(self:Self)->ABC{ # constuctor
-		1+2+3;
+	def ABC(self:Self, a: Any)->ABC{ # constuctor
+		print(1+2+3,a);
 	};
 }
 
@@ -34,8 +35,8 @@ class ABC{
 # print(a,b);
 # count(1,10);
 
-# use "err.txt";
-# print(pi);
-myobj = ABC();
+use "err.txt";
+print(pi);
+myobj = ABC(1);
 print(myobj);
 count(1,10);
