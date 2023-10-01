@@ -376,8 +376,8 @@ impl Parser {
             return Err("Missing ':'.".to_string());
         }
 
-        let type_ =match unwrap_some!(self.tokens.next()).type_ {
-            TokenType::Identifier(t) =>  t,
+        let type_ = match unwrap_some!(self.tokens.next()).type_ {
+            TokenType::Identifier(t) => t,
             _ => return Err("Expected an identifier".to_string()),
         };
         self.symtab.insert(
@@ -385,10 +385,7 @@ impl Parser {
             Symbol::new(type_.clone(), self.current_scope.clone()),
         );
         Ok((
-            ExprValue::VarDecl {
-                name,
-                type_,
-            },
+            ExprValue::VarDecl { name, type_ },
             NodePosition {
                 pos: nx.pos,
                 line_no: nx.line_no,
@@ -442,65 +439,31 @@ impl Parser {
                 self.advance();
                 self.tokens.next(); // Eat '='
                 let value = Box::new(self.parse_expression().unwrap().0);
-                return Ok((
-                    ExprValue::Assign {
-                        name,
-                        value,
-                    },
-                    start,
-                ));
+                return Ok((ExprValue::Assign { name, value }, start));
             }
             TokenType::PlusEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '+='
                 let value = Box::new(self.parse_expression().unwrap().0);
-                return Ok((
-                    ExprValue::AugAssign {
-                        name,
-                        op,
-                        value,
-                    },
-                    start,
-                ));
+                return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::MinusEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '-='
                 let value = Box::new(self.parse_expression().unwrap().0);
-                return Ok((
-                    ExprValue::AugAssign {
-                        name,
-                        op,
-                        value,
-                    },
-                    start,
-                ));
+                return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::DivEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '/='
                 let value = Box::new(self.parse_expression().unwrap().0);
-                return Ok((
-                    ExprValue::AugAssign {
-                        name,
-                        op,
-                        value,
-                    },
-                    start,
-                ));
+                return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::MulEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '*='
                 let value = Box::new(self.parse_expression().unwrap().0);
-                return Ok((
-                    ExprValue::AugAssign {
-                        name,
-                        op,
-                        value,
-                    },
-                    start,
-                ));
+                return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             _ => {}
         }
@@ -525,8 +488,8 @@ impl Parser {
                     }
                 }
                 if unwrap_some!(self.tokens.peek()).type_ == TokenType::Comma {
-                        self.advance();
-                        self.tokens.next(); // Eat ','
+                    self.advance();
+                    self.tokens.next(); // Eat ','
                 }
             }
         }
@@ -551,16 +514,14 @@ impl Parser {
         self.advance();
         let nx = unwrap_some!(self.tokens.next());
         match nx.type_ {
-            TokenType::Str(s) => {
-                Ok((
-                    ExprValue::Str(s),
-                    NodePosition {
-                        pos: nx.pos,
-                        line_no: nx.line_no,
-                        file: nx.file,
-                    },
-                ))
-            }
+            TokenType::Str(s) => Ok((
+                ExprValue::Str(s),
+                NodePosition {
+                    pos: nx.pos,
+                    line_no: nx.line_no,
+                    file: nx.file,
+                },
+            )),
             _ => unreachable!(),
         }
     }
@@ -570,16 +531,14 @@ impl Parser {
         let nx = unwrap_some!(self.tokens.next()); // Eat `use`
         self.advance();
         match unwrap_some!(self.tokens.next()).type_ {
-            TokenType::Str(s) => {
-                Ok((
-                    ExprValue::Use(s.to_string()),
-                    NodePosition {
-                        pos: nx.pos,
-                        line_no: nx.line_no,
-                        file: nx.file,
-                    },
-                ))
-            }
+            TokenType::Str(s) => Ok((
+                ExprValue::Use(s.to_string()),
+                NodePosition {
+                    pos: nx.pos,
+                    line_no: nx.line_no,
+                    file: nx.file,
+                },
+            )),
             _ => Err("Invalid 'use' expression".to_string()),
         }
     }

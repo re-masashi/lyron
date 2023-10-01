@@ -1,7 +1,8 @@
 class String{
-#	def String()->None{
-#
-#	}
+	def String(self:Self)->None{
+		setattr(self, "a", 1);
+		self
+	}
 	def ascii_letters() -> Str{
 		"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	}

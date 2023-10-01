@@ -13,7 +13,7 @@ pub mod function;
 pub mod program;
 pub mod stdlib;
 
-type NativeFn = fn(Vec<Value>, Visitor) -> Value;
+type NativeFn = fn(Vec<Value>, &mut Visitor) -> Value;
 // (arity, args)->return value
 
 pub trait Callable: Debug {
@@ -53,7 +53,12 @@ pub enum Value {
     Function(String, VMFunction),
     NativeFunction(String, NativeFn),
     Class(String, HashMap<String, VMFunction>, HashMap<String, Value>),
-    Object(String, HashMap<String, VMFunction>, HashMap<String, Value>),
+    Object(
+        String,
+        HashMap<String, VMFunction>,
+        HashMap<String, Value>,
+        usize,
+    ),
     Dict(HashMap<String, Value>),
     Array(Vec<Value>),
     None,
@@ -76,12 +81,12 @@ impl PartialEq for Value {
 impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Value) -> Option<Ordering> {
         match (self, other) {
-            (Value::Str( s), Value::Str( o)) => s.partial_cmp(o),
-            (Value::Int32( s), Value::Int32( o)) => s.partial_cmp(o),
-            (Value::Int64( s), Value::Int64( o)) => s.partial_cmp(o),
-            (Value::Float32( s), Value::Float32( o)) => s.partial_cmp(o),
-            (Value::Float64( s), Value::Float64( o)) => s.partial_cmp(o),
-            (Value::Boolean( s), Value::Boolean( o)) => s.partial_cmp(o),
+            (Value::Str(s), Value::Str(o)) => s.partial_cmp(o),
+            (Value::Int32(s), Value::Int32(o)) => s.partial_cmp(o),
+            (Value::Int64(s), Value::Int64(o)) => s.partial_cmp(o),
+            (Value::Float32(s), Value::Float32(o)) => s.partial_cmp(o),
+            (Value::Float64(s), Value::Float64(o)) => s.partial_cmp(o),
+            (Value::Boolean(s), Value::Boolean(o)) => s.partial_cmp(o),
             _ => None,
         }
     }
@@ -126,35 +131,21 @@ impl TryFrom<Value> for String {
     type Error = VMError;
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
-            Value::Str(s) => {
-                Ok(s)
-            }
-            Value::Int32(f) => {
-                Ok(f.to_string())
-            }
-            Value::Int64(f) => {
-                Ok(f.to_string())
-            }
-            Value::Float32(f) => {
-                Ok(f.to_string())
-            }
-            Value::Float64(f) => {
-                Ok(f.to_string())
-            }
+            Value::Str(s) => Ok(s),
+            Value::Int32(f) => Ok(f.to_string()),
+            Value::Int64(f) => Ok(f.to_string()),
+            Value::Float32(f) => Ok(f.to_string()),
+            Value::Float64(f) => Ok(f.to_string()),
             Value::Boolean(b) => Ok(b.to_string()),
-            Value::Function(n, _f) => {
-                Ok(format!("Function <{:#}>", n).to_string())
-            }
-            Value::NativeFunction(n, _f) => {
-                Ok(format!("Native function <{:#}>", n).to_string())
-            }
+            Value::Function(n, _f) => Ok(format!("Function <{:#}>", n).to_string()),
+            Value::NativeFunction(n, _f) => Ok(format!("Native function <{:#}>", n).to_string()),
             Value::None => Ok("None".to_string()),
             Value::Class(name, _, _) => Ok(format!("Class <{:#}>", name).to_string()),
-            Value::Object(classname, _, _) => {
+            Value::Object(classname, _, _, _) => {
                 Ok(format!("Object of class <{:#}>", classname).to_string())
             }
             Value::Dict(_d) => Ok("Dict ".to_string()),
-            Value::Array(_a)=>Ok("array".to_string())
+            Value::Array(_a) => Ok("array".to_string()),
         }
     }
 }
@@ -193,6 +184,7 @@ impl TryFrom<Value> for () {
 pub struct Visitor {
     pub position: NodePosition,
     pub variables: HashMap<String, Value>,
+    pub objects: Vec<Option<Value>>,
 }
 
 #[derive(Debug)]
@@ -209,21 +201,21 @@ pub struct VMFunction {
 impl Callable for VMFunction {
     fn arity(&self) -> usize {
         let Function {
-                name: _,
-                ref args,
-                expressions: _,
-                return_type: _,
-            } = self.decl.borrow();
+            name: _,
+            ref args,
+            expressions: _,
+            return_type: _,
+        } = self.decl.borrow();
         args.name.len()
     }
     fn call_(&self, visitor: &mut Visitor, arguments: Vec<Value>) -> Result<Value, VMError> {
         // println!("Called");
         let Function {
-                name:_,
-                args,
-                expressions,
-                return_type:_,
-            } =self.decl.borrow();
+            name: _,
+            args,
+            expressions,
+            return_type: _,
+        } = self.decl.borrow();
         if args.name.is_empty() {
         } else if arguments.len() != self.arity() {
             panic!("Tried to call an invalid function");
@@ -276,6 +268,7 @@ impl Visitor {
                 file: "main".to_string(),
             },
             variables: HashMap::new(),
+            objects: Vec::new(),
         }
     }
     pub fn init(&mut self) {
@@ -310,7 +303,7 @@ impl Visitor {
         self.variables.insert(
             "array".to_string(),
             Value::NativeFunction("array".to_string(), stdlib::__array),
-        );        
+        );
     }
     fn _unwrap(&self, expr: Result<Value, VMError>) -> Value {
         match expr {
@@ -319,8 +312,8 @@ impl Visitor {
         }
     }
 }
-impl Default for Visitor{
-    fn default()->Self{
+impl Default for Visitor {
+    fn default() -> Self {
         Self::new()
     }
 }

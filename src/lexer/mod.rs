@@ -86,7 +86,7 @@ impl Iterator for Lexer {
         // Find first non-whitespace character
         loop {
             match self.raw_data.next() {
-                Some(' ')|Some('\t') => {
+                Some(' ') | Some('\t') => {
                     self.pos += 1;
                     continue;
                 }

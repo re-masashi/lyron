@@ -21,16 +21,15 @@ impl Parser {
             _ => unreachable!(),
         };
         // Check if colon exists.
-            match unwrap_some!(self.tokens.peek()) {
-                Token {
-                    type_: TokenType::Colon,
-                    pos: _,
-                    line_no: _,
-                    file: _,
-                } => {
-                } 
-                _ => return Err("expected ':' .".to_string()),
-            }
+        match unwrap_some!(self.tokens.peek()) {
+            Token {
+                type_: TokenType::Colon,
+                pos: _,
+                line_no: _,
+                file: _,
+            } => {}
+            _ => return Err("expected ':' .".to_string()),
+        }
         self.advance();
         self.tokens.next(); // Eat ':'
                             // Check if type exists
@@ -79,9 +78,9 @@ impl Parser {
         // Eat and store name
         let name = match unwrap_some!(self.tokens.next()).type_ {
             TokenType::Identifier(n) => n, // Always matches
-            _ => unreachable!(),                  // never happens
+            _ => unreachable!(),           // never happens
         };
-        
+
         if unwrap_some!(self.tokens.peek()).type_ != TokenType::LParen {
             return Err("Syntax Error: expected '(' after Identifier".to_string());
         }
@@ -162,7 +161,7 @@ impl Parser {
                 pos,
                 line_no,
                 file,
-            })  => {
+            }) => {
                 let start = NodePosition {
                     pos: *pos,
                     line_no: *line_no,

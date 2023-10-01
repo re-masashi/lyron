@@ -36,55 +36,95 @@ impl Visitor {
                         // std::mem::replace(self, i);
                         Ok(c)
                     }
-                    Some(Value::NativeFunction(_n, f)) => {
+                    Some(Value::NativeFunction(x, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(self.clone().visit_expr(a).unwrap());
                         }
-                        let c = f.clone()(myargs, self.clone());
+                        let c = f.clone()(myargs, self);
                         Ok(c)
                     }
                     Some(Value::Class(n, cl, _)) => {
-                        let mut myargs: Vec<Value> =
-                            vec![Value::Object(n.clone(), cl.clone(), HashMap::new())];
-                        for (_i, a) in args.into_iter().enumerate() {
+                        let obj_pos = self.objects.len();
+                        let mut myargs: Vec<Value> = vec![Value::Object(
+                            n.clone(),
+                            cl.clone(),
+                            HashMap::new(),
+                            obj_pos,
+                        )];
+                        self.objects.push(Some(myargs[0].clone()));
+                        // self.objects.push(Some(myargs[0].clone()));
+                        for (_i, a) in args.clone().into_iter().enumerate() {
                             myargs.push(self.clone().visit_expr(a).unwrap());
                         }
                         match cl.get(n) {
-                            Some(f) => f.clone().call_(&mut self.clone(), myargs.clone()).unwrap(),
+                            Some(f) => {
+                                if f.clone().arity() == 0 {
+                                    f.clone().call_(&mut self.clone(), vec![]).unwrap();
+                                    self.objects.push(Some(myargs[0].clone()));
+                                    return Ok(match &self.objects[self.objects.len() - 1] {
+                                        Some(s) => s.clone(),
+                                        None => unreachable!(),
+                                    })
+                                } else {
+                                    let objcons = f
+                                        .clone()
+                                        .call_(&mut self.clone(), myargs.clone())
+                                        .unwrap();
+                                    if let Value::Object(_, _, _, _) = objcons {
+                                        self.objects.push(Some(objcons));
+                                        return Ok(match &self.objects[self.objects.len() - 1] {
+                                            Some(s) => s.clone(),
+                                            None => unreachable!(),
+                                        })
+                                    } else {
+                                        println!("{:?}",objcons );
+                                        return Err(VMError {
+                                            type_: "InvalidConstructor".to_string(),
+                                            cause: "Constructor must return an Object".to_string(),
+                                        });
+                                    }
+                                }
+                            }
                             None => {
-                               return Ok(Value::Object(n.to_string(), cl.clone(), HashMap::new()))
+                                let obj = Value::Object(
+                                    n.to_string(),
+                                    cl.clone(),
+                                    HashMap::new(),
+                                    self.objects.len(),
+                                );
+                                self.objects.push(Some(obj));
+                                return Ok(match &self.objects[self.objects.len() - 1] {
+                                    Some(s) => s.clone(),
+                                    None => unreachable!(),
+                                });
                             }
                         };
-                        Ok(myargs[0].clone())
+                        self.objects.push(Some(myargs[0].clone()));
+                        Ok(match &self.objects[self.objects.len() - 1] {
+                            Some(s) => s.clone(),
+                            None => unreachable!(),
+                        })
                     }
                     Some(_) => {
                         panic!("Wahhahahhaha");
                     }
-                    None => {
-                        Err(VMError {
-                            type_: "UnderclaredVariable".to_string(),
-                            cause: "No fn".to_string(),
-                        })
-                    }
+                    None => Err(VMError {
+                        type_: "UnderclaredVariable".to_string(),
+                        cause: "No fn".to_string(),
+                    }),
                 }
             }
             ExprValue::UnOp(op, expr) => match *op {
                 TokenType::Plus => self.visit_expr(*expr),
-                TokenType::Minus => {
-                    Ok(Value::Float64(
-                        (-1_f64) * f64::try_from(self.visit_expr(*expr).unwrap()).unwrap(),
-                    ))
-                }
-                TokenType::Not => {
-                    Ok(Value::Boolean(!bool::from(self.visit_expr(*expr).unwrap())))
-                }
-                _ => {
-                    Err(VMError {
-                        type_: "OperatorError".to_string(),
-                        cause: "Invalid op".to_string(),
-                    })
-                }
+                TokenType::Minus => Ok(Value::Float64(
+                    (-1_f64) * f64::try_from(self.visit_expr(*expr).unwrap()).unwrap(),
+                )),
+                TokenType::Not => Ok(Value::Boolean(!bool::from(self.visit_expr(*expr).unwrap()))),
+                _ => Err(VMError {
+                    type_: "OperatorError".to_string(),
+                    cause: "Invalid op".to_string(),
+                }),
             },
             ExprValue::BinOp(lhs, op, rhs) => Ok(match *op {
                 TokenType::Plus => match ((*lhs).clone(), (*rhs).clone()) {
@@ -135,7 +175,7 @@ impl Visitor {
                 }
                 TokenType::Dot => {
                     let obj = self.visit_expr(*lhs).unwrap();
-                    if let Value::Object(_n, c, a) = obj.clone() {
+                    if let Value::Object(_n, c, a, _) = obj.clone() {
                         match *rhs {
                             ExprValue::Identifier(n) => match c.get(&n) {
                                 Some(s) => {
@@ -237,8 +277,11 @@ impl Visitor {
                 Ok(val)
             }
             ExprValue::Use(path) => {
-                if &path[..4] == "std:"{
-                    let lexer = unwrap_or_exit!(Lexer::from_file(&("iorekfiles/".to_owned()+&path[4..]+".lyr")), "IO");
+                if &path[..4] == "std:" {
+                    let lexer = unwrap_or_exit!(
+                        Lexer::from_file(&("iorekfiles/".to_owned() + &path[4..] + ".lyr")),
+                        "IO"
+                    );
                     let tokens = lexer
                         .map(|t| unwrap_or_exit!(t, "Lexing"))
                         .collect::<Vec<_>>();
@@ -262,7 +305,7 @@ impl Visitor {
                 self.variables.extend(visitor.variables.clone());
                 Ok(Value::None)
             }
-            ExprValue::While(cond, exprs)=>{
+            ExprValue::While(cond, exprs) => {
                 let mut retval: Result<Value> = Ok(Value::None);
                 while bool::from(self.visit_expr((*cond).clone()).unwrap()) {
                     for expr in &exprs {

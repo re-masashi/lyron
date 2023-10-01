@@ -23,6 +23,8 @@ def count(curr: i32, end:i32) ->Any{
 class ABC{
 	def ABC(self:Self, a: Any)->ABC{ # constuctor
 		print(1+2+3,a);
+		print(self);
+		self
 	};
 	def mydef(a:Any)->None{
 		print("mydef",a);
@@ -43,5 +45,7 @@ print(pi);
 myobj = ABC(1);
 myobj.mydef();
 count(1,10);
+setattr(myobj, "a", "attr");
+print(getattr(myobj, "a"));
 use "std:hello_world";
 HelloWorld();
