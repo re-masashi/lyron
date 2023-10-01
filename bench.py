@@ -5,3 +5,8 @@ def count(curr:int, end:int):
 		count(curr, end)
 
 count(0,100)
+
+i = 0
+while i < 10000:
+	i = i + 1
+	print(i)

@@ -8,9 +8,8 @@ impl Visitor {
     pub fn visit_class(&mut self, c: Class) {
         let mut fns: HashMap<String, VMFunction> = HashMap::new();
         for fun in c.fns {
-            match fun {
-                (f, _) => fns.insert(f.name.clone(), self.visit_fn(f)),
-            };
+            let (f,_)=fun;
+            fns.insert(f.name.clone(), self.visit_fn(f));
         }
         self.variables
             .insert(c.name.clone(), Value::Class(c.name, fns, HashMap::new()));

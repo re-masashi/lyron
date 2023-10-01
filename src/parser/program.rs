@@ -12,7 +12,7 @@ impl Parser {
                         Ok((result, pos)) => {
                             ast.insert(ast.len(), (AstNode::Extern(result), pos));
                         }
-                        Err(e) if e == "EOF".to_string() => return Ok(ast),
+                        Err(e) if e == *"EOF".to_string() => return Ok(ast),
                         Err(e) => return Err(e),
                     },
 
@@ -20,7 +20,7 @@ impl Parser {
                         Ok((result, pos)) => {
                             ast.insert(ast.len(), (AstNode::FunctionDef(result), pos));
                         }
-                        Err(e) if e == "EOF".to_string() => return Ok(ast),
+                        Err(e) if e == *"EOF".to_string() => return Ok(ast),
                         Err(e) => return Err(e),
                     },
 
@@ -28,7 +28,7 @@ impl Parser {
                         Ok((result, pos)) => {
                             ast.insert(ast.len(), (AstNode::Class(result), pos));
                         }
-                        Err(e) if e == "EOF".to_string() => return Ok(ast),
+                        Err(e) if e == *"EOF".to_string() => return Ok(ast),
                         Err(e) => return Err(e),
                     },
 
@@ -60,7 +60,7 @@ impl Parser {
                                 };
                                 ast.insert(ast.len(), (AstNode::Expression(result), pos));
                             }
-                            Err(e) if e == "EOF".to_string() => return Ok(ast),
+                            Err(e) if e == *"EOF".to_string() => return Ok(ast),
                             Err(e) => return Err(e),
                         }
                     } // {

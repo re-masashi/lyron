@@ -24,6 +24,9 @@ class ABC{
 	def ABC(self:Self, a: Any)->ABC{ # constuctor
 		print(1+2+3,a);
 	};
+	def mydef(a:Any)->None{
+		print("mydef",a);
+	};
 }
 
 # a=1;
@@ -38,5 +41,7 @@ class ABC{
 use "err.txt";
 print(pi);
 myobj = ABC(1);
-print(myobj);
+myobj.mydef();
 count(1,10);
+use "std:hello_world";
+HelloWorld();

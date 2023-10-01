@@ -1,5 +1,5 @@
 def count(curr: i32, end:i32) ->Any{
-	if(curr<=end){
+	if curr<=end{
 		print(curr);
 		curr = curr +1;
 		count(curr, end);
@@ -8,3 +8,9 @@ def count(curr: i32, end:i32) ->Any{
 }
 
 count(0,100);
+
+i = 0;
+while i < 10000{
+	i = i+1;
+	print(i);	
+};

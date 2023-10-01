@@ -34,7 +34,7 @@ impl Visitor {
                         }
                         let c = f.clone().call_(&mut self.clone(), myargs).unwrap();
                         // std::mem::replace(self, i);
-                        return Ok(c);
+                        Ok(c)
                     }
                     Some(Value::NativeFunction(_n, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
@@ -42,27 +42,27 @@ impl Visitor {
                             myargs.push(self.clone().visit_expr(a).unwrap());
                         }
                         let c = f.clone()(myargs, self.clone());
-                        return Ok(c);
+                        Ok(c)
                     }
                     Some(Value::Class(n, cl, _)) => {
                         let mut myargs: Vec<Value> =
-                            vec![Value::Object(n.clone(), base_obj_hashmap(), HashMap::new())];
+                            vec![Value::Object(n.clone(), cl.clone(), HashMap::new())];
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(self.clone().visit_expr(a).unwrap());
                         }
                         match cl.get(n) {
-                            Some(f) => f.clone().call_(&mut self.clone(), myargs.clone()),
+                            Some(f) => f.clone().call_(&mut self.clone(), myargs.clone()).unwrap(),
                             None => {
-                                return Ok(Value::Object(n.to_string(), cl.clone(), HashMap::new()))
+                               return Ok(Value::Object(n.to_string(), cl.clone(), HashMap::new()))
                             }
                         };
-                        return Ok(myargs[0].clone());
+                        Ok(myargs[0].clone())
                     }
                     Some(_) => {
                         panic!("Wahhahahhaha");
                     }
                     None => {
-                        return Err(VMError {
+                        Err(VMError {
                             type_: "UnderclaredVariable".to_string(),
                             cause: "No fn".to_string(),
                         })
@@ -70,17 +70,17 @@ impl Visitor {
                 }
             }
             ExprValue::UnOp(op, expr) => match *op {
-                TokenType::Plus => return self.visit_expr(*expr),
+                TokenType::Plus => self.visit_expr(*expr),
                 TokenType::Minus => {
-                    return Ok(Value::Float64(
-                        (-1 as f64) * f64::try_from(self.visit_expr(*expr).unwrap()).unwrap(),
-                    ));
+                    Ok(Value::Float64(
+                        (-1_f64) * f64::try_from(self.visit_expr(*expr).unwrap()).unwrap(),
+                    ))
                 }
                 TokenType::Not => {
-                    return Ok(Value::Boolean(!bool::from(self.visit_expr(*expr).unwrap())))
+                    Ok(Value::Boolean(!bool::from(self.visit_expr(*expr).unwrap())))
                 }
                 _ => {
-                    return Err(VMError {
+                    Err(VMError {
                         type_: "OperatorError".to_string(),
                         cause: "Invalid op".to_string(),
                     })
@@ -135,7 +135,7 @@ impl Visitor {
                 }
                 TokenType::Dot => {
                     let obj = self.visit_expr(*lhs).unwrap();
-                    if let Value::Object(_n, c, a) = obj {
+                    if let Value::Object(_n, c, a) = obj.clone() {
                         match *rhs {
                             ExprValue::Identifier(n) => match c.get(&n) {
                                 Some(s) => {
@@ -154,6 +154,9 @@ impl Visitor {
                             ExprValue::FnCall(n, args) => match c.get(&n) {
                                 Some(s) => {
                                     let mut myargs = Vec::new();
+                                    if !s.decl.args.name.is_empty() {
+                                        myargs.push(obj.clone()); // self
+                                    }
                                     for (_i, a) in args.into_iter().enumerate() {
                                         myargs.push(self.clone().visit_expr(a).unwrap());
                                     }
@@ -193,9 +196,9 @@ impl Visitor {
                 // }
                 _ => todo!(),
             }),
-            ExprValue::Boolean(b) => return Ok(Value::Boolean(b)),
-            ExprValue::Integer(b) => return Ok(Value::Float64(b as f64)),
-            ExprValue::Str(s) => return Ok(Value::Str(s.clone())),
+            ExprValue::Boolean(b) => Ok(Value::Boolean(b)),
+            ExprValue::Integer(b) => Ok(Value::Float64(b as f64)),
+            ExprValue::Str(s) => Ok(Value::Str(s.clone())),
             ExprValue::Identifier(i) => match self.variables.get(&i) {
                 Some(expr) => Ok(expr.clone()),
                 None => Err(VMError {
@@ -204,7 +207,7 @@ impl Visitor {
                 }),
             },
             ExprValue::VarDecl { name, type_: _ } => {
-                if self.variables.get(&name) != None {
+                if self.variables.get(&name).is_some() {
                     return Err(VMError {
                         type_: "Redeclaration".to_string(),
                         cause: name,
@@ -219,21 +222,34 @@ impl Visitor {
                     for ex in &(*if_) {
                         retval = self.visit_expr(ex.clone());
                     }
-                    return retval;
+                    retval
                 } else {
                     let mut retval: Result<Value> = Ok(self.visit_expr((*cond).clone()).unwrap());
                     for ex in &(*else_) {
                         retval = self.visit_expr(ex.clone());
                     }
-                    return retval;
+                    retval
                 }
             }
             ExprValue::Assign { name, value } => {
                 let val = self.visit_expr(*value.clone()).unwrap();
                 self.variables.insert(name, val.clone());
-                return Ok(val);
+                Ok(val)
             }
             ExprValue::Use(path) => {
+                if &path[..4] == "std:"{
+                    let lexer = unwrap_or_exit!(Lexer::from_file(&("iorekfiles/".to_owned()+&path[4..]+".lyr")), "IO");
+                    let tokens = lexer
+                        .map(|t| unwrap_or_exit!(t, "Lexing"))
+                        .collect::<Vec<_>>();
+                    let mut parser = Parser::new(tokens.into_iter().peekable(), &path);
+                    let program = unwrap_or_exit!(parser.parse_program(), "Parsing");
+                    let mut visitor = Visitor::new();
+                    visitor.init();
+                    visitor.visit_program(program);
+                    self.variables.extend(visitor.variables.clone());
+                    return Ok(Value::None);
+                }
                 let lexer = unwrap_or_exit!(Lexer::from_file(&path), "IO");
                 let tokens = lexer
                     .map(|t| unwrap_or_exit!(t, "Lexing"))
@@ -244,7 +260,7 @@ impl Visitor {
                 visitor.init();
                 visitor.visit_program(program);
                 self.variables.extend(visitor.variables.clone());
-                return Ok(Value::None);
+                Ok(Value::None)
             }
             ExprValue::While(cond, exprs)=>{
                 let mut retval: Result<Value> = Ok(Value::None);
@@ -253,7 +269,7 @@ impl Visitor {
                         retval = self.visit_expr(expr.clone());
                     }
                 }
-                return retval
+                retval
             }
             // ExprValue::Walrus(obj, attr, val) => {
             //     let obj =self.visit_expr(*obj).unwrap();

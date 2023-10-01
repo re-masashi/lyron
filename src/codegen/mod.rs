@@ -55,18 +55,19 @@ pub enum Value {
     Class(String, HashMap<String, VMFunction>, HashMap<String, Value>),
     Object(String, HashMap<String, VMFunction>, HashMap<String, Value>),
     Dict(HashMap<String, Value>),
+    Array(Vec<Value>),
     None,
 }
 
 impl PartialEq for Value {
     fn eq(&self, other: &Value) -> bool {
         match (self, other) {
-            (&Value::Str(ref s), &Value::Str(ref o)) => s == o,
-            (&Value::Int32(ref s), &Value::Int32(ref o)) => s == o,
-            (&Value::Int64(ref s), &Value::Int64(ref o)) => s == o,
-            (&Value::Float32(ref s), &Value::Float32(ref o)) => s == o,
-            (&Value::Float64(ref s), &Value::Float64(ref o)) => s == o,
-            (&Value::Boolean(ref s), &Value::Boolean(ref o)) => s == o,
+            (Value::Str(ref s), Value::Str(ref o)) => s == o,
+            (Value::Int32(s), Value::Int32(o)) => s == o,
+            (Value::Int64(s), Value::Int64(o)) => s == o,
+            (Value::Float32(s), Value::Float32(o)) => s == o,
+            (Value::Float64(s), Value::Float64(o)) => s == o,
+            (Value::Boolean(s), Value::Boolean(o)) => s == o,
             _ => false,
         }
     }
@@ -75,12 +76,12 @@ impl PartialEq for Value {
 impl PartialOrd for Value {
     fn partial_cmp(&self, other: &Value) -> Option<Ordering> {
         match (self, other) {
-            (&Value::Str(ref s), &Value::Str(ref o)) => s.partial_cmp(o),
-            (&Value::Int32(ref s), &Value::Int32(ref o)) => s.partial_cmp(o),
-            (&Value::Int64(ref s), &Value::Int64(ref o)) => s.partial_cmp(o),
-            (&Value::Float32(ref s), &Value::Float32(ref o)) => s.partial_cmp(o),
-            (&Value::Float64(ref s), &Value::Float64(ref o)) => s.partial_cmp(o),
-            (&Value::Boolean(ref s), &Value::Boolean(ref o)) => s.partial_cmp(o),
+            (Value::Str( s), Value::Str( o)) => s.partial_cmp(o),
+            (Value::Int32( s), Value::Int32( o)) => s.partial_cmp(o),
+            (Value::Int64( s), Value::Int64( o)) => s.partial_cmp(o),
+            (Value::Float32( s), Value::Float32( o)) => s.partial_cmp(o),
+            (Value::Float64( s), Value::Float64( o)) => s.partial_cmp(o),
+            (Value::Boolean( s), Value::Boolean( o)) => s.partial_cmp(o),
             _ => None,
         }
     }
@@ -89,12 +90,12 @@ impl PartialOrd for Value {
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            &Value::Str(ref s) => write!(f, "{}", s),
-            &Value::Int32(n) => write!(f, "{}", n),
-            &Value::Int64(n) => write!(f, "{}", n),
-            &Value::Float32(n) => write!(f, "{}", n),
-            &Value::Float64(n) => write!(f, "{}", n),
-            &Value::Boolean(ref b) => write!(f, "{}", b),
+            Value::Str(s) => write!(f, "{}", s),
+            Value::Int32(n) => write!(f, "{}", n),
+            Value::Int64(n) => write!(f, "{}", n),
+            Value::Float32(n) => write!(f, "{}", n),
+            Value::Float64(n) => write!(f, "{}", n),
+            Value::Boolean(b) => write!(f, "{}", b),
             Value::Class(name, ..) => write!(f, "<class {}>", name.clone()),
             _ => Ok(()),
         }
@@ -107,7 +108,7 @@ impl TryFrom<Value> for f64 {
         if let Value::Float32(n) = value {
             Ok(n as f64)
         } else if let Value::Float64(n) = value {
-            Ok(n as f64)
+            Ok(n)
         } else if let Value::Int32(n) = value {
             Ok(n as f64)
         } else if let Value::Int64(n) = value {
@@ -126,33 +127,34 @@ impl TryFrom<Value> for String {
     fn try_from(value: Value) -> Result<Self, Self::Error> {
         match value {
             Value::Str(s) => {
-                return Ok(s);
+                Ok(s)
             }
             Value::Int32(f) => {
-                return Ok(f.to_string());
+                Ok(f.to_string())
             }
             Value::Int64(f) => {
-                return Ok(f.to_string());
+                Ok(f.to_string())
             }
             Value::Float32(f) => {
-                return Ok(f.to_string());
+                Ok(f.to_string())
             }
             Value::Float64(f) => {
-                return Ok(f.to_string());
+                Ok(f.to_string())
             }
-            Value::Boolean(b) => return Ok(b.to_string()),
+            Value::Boolean(b) => Ok(b.to_string()),
             Value::Function(n, _f) => {
-                return Ok(format!("Function <{:#}>", n).to_string());
+                Ok(format!("Function <{:#}>", n).to_string())
             }
             Value::NativeFunction(n, _f) => {
-                return Ok(format!("Native function <{:#}>", n).to_string())
+                Ok(format!("Native function <{:#}>", n).to_string())
             }
-            Value::None => return Ok("None".to_string()),
-            Value::Class(name, _, _) => return Ok(format!("Class <{:#}>", name).to_string()),
+            Value::None => Ok("None".to_string()),
+            Value::Class(name, _, _) => Ok(format!("Class <{:#}>", name).to_string()),
             Value::Object(classname, _, _) => {
-                return Ok(format!("Object of class <{:#}>", classname).to_string())
+                Ok(format!("Object of class <{:#}>", classname).to_string())
             }
-            Value::Dict(d) => return Ok("Dict ".to_string()),
+            Value::Dict(_d) => Ok("Dict ".to_string()),
+            Value::Array(_a)=>Ok("array".to_string())
         }
     }
 }
@@ -200,34 +202,29 @@ pub struct VMError {
 }
 
 #[derive(Debug, Clone)]
-struct VMFunction {
+pub struct VMFunction {
     decl: Rc<Function>,
 }
 
 impl Callable for VMFunction {
     fn arity(&self) -> usize {
-        match self.decl.borrow() {
-            Function {
+        let Function {
                 name: _,
                 ref args,
                 expressions: _,
                 return_type: _,
-            } => args.name.len(),
-            _ => 0,
-        }
+            } = self.decl.borrow();
+        args.name.len()
     }
     fn call_(&self, visitor: &mut Visitor, arguments: Vec<Value>) -> Result<Value, VMError> {
         // println!("Called");
-        let (_name, args, expressions, _return_type) = match self.decl.borrow() {
-            Function {
-                name,
+        let Function {
+                name:_,
                 args,
                 expressions,
-                return_type,
-            } => (name, args, expressions, return_type),
-            _ => panic!("Tried to call an invalid function"),
-        };
-        if args.name.len() == 0 {
+                return_type:_,
+            } =self.decl.borrow();
+        if args.name.is_empty() {
         } else if arguments.len() != self.arity() {
             panic!("Tried to call an invalid function");
         } else {
@@ -249,7 +246,7 @@ impl Callable for VMFunction {
             }
         }
         match last {
-            Ok(v) => return Ok(v),
+            Ok(v) => Ok(v),
             Err(e) => {
                 println!("err {:?}", e);
                 Err(e)
@@ -261,14 +258,14 @@ impl Callable for VMFunction {
     }
 }
 
-macro_rules! define_native {
-    ($f:expr) => {
-        self.variables.insert(
-            $f.to_string(),
-            Value::NativeFunction("$f".to_string(), stdlib::$f),
-        );
-    };
-}
+// macro_rules! define_native {
+//     ($f:expr) => {
+//         self.variables.insert(
+//             $f.to_string(),
+//             Value::NativeFunction("$f".to_string(), stdlib::$f),
+//         );
+//     };
+// }
 
 impl Visitor {
     pub fn new() -> Self {
@@ -302,11 +299,28 @@ impl Visitor {
             "dict".to_string(),
             Value::NativeFunction("dict".to_string(), stdlib::__dict),
         );
+        self.variables.insert(
+            "startswith".to_string(),
+            Value::NativeFunction("startswith".to_string(), stdlib::__startswith),
+        );
+        self.variables.insert(
+            "len".to_string(),
+            Value::NativeFunction("len".to_string(), stdlib::__len),
+        );
+        self.variables.insert(
+            "array".to_string(),
+            Value::NativeFunction("array".to_string(), stdlib::__array),
+        );        
     }
     fn _unwrap(&self, expr: Result<Value, VMError>) -> Value {
         match expr {
             Ok(v) => v,
             _ => std::process::exit(1),
         }
+    }
+}
+impl Default for Visitor{
+    fn default()->Self{
+        Self::new()
     }
 }

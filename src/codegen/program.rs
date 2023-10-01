@@ -18,6 +18,5 @@ impl Visitor {
                 _ => todo!(),
             }
         }
-        ()
     }
 }

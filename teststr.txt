@@ -1,0 +1,2 @@
+use "std:string";
+print(String().digits());

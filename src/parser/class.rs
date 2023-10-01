@@ -4,7 +4,6 @@ use crate::{unwrap_some, Result};
 
 impl Parser {
     pub fn parse_class(&mut self) -> Result<(Class, NodePosition)> {
-        let name: String;
         let mut fns: Vec<(Function, NodePosition)> = Vec::new();
 
         // println!("{:#?}", self.tokens.peek());
@@ -18,10 +17,10 @@ impl Parser {
         };
         // println!("{:#?}", self.tokens.peek());
 
-        match &unwrap_some!(self.tokens.peek()).type_ {
-            TokenType::Identifier(i) => name = i.clone(),
+        let name = match &unwrap_some!(self.tokens.peek()).type_ {
+            TokenType::Identifier(i) => i.clone(),
             _ => return Err("Syntax Error: expected Identifier after keyword 'class'".to_string()),
-        }
+        };
         self.advance();
         self.tokens.next(); // eat the identifier
 
@@ -43,6 +42,6 @@ impl Parser {
         }
         self.advance();
         self.tokens.next(); // eat '}'
-        return Ok((Class { name, fns }, start));
+        Ok((Class { name, fns }, start))
     }
 }

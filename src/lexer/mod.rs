@@ -86,17 +86,17 @@ impl Iterator for Lexer {
         // Find first non-whitespace character
         loop {
             match self.raw_data.next() {
-                Some(c) if (c == ' ' || c == '\t') => {
+                Some(' ')|Some('\t') => {
                     self.pos += 1;
                     continue;
                 }
-                Some(c) if c == '\n' => {
+                Some('\n') => {
                     self.line_no += 1;
                     self.pos = 0;
                     continue;
                 }
                 // Comment
-                Some(c) if c == '#' => {
+                Some('#') => {
                     let mut dump = String::new();
                     self.get_next_char_while(&mut dump, |c| c != '\n');
                     // println!("Lexing comment");
@@ -118,18 +118,18 @@ impl Iterator for Lexer {
             let mut name = current_char.to_string();
             self.get_next_char_while(&mut name, Self::is_in_identifier);
             match name {
-                s if String::from("if") == s => token = Ok(TokenType::If),
-                s if String::from("else") == s => token = Ok(TokenType::Else),
-                s if String::from("let") == s => token = Ok(TokenType::Let),
-                s if String::from("def") == s => token = Ok(TokenType::Def),
-                s if String::from("extern") == s => token = Ok(TokenType::Extern),
-                s if String::from("use") == s => token = Ok(TokenType::Use),
-                s if String::from("return") == s => token = Ok(TokenType::Return),
-                s if String::from("true") == s => token = Ok(TokenType::True),
-                s if String::from("false") == s => token = Ok(TokenType::False),
-                s if String::from("class") == s => token = Ok(TokenType::Class),
-                s if String::from("mod") == s => token = Ok(TokenType::Module),
-                s if String::from("while") == s => token = Ok(TokenType::While),
+                s if *"if" == s => token = Ok(TokenType::If),
+                s if *"else" == s => token = Ok(TokenType::Else),
+                s if *"let" == s => token = Ok(TokenType::Let),
+                s if *"def" == s => token = Ok(TokenType::Def),
+                s if *"extern" == s => token = Ok(TokenType::Extern),
+                s if *"use" == s => token = Ok(TokenType::Use),
+                s if *"return" == s => token = Ok(TokenType::Return),
+                s if *"true" == s => token = Ok(TokenType::True),
+                s if *"false" == s => token = Ok(TokenType::False),
+                s if *"class" == s => token = Ok(TokenType::Class),
+                s if *"mod" == s => token = Ok(TokenType::Module),
+                s if *"while" == s => token = Ok(TokenType::While),
                 s => token = Ok(TokenType::Identifier(s)),
             };
         }
@@ -273,12 +273,12 @@ impl Iterator for Lexer {
             token = Ok(TokenType::Unknown)
         }
 
-        return Some(Ok(Token {
+        Some(Ok(Token {
             type_: token.unwrap(),
             pos: self.pos,
             line_no: self.line_no,
             file: self.file.clone(),
-        }));
+        }))
     }
 }
 

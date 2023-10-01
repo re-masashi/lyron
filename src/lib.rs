@@ -37,10 +37,7 @@ impl SymbolTable {
     }
 
     fn lookup(&mut self, name: String) -> Option<Symbol> {
-        match self.symbols.get(&name) {
-            Some(s) => Some(s.clone()),
-            None => None,
-        }
+        self.symbols.get(&name).cloned()
     }
 }
 

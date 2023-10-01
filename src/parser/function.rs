@@ -53,17 +53,14 @@ impl Parser {
     }
 
     pub fn parse_extern(&mut self) -> Result<(External, NodePosition)> {
-        let name: String;
-        let return_type: String;
         let mut args = Args {
             name: vec![],
             type_: vec![],
         };
-        let start: NodePosition;
 
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat extern
-        start = NodePosition {
+        let start = NodePosition {
             pos: nx.pos,
             line_no: nx.line_no,
             file: nx.file.to_string(),
@@ -80,11 +77,11 @@ impl Parser {
         }
         self.advance();
         // Eat and store name
-        match unwrap_some!(self.tokens.next()).type_ {
-            TokenType::Identifier(n) => name = n, // Always matches
+        let name = match unwrap_some!(self.tokens.next()).type_ {
+            TokenType::Identifier(n) => n, // Always matches
             _ => unreachable!(),                  // never happens
-        }
-
+        };
+        
         if unwrap_some!(self.tokens.peek()).type_ != TokenType::LParen {
             return Err("Syntax Error: expected '(' after Identifier".to_string());
         }
@@ -124,10 +121,10 @@ impl Parser {
         self.advance();
         self.tokens.next(); // Eat '->'
 
-        match &unwrap_some!(self.tokens.peek()).type_ {
-            TokenType::Identifier(n) => return_type = n.to_string(),
+        let return_type: String = match &unwrap_some!(self.tokens.peek()).type_ {
+            TokenType::Identifier(n) => n.to_string(),
             _ => return Err("expected return type after extern".to_string()),
-        }
+        };
         self.advance();
         self.tokens.next(); // Eat the identifier
 
@@ -141,14 +138,14 @@ impl Parser {
             name.clone(),
             Symbol::new(return_type.clone(), self.current_scope.clone()),
         );
-        return Ok((
+        Ok((
             External {
-                name: name,
-                args: args,
-                return_type: return_type,
+                name,
+                args,
+                return_type,
             },
             start,
-        ));
+        ))
     } // end of parse_extern
 
     pub fn parse_function(&mut self) -> Result<(Function, NodePosition)> {
@@ -159,15 +156,14 @@ impl Parser {
             type_: vec![],
         };
         let mut expressions: Vec<ExprValue> = Vec::new();
-        let start: NodePosition;
         match self.tokens.peek() {
             Some(Token {
-                type_,
+                type_: TokenType::Def,
                 pos,
                 line_no,
                 file,
-            }) if type_ == &TokenType::Def => {
-                start = NodePosition {
+            })  => {
+                let start = NodePosition {
                     pos: *pos,
                     line_no: *line_no,
                     file: file.to_string(),
@@ -299,15 +295,15 @@ impl Parser {
                     name.clone(),
                     Symbol::new(return_type.clone(), self.current_scope.clone()),
                 );
-                return Ok((
+                Ok((
                     Function {
-                        name: name,
-                        args: args,
-                        expressions: expressions,
-                        return_type: return_type,
+                        name,
+                        args,
+                        expressions,
+                        return_type,
                     },
                     start,
-                ));
+                ))
             }
             _ => Err("PASS".to_string()), //never happens
         }

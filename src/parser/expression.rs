@@ -159,11 +159,10 @@ impl Parser {
             file: nx.file,
         };
         self.advance();
-        let op = match nx.type_ {
-            t => Box::new(t),
-        };
+        let t = nx.type_;
+        let op = Box::new(t);
         let expr = Box::new(self.parse_expression().unwrap().0);
-        return Ok((ExprValue::UnOp(op, expr), start));
+        Ok((ExprValue::UnOp(op, expr), start))
     }
 
     pub fn parse_paren_expression(&mut self) -> Result<(ExprValue, NodePosition)> {
@@ -173,20 +172,20 @@ impl Parser {
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::RParen {
             self.advance();
             let nx = unwrap_some!(self.tokens.next()); // Eat ')'
-            return Ok((
+            Ok((
                 expr,
                 NodePosition {
                     pos: nx.pos,
                     line_no: nx.line_no,
                     file: nx.file,
                 },
-            ));
+            ))
         } else {
-            return Err(format!(
+            Err(format!(
                 "Missing closing parenthesis {:#?}:{:#?}",
                 self.line_no, self.pos
             )
-            .to_string());
+            .to_string())
         }
     }
 
@@ -293,9 +292,9 @@ impl Parser {
         } else {
             return Err("Missing closing '}' at else.".to_string());
         }
-        return Ok((
+        Ok((
             ExprValue::IfElse {
-                cond: cond,
+                cond,
                 if_: expressions_if,
                 else_: expressions_else,
             },
@@ -304,7 +303,7 @@ impl Parser {
                 line_no: nx.line_no,
                 file: nx.file,
             },
-        ));
+        ))
     }
 
     pub fn parse_while(&mut self) -> Result<(ExprValue, NodePosition)> {
@@ -366,14 +365,10 @@ impl Parser {
     pub fn parse_declaration(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat `let`
-        let name: String;
-        let type_: String;
-
-        match unwrap_some!(self.tokens.next()).type_ {
-            TokenType::Identifier(n) => name = n,
+        let name: String = match unwrap_some!(self.tokens.next()).type_ {
+            TokenType::Identifier(n) => n,
             _ => return Err("Expected an identifier".to_string()),
-        }
-
+        };
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Colon {
             self.advance();
             self.tokens.next(); // Eat ':'
@@ -381,51 +376,51 @@ impl Parser {
             return Err("Missing ':'.".to_string());
         }
 
-        match unwrap_some!(self.tokens.next()).type_ {
-            TokenType::Identifier(t) => type_ = t,
+        let type_ =match unwrap_some!(self.tokens.next()).type_ {
+            TokenType::Identifier(t) =>  t,
             _ => return Err("Expected an identifier".to_string()),
-        }
+        };
         self.symtab.insert(
             name.clone(),
             Symbol::new(type_.clone(), self.current_scope.clone()),
         );
-        return Ok((
+        Ok((
             ExprValue::VarDecl {
-                name: name,
-                type_: type_,
+                name,
+                type_,
             },
             NodePosition {
                 pos: nx.pos,
                 line_no: nx.line_no,
                 file: nx.file,
             },
-        ));
+        ))
     }
 
     pub fn parse_true(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat `true`
-        return Ok((
+        Ok((
             ExprValue::Boolean(true),
             NodePosition {
                 pos: nx.pos,
                 line_no: nx.line_no,
                 file: nx.file,
             },
-        ));
+        ))
     }
 
     pub fn parse_false(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat `false`
-        return Ok((
+        Ok((
             ExprValue::Boolean(false),
             NodePosition {
                 pos: nx.pos,
                 line_no: nx.line_no,
                 file: nx.file,
             },
-        ));
+        ))
     }
 
     pub fn parse_identifier(&mut self) -> Result<(ExprValue, NodePosition)> {
@@ -449,8 +444,8 @@ impl Parser {
                 let value = Box::new(self.parse_expression().unwrap().0);
                 return Ok((
                     ExprValue::Assign {
-                        name: name,
-                        value: value,
+                        name,
+                        value,
                     },
                     start,
                 ));
@@ -461,9 +456,9 @@ impl Parser {
                 let value = Box::new(self.parse_expression().unwrap().0);
                 return Ok((
                     ExprValue::AugAssign {
-                        name: name,
-                        op: op,
-                        value: value,
+                        name,
+                        op,
+                        value,
                     },
                     start,
                 ));
@@ -474,9 +469,9 @@ impl Parser {
                 let value = Box::new(self.parse_expression().unwrap().0);
                 return Ok((
                     ExprValue::AugAssign {
-                        name: name,
-                        op: op,
-                        value: value,
+                        name,
+                        op,
+                        value,
                     },
                     start,
                 ));
@@ -487,9 +482,9 @@ impl Parser {
                 let value = Box::new(self.parse_expression().unwrap().0);
                 return Ok((
                     ExprValue::AugAssign {
-                        name: name,
-                        op: op,
-                        value: value,
+                        name,
+                        op,
+                        value,
                     },
                     start,
                 ));
@@ -500,9 +495,9 @@ impl Parser {
                 let value = Box::new(self.parse_expression().unwrap().0);
                 return Ok((
                     ExprValue::AugAssign {
-                        name: name,
-                        op: op,
-                        value: value,
+                        name,
+                        op,
+                        value,
                     },
                     start,
                 ));
@@ -529,16 +524,13 @@ impl Parser {
                         }
                     }
                 }
-                match unwrap_some!(self.tokens.peek()).type_ {
-                    TokenType::Comma => {
+                if unwrap_some!(self.tokens.peek()).type_ == TokenType::Comma {
                         self.advance();
                         self.tokens.next(); // Eat ','
-                    }
-                    _ => {}
                 }
             }
         }
-        return Ok((ExprValue::Identifier(name), start));
+        Ok((ExprValue::Identifier(name), start))
     }
 
     pub fn parse_return(&mut self) -> Result<(ExprValue, NodePosition)> {
@@ -560,7 +552,7 @@ impl Parser {
         let nx = unwrap_some!(self.tokens.next());
         match nx.type_ {
             TokenType::Str(s) => {
-                return Ok((
+                Ok((
                     ExprValue::Str(s),
                     NodePosition {
                         pos: nx.pos,
@@ -570,7 +562,7 @@ impl Parser {
                 ))
             }
             _ => unreachable!(),
-        };
+        }
     }
 
     pub fn parse_use(&mut self) -> Result<(ExprValue, NodePosition)> {
@@ -579,7 +571,7 @@ impl Parser {
         self.advance();
         match unwrap_some!(self.tokens.next()).type_ {
             TokenType::Str(s) => {
-                return Ok((
+                Ok((
                     ExprValue::Use(s.to_string()),
                     NodePosition {
                         pos: nx.pos,
@@ -588,7 +580,7 @@ impl Parser {
                     },
                 ))
             }
-            _ => return Err("Invalid 'use' expression".to_string()),
+            _ => Err("Invalid 'use' expression".to_string()),
         }
     }
 }
