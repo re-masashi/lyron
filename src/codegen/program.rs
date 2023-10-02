@@ -6,10 +6,11 @@ pub type Result<T> = std::result::Result<T, VMError>;
 
 impl Visitor {
     pub fn visit_program(&mut self, astnodes: Vec<(AstNode, NodePosition)>) {
-        for (node, _pos) in astnodes {
+        for (node, pos) in astnodes {
+            self.position =pos.clone();
             match node {
                 AstNode::Expression(e) => {
-                    let _ = self.visit_expr(e).unwrap();
+                    let _ = self.clone().uoe(self.visit_expr(e));
                 }
                 AstNode::FunctionDef(f) => {
                     let _ = self.visit_fn(f);

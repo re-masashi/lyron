@@ -133,9 +133,9 @@ impl Parser {
                             Box::new(r_value.unwrap().0),
                         ),
                         NodePosition {
-                            pos: 0,
-                            line_no: 0,
-                            file: "".to_string(),
+                            pos: self.pos,
+                            line_no: self.line_no,
+                            file:self.file.clone(),
                         },
                     ));
                 }

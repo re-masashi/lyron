@@ -7,6 +7,7 @@ use std::convert::{From, TryFrom};
 use std::fmt::Debug;
 use std::rc::Rc;
 use std::{fmt, process};
+use std::fs::read_to_string;
 
 pub mod class;
 pub mod expression;
@@ -306,12 +307,30 @@ impl Visitor {
             Value::NativeFunction("array".to_string(), stdlib::__array),
         );
     }
+    pub fn vmerror(&self, err: VMError) -> String{
+        format!(
+                    "
+        {text}
+        {pointy}
+        {type_}: {cause}
+
+            at {line}:{pos} in file `{file}`.",
+                    text=read_to_string(self.position.file.clone())
+                        .unwrap()
+                        .lines()
+                        .collect::<Vec<_>>()[(self.position.line_no - 1) as usize],
+                    pointy="~".repeat(self.position.pos as usize) + "^",
+                    type_=err.type_,
+                    cause=err.cause,
+                    line = self.position.line_no,
+                    pos=self.position.pos,
+                    file=self.position.file
+                )
+                .to_string()
+    }
 }
 
-pub fn vmerror(err: VMError) {
-    error!("{:#}: {:#}", err.type_, err.cause);
-    process::exit(1);
-}
+
 
 impl Default for Visitor {
     fn default() -> Self {
