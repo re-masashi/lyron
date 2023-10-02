@@ -65,20 +65,18 @@ impl Visitor {
                                     return Ok(match &self.objects[self.objects.len() - 1] {
                                         Some(s) => s.clone(),
                                         None => unreachable!(),
-                                    })
+                                    });
                                 } else {
-                                    let objcons = f
-                                        .clone()
-                                        .call_(&mut self.clone(), myargs.clone())
-                                        .unwrap();
+                                    let objcons =
+                                        f.clone().call_(&mut self.clone(), myargs.clone()).unwrap();
                                     if let Value::Object(_, _, _, _) = objcons {
                                         self.objects.push(Some(objcons));
                                         return Ok(match &self.objects[self.objects.len() - 1] {
                                             Some(s) => s.clone(),
                                             None => unreachable!(),
-                                        })
+                                        });
                                     } else {
-                                        println!("{:?}",objcons );
+                                        println!("{:?}", objcons);
                                         return Err(VMError {
                                             type_: "InvalidConstructor".to_string(),
                                             cause: "Constructor must return an Object".to_string(),

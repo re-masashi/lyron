@@ -3,7 +3,6 @@ def count(curr: i32, end:i32) ->Any{
 		print(curr);
 		curr = curr +1;
 		count(curr, end);
-	}else{
 	}
 }
 

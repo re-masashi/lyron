@@ -40,8 +40,8 @@ class ABC{
 # print(a,b);
 # count(1,10);
 
-use "err.txt";
-print(pi);
+#use "err.txt";
+#print(pi);
 myobj = ABC(1);
 myobj.mydef();
 count(1,10);

@@ -1,11 +1,12 @@
 use crate::parser::{Function, NodePosition};
+use log::error;
 use std::borrow::Borrow;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::convert::{From, TryFrom};
-use std::fmt;
 use std::fmt::Debug;
 use std::rc::Rc;
+use std::{fmt, process};
 
 pub mod class;
 pub mod expression;
@@ -305,13 +306,13 @@ impl Visitor {
             Value::NativeFunction("array".to_string(), stdlib::__array),
         );
     }
-    fn _unwrap(&self, expr: Result<Value, VMError>) -> Value {
-        match expr {
-            Ok(v) => v,
-            _ => std::process::exit(1),
-        }
-    }
 }
+
+pub fn vmerror(err: VMError) {
+    error!("{:#}: {:#}", err.type_, err.cause);
+    process::exit(1);
+}
+
 impl Default for Visitor {
     fn default() -> Self {
         Self::new()

@@ -52,9 +52,8 @@ impl Parser {
                                     Some(_) => {
                                         let pos = unwrap_some!(self.tokens.peek()).pos;
                                         let line = unwrap_some!(self.tokens.peek()).line_no;
-                                        return Err(format!(
-											"Expected semicolon after expression. Before line {}:{}", line, pos)
-                                        .to_string());
+                                        return Err(self
+                                            .parser_error("Expected semicolon after expression"));
                                     }
                                     None => return Err("EOF".to_string()),
                                 };

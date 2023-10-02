@@ -72,7 +72,7 @@ impl Parser {
                 line_no: _,
                 file: _,
             } => {}
-            _ => return Err("Syntax Error: expected Identifier after keyword 'extern'".to_string()),
+            _ => return Err(self.parser_error("Expected Identifier after keyword 'extern'")),
         }
         self.advance();
         // Eat and store name
@@ -82,7 +82,7 @@ impl Parser {
         };
 
         if unwrap_some!(self.tokens.peek()).type_ != TokenType::LParen {
-            return Err("Syntax Error: expected '(' after Identifier".to_string());
+            return Err(self.parser_error("Expected '(' after identifier"));
         }
         self.advance();
         self.tokens.next(); // Eat '('
@@ -115,14 +115,14 @@ impl Parser {
         }
 
         if unwrap_some!(self.tokens.peek()).type_ != TokenType::Arrow {
-            return Err("expected '->'".to_string());
+            return Err(self.parser_error("expected '->'"));
         }
         self.advance();
         self.tokens.next(); // Eat '->'
 
         let return_type: String = match &unwrap_some!(self.tokens.peek()).type_ {
             TokenType::Identifier(n) => n.to_string(),
-            _ => return Err("expected return type after extern".to_string()),
+            _ => return Err(self.parser_error("expected return type after extern")),
         };
         self.advance();
         self.tokens.next(); // Eat the identifier
@@ -131,7 +131,7 @@ impl Parser {
             self.advance();
             self.tokens.next(); //Eat semicolon
         } else {
-            return Err("Semicolon after extern is mandatory.".to_string());
+            return Err(self.parser_error("Semicolon after extern is mandatory."));
         }
         self.symtab.insert(
             name.clone(),
@@ -177,11 +177,7 @@ impl Parser {
                         line_no: _,
                         file: _,
                     } => {}
-                    _ => {
-                        return Err(
-                            "Syntax Error: expected Identifier after keyword 'extern'".to_string()
-                        )
-                    }
+                    _ => return Err(self.parser_error("Expected Identifier after keyword 'def'")),
                 }
                 self.advance();
                 // Eat and store
@@ -192,7 +188,7 @@ impl Parser {
                 self.current_scope = format!("{}.{}", self.current_scope, name.clone());
 
                 if unwrap_some!(self.tokens.peek()).type_ != TokenType::LParen {
-                    return Err("Syntax Error: expected '(' after Identifier".to_string());
+                    return Err(self.parser_error("Expected '(' after Identifier"));
                 }
 
                 self.tokens.next(); // Eat '('
@@ -223,20 +219,20 @@ impl Parser {
                 }
 
                 if unwrap_some!(self.tokens.peek()).type_ != TokenType::Arrow {
-                    return Err("expected '->'".to_string());
+                    return Err(self.parser_error("expected '->'"));
                 }
                 self.advance();
                 self.tokens.next(); // Eat '->'
 
                 match &unwrap_some!(self.tokens.peek()).type_ {
                     TokenType::Identifier(n) => return_type = n.to_string(),
-                    _ => return Err("expected return type_".to_string()),
+                    _ => return Err(self.parser_error("expected return type")),
                 }
                 self.advance();
                 self.tokens.next(); // Eat the return_type
 
                 if unwrap_some!(self.tokens.peek()).type_ != TokenType::LBrace {
-                    return Err("expected '{' in fn def".to_string());
+                    return Err(self.parser_error("expected '{' in fn def"));
                 }
                 self.advance();
                 self.tokens.next(); // Eat '{'
@@ -244,12 +240,7 @@ impl Parser {
                 loop {
                     match self.parse_expression() {
                         Ok(expr) => expressions.insert(expressions.len(), expr.0),
-                        Err(e)
-                            if e == format!(
-                                "Invalid expression {:#?}:{:#?} in file {:#?}",
-                                self.line_no, self.pos, self.file
-                            ) =>
-                        {
+                        Err(e) if e == self.parser_error("Invalid expression") => {
                             if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
                                 || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                             {
@@ -270,14 +261,14 @@ impl Parser {
                         TokenType::RBrace => break,
                         _ => {
                             print!("{:?}", self.tokens.peek());
-                            return Err("Expected semicolon or '}'".to_string());
+                            return Err(self.parser_error("Expected semicolon or '}'"));
                         }
                     }
                 }
 
                 if unwrap_some!(self.tokens.peek()).type_ != TokenType::RBrace {
                     print!("{:?}", unwrap_some!(self.tokens.peek()).type_);
-                    return Err("expected '}'".to_string());
+                    return Err(self.parser_error("expected '}'"));
                 }
                 self.advance();
                 self.tokens.next(); // Eat Rbrace
@@ -304,7 +295,7 @@ impl Parser {
                     start,
                 ))
             }
-            _ => Err("PASS".to_string()), //never happens
+            _ => Err("PASS".to_string()), // never happens
         }
     }
 }

@@ -1,8 +1,12 @@
 use crate::lexer::tokens::{Token, TokenType};
 use crate::SymbolTable;
 
+use std::fs::{self, read_to_string};
+use std::io::{self, BufRead};
 use std::iter::Peekable;
+use std::path::Path;
 use std::vec::IntoIter;
+use termcolor;
 
 pub mod class;
 pub mod expression;
@@ -156,5 +160,26 @@ impl Parser {
         //     Some(t)=>t,
         //     None=> panic!("Dunno")
         // }.file.to_string();
+    }
+
+    fn parser_error(&self, cause: &str) -> String {
+        format!(
+            "
+{text}
+{pointy}
+{cause}
+
+    at {line}:{pos} in file `{file}`.",
+            text=read_to_string(self.file.clone())
+                .unwrap()
+                .lines()
+                .collect::<Vec<_>>()[(self.line_no - 1) as usize],
+            pointy="~".repeat(self.pos as usize) + "^",
+            cause=cause,
+            line = self.line_no,
+            pos=self.pos,
+            file=self.file
+        )
+        .to_string()
     }
 }

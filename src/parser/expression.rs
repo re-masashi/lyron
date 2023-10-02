@@ -47,13 +47,7 @@ impl Parser {
 
                 TokenType::Str(_) => self.parse_string(),
 
-                _ => {
-                    return Err(format!(
-                        "Invalid expression {:#?}:{:#?} in file {:#?}",
-                        self.line_no, self.pos, self.file
-                    )
-                    .to_string())
-                }
+                _ => return Err(self.parser_error("Invalid expression")),
             };
         // The functions above will eat the value, then we can proceed to check for a bin op.
         loop {
@@ -181,11 +175,7 @@ impl Parser {
                 },
             ))
         } else {
-            Err(format!(
-                "Missing closing parenthesis {:#?}:{:#?}",
-                self.line_no, self.pos
-            )
-            .to_string())
+            Err(self.parser_error("Missing closing ')'"))
         }
     }
 
@@ -202,18 +192,13 @@ impl Parser {
             self.advance();
             self.tokens.next(); // Eat '{'
         } else {
-            return Err("Expected '{' .".to_string());
+            return Err(self.parser_error("expected '{' after condition."));
         }
 
         loop {
             match self.parse_expression() {
                 Ok((expr, _)) => expressions_if.insert(expressions_if.len(), expr),
-                Err(e)
-                    if e == format!(
-                        "Invalid expression {:#?}:{:#?} in file {:#?}",
-                        self.line_no, self.pos, self.file
-                    ) =>
-                {
+                Err(e) if e == self.parser_error("Invalid expression") => {
                     if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
                         || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                     {
@@ -232,7 +217,7 @@ impl Parser {
                     continue;
                 }
                 TokenType::RBrace => break,
-                _ => return Err("Expected semicolon or '}'".to_string()),
+                _ => return Err(self.parser_error("Expected semicolon or '}'")),
             }
         }
 
@@ -245,25 +230,31 @@ impl Parser {
             self.advance();
             self.tokens.next(); // Eat 'else'
         } else {
-            return Err("`if` without `else` not allowed.".to_string());
+            return Ok((
+                ExprValue::IfElse {
+                    cond,
+                    if_: expressions_if,
+                    else_: Vec::new(),
+                },
+                NodePosition {
+                    pos: nx.pos,
+                    line_no: nx.line_no,
+                    file: nx.file,
+                },
+            ));
         }
 
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::LBrace {
             self.advance();
             self.tokens.next(); // Eat '{'
         } else {
-            return Err("Expected '{'.".to_string());
+            return Err(self.parser_error("Expected '{' after x"));
         }
 
         loop {
             match self.parse_expression() {
                 Ok((expr, _)) => expressions_else.insert(expressions_else.len(), expr),
-                Err(e)
-                    if e == format!(
-                        "Invalid expression {:#?}:{:#?} in file {:#?}",
-                        self.line_no, self.pos, self.file
-                    ) =>
-                {
+                Err(e) if e == self.parser_error("Invalid expression") => {
                     if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
                         || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                     {
@@ -282,7 +273,7 @@ impl Parser {
                     continue;
                 }
                 TokenType::RBrace => break,
-                _ => return Err("Expected semicolon or '}'".to_string()),
+                _ => return Err(self.parser_error("Expected semicolon or '}'")),
             }
         }
 
@@ -290,7 +281,7 @@ impl Parser {
             self.advance();
             self.tokens.next(); // Eat '}'
         } else {
-            return Err("Missing closing '}' at else.".to_string());
+            return Err(self.parser_error("Missing closing '}' at else."));
         }
         Ok((
             ExprValue::IfElse {
@@ -315,17 +306,12 @@ impl Parser {
             self.advance();
             self.tokens.next(); // Eat '{'
         } else {
-            return Err("Expected '{' .".to_string());
+            return Err(self.parser_error("Expected '{' after condition"));
         }
         loop {
             match self.parse_expression() {
                 Ok((expr, _)) => expressions.insert(expressions.len(), expr),
-                Err(e)
-                    if e == format!(
-                        "Invalid expression {:#?}:{:#?} in file {:#?}",
-                        self.line_no, self.pos, self.file
-                    ) =>
-                {
+                Err(e) if e == self.parser_error("Invalid expression") => {
                     if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
                         || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                     {
@@ -344,7 +330,7 @@ impl Parser {
                     continue;
                 }
                 TokenType::RBrace => break,
-                _ => return Err("Expected semicolon or '}'".to_string()),
+                _ => return Err(self.parser_error("Expected semicolon or '}'")),
             }
         }
 
@@ -367,18 +353,18 @@ impl Parser {
         let nx = unwrap_some!(self.tokens.next()); // Eat `let`
         let name: String = match unwrap_some!(self.tokens.next()).type_ {
             TokenType::Identifier(n) => n,
-            _ => return Err("Expected an identifier".to_string()),
+            _ => return Err(self.parser_error("Expected an identifier after let")),
         };
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Colon {
             self.advance();
             self.tokens.next(); // Eat ':'
         } else {
-            return Err("Missing ':'.".to_string());
+            return Err(self.parser_error("Missing ':'."));
         }
 
         let type_ = match unwrap_some!(self.tokens.next()).type_ {
             TokenType::Identifier(t) => t,
-            _ => return Err("Expected an identifier".to_string()),
+            _ => return Err(self.parser_error("Expected an identifier")),
         };
         self.symtab.insert(
             name.clone(),
@@ -539,7 +525,7 @@ impl Parser {
                     file: nx.file,
                 },
             )),
-            _ => Err("Invalid 'use' expression".to_string()),
+            _ => Err(self.parser_error("Invalid 'use' expression")),
         }
     }
 }
