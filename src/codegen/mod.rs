@@ -10,12 +10,14 @@ use std::{fmt};
 use std::fs::read_to_string;
 use std::process;
 use log::error;
+use owo_colors::OwoColorize;
 
 pub mod class;
 pub mod expression;
 pub mod function;
 pub mod program;
 pub mod stdlib;
+pub mod json;
 
 type NativeFn = fn(Vec<Value>, &mut Visitor) -> Value;
 // (arity, args)->return value
@@ -308,6 +310,11 @@ impl Visitor {
             "array".to_string(),
             Value::NativeFunction("array".to_string(), stdlib::__array),
         );
+        self.variables.insert(
+            "json_parse".to_string(),
+            Value::NativeFunction("json_parse".to_string(), crate::codegen::json::json_parse),
+        );
+
     }
 }
 
@@ -333,12 +340,12 @@ pub fn vmerrorfmt(err: VMError, position: &NodePosition) -> String{
                     .unwrap()
                     .lines()
                     .collect::<Vec<_>>()[(position.line_no - 1) as usize],
-                pointy="~".repeat(position.pos as usize) + "^",
-                type_=err.type_,
-                cause=err.cause,
-                line = position.line_no,
-                pos=position.pos,
-                file=position.file
+                pointy=("~".repeat(position.pos as usize) + "^").red(),
+                type_=err.type_.yellow(),
+                cause=err.cause.blue(),
+                line = position.line_no.green(),
+                pos=position.pos.green(),
+                file=position.file.green()
             )
             .to_string()
 }

@@ -7,6 +7,7 @@ use std::iter::Peekable;
 
 use std::vec::IntoIter;
 
+use owo_colors::OwoColorize;
 
 pub mod class;
 pub mod expression;
@@ -174,11 +175,11 @@ impl Parser {
                 .unwrap()
                 .lines()
                 .collect::<Vec<_>>()[(self.line_no - 1) as usize],
-            pointy="~".repeat(self.pos as usize) + "^",
-            cause=cause,
-            line = self.line_no,
-            pos=self.pos,
-            file=self.file
+            pointy=("~".repeat(self.pos as usize) + "^").red(),
+            cause=cause.yellow(),
+            line = self.line_no.green(),
+            pos=self.pos.green(),
+            file=self.file.green()
         )
         .to_string()
     }

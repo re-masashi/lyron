@@ -49,4 +49,3 @@ setattr(myobj, "a", "attr");
 print(getattr(myobj, "a"));
 use "std:hello_world";
 HelloWorld();
-myobj.ashasa;
