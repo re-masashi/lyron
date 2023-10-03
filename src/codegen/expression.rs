@@ -1,4 +1,4 @@
-use crate::codegen::{Callable, VMError, VMFunction, Value, Visitor};
+use crate::codegen::{Callable, VMError, VMFunction, Value, Visitor, uoe};
 use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
 use crate::parser::{ExprValue, Parser};
@@ -21,11 +21,11 @@ macro_rules! unwrap_or_exit {
     };
 }
 
-macro_rules! uoe {
-    ($f:expr) => {
-        self.uoe(expr)
-    };
-}
+// macro_rules! uoe {
+//     ($f:expr) => {
+//         self.uoe(expr)
+//     };
+// }
 
 impl Visitor {
     pub fn visit_expr(&mut self, expr: ExprValue) -> Result<Value> {
@@ -36,16 +36,16 @@ impl Visitor {
                     Some(Value::Function(_n, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
                         for (_i, a) in args.into_iter().enumerate() {
-                            myargs.push(self.uoe(self.clone().visit_expr(a)));
+                            myargs.push(uoe(self.clone().visit_expr(a), &self.position));
                         }
-                        let c = self.uoe(f.clone().call_(&mut self.clone(), myargs));
+                        let c = uoe(f.clone().call_(&mut self.clone(), myargs), &self.position);
                         // std::mem::replace(self, i);
                         Ok(c)
                     }
-                    Some(Value::NativeFunction(x, f)) => {
+                    Some(Value::NativeFunction(_x, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
                         for (_i, a) in args.into_iter().enumerate() {
-                            myargs.push(self.uoe(self.clone().visit_expr(a)));
+                            myargs.push(uoe(self.clone().visit_expr(a), &self.position));
                         }
                         let c = f.clone()(myargs, self);
                         Ok(c)
@@ -61,32 +61,32 @@ impl Visitor {
                         self.objects.push(Some(myargs[0].clone()));
                         // self.objects.push(Some(myargs[0].clone()));
                         for (_i, a) in args.clone().into_iter().enumerate() {
-                            myargs.push(self.uoe(self.clone().visit_expr(a)));
+                            myargs.push(uoe(self.clone().visit_expr(a), &self.position));
                         }
                         match cl.get(n) {
                             Some(f) => {
                                 if f.clone().arity() == 0 {
-                                    self.uoe(f.clone().call_(&mut self.clone(), vec![]));
+                                    uoe(f.clone().call_(&mut self.clone(), vec![]), &self.position);
                                     self.objects.push(Some(myargs[0].clone()));
-                                    return Ok(match &self.objects[self.objects.len() - 1] {
+                                    Ok(match &self.objects[self.objects.len() - 1] {
                                         Some(s) => s.clone(),
                                         None => unreachable!(),
-                                    });
+                                    })
                                 } else {
                                     let objcons =
-                                        self.uoe(f.clone().call_(&mut self.clone(), myargs.clone()));
+                                        uoe(f.clone().call_(&mut self.clone(), myargs.clone()), &self.position);
                                     if let Value::Object(_, _, _, _) = objcons {
                                         self.objects.push(Some(objcons));
-                                        return Ok(match &self.objects[self.objects.len() - 1] {
+                                        Ok(match &self.objects[self.objects.len() - 1] {
                                             Some(s) => s.clone(),
                                             None => unreachable!(),
-                                        });
+                                        })
                                     } else {
                                         println!("{:?}", objcons);
-                                        return Err(VMError {
+                                        Err(VMError {
                                             type_: "InvalidConstructor".to_string(),
                                             cause: "Constructor must return an Object".to_string(),
-                                        });
+                                        })
                                     }
                                 }
                             }
@@ -98,17 +98,12 @@ impl Visitor {
                                     self.objects.len(),
                                 );
                                 self.objects.push(Some(obj));
-                                return Ok(match &self.objects[self.objects.len() - 1] {
+                                Ok(match &self.objects[self.objects.len() - 1] {
                                     Some(s) => s.clone(),
                                     None => unreachable!(),
-                                });
+                                })
                             }
-                        };
-                        self.objects.push(Some(myargs[0].clone()));
-                        Ok(match &self.objects[self.objects.len() - 1] {
-                            Some(s) => s.clone(),
-                            None => unreachable!(),
-                        })
+                        }
                     }
                     Some(_) => {
                         panic!("Wahhahahhaha");
@@ -122,9 +117,9 @@ impl Visitor {
             ExprValue::UnOp(op, expr) => match *op {
                 TokenType::Plus => self.visit_expr(*expr),
                 TokenType::Minus => Ok(Value::Float64(
-                    (-1_f64) * f64::try_from(self.clone().uoe(self.visit_expr(*expr))).unwrap(),
+                    (-1_f64) * f64::try_from(uoe(self.visit_expr(*expr), &self.position)).unwrap(),
                 )),
-                TokenType::Not => Ok(Value::Boolean(!bool::from(self.clone().uoe(self.visit_expr(*expr))))),
+                TokenType::Not => Ok(Value::Boolean(!bool::from(uoe(self.visit_expr(*expr), &self.position)))),
                 _ => Err(VMError {
                     type_: "OperatorError".to_string(),
                     cause: "Invalid op".to_string(),
@@ -133,50 +128,49 @@ impl Visitor {
             ExprValue::BinOp(lhs, op, rhs) => Ok(match *op {
                 TokenType::Plus => match ((*lhs).clone(), (*rhs).clone()) {
                     (ExprValue::Str(_), _) | (_, ExprValue::Str(_)) => Value::Str(
-                        self.clone().uoe(self.visit_expr(*lhs))
+                        uoe(self.visit_expr(*lhs), &self.position)
                             .clone()
                             .to_string()
                             .to_owned()
-                            + &self.clone().uoe(self
-                                .visit_expr(*rhs))
+                            + &uoe(self.visit_expr(*rhs), &self.position)
                                 .clone()
                                 .to_string()
                                 .to_owned(),
                     ),
                     _ => Value::Float64(
-                        f64::try_from(self.clone().uoe(self.visit_expr((*lhs).clone()))).unwrap()
-                            + f64::try_from(self.clone().uoe(self.visit_expr((*rhs).clone()))).unwrap(),
+                        f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
+                            + f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
                     ),
                 },
                 TokenType::Minus => Value::Float64(
-                    f64::try_from(self.clone().uoe(self.visit_expr((*lhs).clone()))).unwrap()
-                        - f64::try_from(self.clone().uoe(self.visit_expr((*rhs).clone()))).unwrap(),
+                    f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
+                        - f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
                 ),
                 TokenType::Div => Value::Float64(
-                    f64::try_from(self.clone().uoe(self.visit_expr((*lhs).clone()))).unwrap()
-                        / f64::try_from(self.clone().uoe(self.visit_expr((*rhs).clone()))).unwrap(),
+                    f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
+                        / f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
                 ),
                 TokenType::Mul => Value::Float64(
-                    f64::try_from(self.clone().uoe(self.visit_expr((*lhs).clone()))).unwrap()
-                        * f64::try_from(self.clone().uoe(self.visit_expr((*rhs).clone()))).unwrap(),
+                    f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
+                        * f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
                 ),
                 TokenType::Less => {
-                    Value::Boolean(self.clone().uoe(self.visit_expr(*lhs)) < self.clone().uoe(self.visit_expr(*rhs)))
+                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) < uoe(self.visit_expr(*rhs), &self.position))
                 }
                 TokenType::Greater => {
-                    Value::Boolean(self.clone().uoe(self.visit_expr(*lhs)) > self.clone().uoe(self.visit_expr(*rhs)))
+                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) > uoe(self.visit_expr(*rhs), &self.position))
                 }
                 TokenType::LessEq => {
-                    Value::Boolean(self.clone().uoe(self.visit_expr(*lhs)) <= self.clone().uoe(self.visit_expr(*rhs)))
+                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) <= uoe(self.visit_expr(*rhs), &self.position))
                 }
                 TokenType::GreaterEq => {
-                    Value::Boolean(self.clone().uoe(self.visit_expr(*lhs)) >= self.clone().uoe(self.visit_expr(*rhs)))
+                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) >= uoe(self.visit_expr(*rhs), &self.position))
                 }
                 TokenType::Equal => {
-                    Value::Boolean(self.clone().uoe(self.visit_expr(*lhs)) == self.clone().uoe(self.visit_expr(*rhs)))
+                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) == uoe(self.visit_expr(*rhs), &self.position))
                 }
                 TokenType::Dot => {
-                    let obj =self.clone().uoe(self.visit_expr(*lhs)) ;
+                    let obj =uoe(self.visit_expr(*lhs), &self.position) ;
                     if let Value::Object(_n, c, a, _) = obj.clone() {
                         match *rhs {
                             ExprValue::Identifier(n) => match c.get(&n) {
@@ -200,9 +194,9 @@ impl Visitor {
                                         myargs.push(obj.clone()); // self
                                     }
                                     for (_i, a) in args.into_iter().enumerate() {
-                                        myargs.push(self.uoe(self.clone().visit_expr(a)));
+                                        myargs.push(uoe(self.clone().visit_expr(a), &self.position));
                                     }
-                                    let c = self.uoe(s.clone().call_(&mut self.clone(), myargs));
+                                    let c = uoe(s.clone().call_(&mut self.clone(), myargs), &self.position);
                                     return Ok(c);
                                 }
                                 None => {
@@ -259,8 +253,8 @@ impl Visitor {
                 Ok(Value::Int32(0))
             }
             ExprValue::IfElse { cond, if_, else_ } => {
-                if bool::from(self.clone().uoe(self.visit_expr((*cond).clone()))) {
-                    let mut retval: Result<Value> = Ok(self.clone().uoe(self.visit_expr((*cond).clone())));
+                if bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) {
+                    let mut retval: Result<Value> = Ok(uoe(self.visit_expr((*cond).clone()), &self.position));
                     for ex in &(*if_) {
                         retval = self.visit_expr(ex.clone());
                     }
@@ -274,7 +268,7 @@ impl Visitor {
                 }
             }
             ExprValue::Assign { name, value } => {
-                let val = self.clone().uoe(self.visit_expr(*value.clone()));
+                let val = uoe(self.visit_expr(*value.clone()), &self.position);
                 self.variables.insert(name, val.clone());
                 Ok(val)
             }
@@ -309,7 +303,7 @@ impl Visitor {
             }
             ExprValue::While(cond, exprs) => {
                 let mut retval: Result<Value> = Ok(Value::None);
-                while bool::from(self.clone().uoe(self.visit_expr((*cond).clone()))) {
+                while bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) {
                     for expr in &exprs {
                         retval = self.visit_expr(expr.clone());
                     }
@@ -331,15 +325,6 @@ impl Visitor {
             // }
             x => panic!("{:?}", x),
         }
-    }
-    pub fn uoe(&self, v: Result<Value>)->Value{ // unwrap or exit
-            match v {
-                Ok(a) => a,
-                Err(e) => {
-                    error!("{}",self.vmerror(e));
-                    process::exit(1);
-                }
-            }
     }
 }
 

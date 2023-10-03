@@ -50,8 +50,8 @@ impl Parser {
                                         self.tokens.next()
                                     } // eat ';'
                                     Some(_) => {
-                                        let pos = unwrap_some!(self.tokens.peek()).pos;
-                                        let line = unwrap_some!(self.tokens.peek()).line_no;
+                                        let _pos = unwrap_some!(self.tokens.peek()).pos;
+                                        let _line = unwrap_some!(self.tokens.peek()).line_no;
                                         return Err(self
                                             .parser_error("Expected semicolon after expression"));
                                     }

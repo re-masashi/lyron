@@ -43,8 +43,8 @@ pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
             }
             a[f64::try_from(args[1].clone()).unwrap() as usize].clone()
         }
-        Value::Object(name, fns, attrs, pos) => match &_visitor.objects[*pos] {
-            Some(Value::Object(n, f, a, _)) => match a.get(&args[1].to_string()) {
+        Value::Object(_name, _fns, _attrs, pos) => match &_visitor.objects[*pos] {
+            Some(Value::Object(_n, _f, a, _)) => match a.get(&args[1].to_string()) {
                 Some(s) => s.clone(),
                 None => Value::None,
             },

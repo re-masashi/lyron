@@ -1,13 +1,15 @@
 use crate::parser::{Function, NodePosition};
-use log::error;
+
 use std::borrow::Borrow;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::convert::{From, TryFrom};
 use std::fmt::Debug;
 use std::rc::Rc;
-use std::{fmt, process};
+use std::{fmt};
 use std::fs::read_to_string;
+use std::process;
+use log::error;
 
 pub mod class;
 pub mod expression;
@@ -307,29 +309,39 @@ impl Visitor {
             Value::NativeFunction("array".to_string(), stdlib::__array),
         );
     }
-    pub fn vmerror(&self, err: VMError) -> String{
-        format!(
-                    "
-        {text}
-        {pointy}
-        {type_}: {cause}
-
-            at {line}:{pos} in file `{file}`.",
-                    text=read_to_string(self.position.file.clone())
-                        .unwrap()
-                        .lines()
-                        .collect::<Vec<_>>()[(self.position.line_no - 1) as usize],
-                    pointy="~".repeat(self.position.pos as usize) + "^",
-                    type_=err.type_,
-                    cause=err.cause,
-                    line = self.position.line_no,
-                    pos=self.position.pos,
-                    file=self.position.file
-                )
-                .to_string()
-    }
 }
 
+pub fn uoe(v: Result<Value, VMError>, position: &NodePosition)->Value{ // unwrap or exit
+        match v {
+            Ok(a) => a,
+            Err(e) => {
+                error!("{}",vmerrorfmt(e, position));
+                process::exit(1);
+            }
+        }
+}
+
+pub fn vmerrorfmt(err: VMError, position: &NodePosition) -> String{
+    format!(
+                "
+    {text}
+    {pointy}
+    {type_}: {cause}
+
+        at {line}:{pos} in file `{file}`.",
+                text=read_to_string(position.file.clone())
+                    .unwrap()
+                    .lines()
+                    .collect::<Vec<_>>()[(position.line_no - 1) as usize],
+                pointy="~".repeat(position.pos as usize) + "^",
+                type_=err.type_,
+                cause=err.cause,
+                line = position.line_no,
+                pos=position.pos,
+                file=position.file
+            )
+            .to_string()
+}
 
 
 impl Default for Visitor {

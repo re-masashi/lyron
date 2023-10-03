@@ -1,12 +1,12 @@
 use crate::lexer::tokens::{Token, TokenType};
 use crate::SymbolTable;
 
-use std::fs::{self, read_to_string};
-use std::io::{self, BufRead};
+use std::fs::{read_to_string};
+use std::io::{BufRead};
 use std::iter::Peekable;
-use std::path::Path;
+
 use std::vec::IntoIter;
-use termcolor;
+
 
 pub mod class;
 pub mod expression;

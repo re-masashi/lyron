@@ -1,4 +1,4 @@
-use crate::codegen::{VMError, Visitor};
+use crate::codegen::{VMError, Visitor, uoe};
 
 use crate::parser::{AstNode, NodePosition};
 
@@ -10,7 +10,7 @@ impl Visitor {
             self.position =pos.clone();
             match node {
                 AstNode::Expression(e) => {
-                    let _ = self.clone().uoe(self.visit_expr(e));
+                    let _ = uoe(self.visit_expr(e), &self.position);
                 }
                 AstNode::FunctionDef(f) => {
                     let _ = self.visit_fn(f);
