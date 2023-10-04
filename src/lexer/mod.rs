@@ -151,16 +151,14 @@ impl Iterator for Lexer {
             self.raw_data.next(); // Eat trailing "
 
             token = Ok(TokenType::Str(value));
-        }
-        else if current_char == '\'' {
+        } else if current_char == '\'' {
             let mut value = String::new();
 
             self.get_next_char_while(&mut value, |c| c != '\'');
             self.raw_data.next(); // Eat trailing "
 
             token = Ok(TokenType::Str(value));
-        }
-        else if current_char == '`' {
+        } else if current_char == '`' {
             let mut value = String::new();
 
             self.get_next_char_while(&mut value, |c| c != '`');

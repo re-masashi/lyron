@@ -135,7 +135,7 @@ impl Parser {
                         NodePosition {
                             pos: self.pos,
                             line_no: self.line_no,
-                            file:self.file.clone(),
+                            file: self.file.clone(),
                         },
                     ));
                 }

@@ -49,4 +49,7 @@ setattr(myobj, "a", "attr");
 print(getattr(myobj, "a"));
 use "std:hello_world";
 HelloWorld();
-json_parse('{"A":"a"}');
+use "std:json";
+print(JSON().dumps(1));
+print(JSON().loads('{"A":1}'));
+exec("mkdir", "iwork");

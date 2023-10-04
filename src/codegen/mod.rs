@@ -1,23 +1,24 @@
 use crate::parser::{Function, NodePosition};
 
+use log::error;
+use owo_colors::OwoColorize;
 use std::borrow::Borrow;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::convert::{From, TryFrom};
+use std::fmt;
 use std::fmt::Debug;
-use std::rc::Rc;
-use std::{fmt};
 use std::fs::read_to_string;
 use std::process;
-use log::error;
-use owo_colors::OwoColorize;
+use std::rc::Rc;
 
 pub mod class;
 pub mod expression;
 pub mod function;
+pub mod json;
 pub mod program;
 pub mod stdlib;
-pub mod json;
+pub mod osutils;
 
 type NativeFn = fn(Vec<Value>, &mut Visitor) -> Result<Value, VMError>;
 // (arity, args)->return value
@@ -318,42 +319,53 @@ impl Visitor {
             "json_dumps".to_string(),
             Value::NativeFunction("json_dumps".to_string(), crate::codegen::json::json_dumps),
         );
-
+        self.variables.insert(
+            "openfile".to_string(),
+            Value::NativeFunction("openfile".to_string(), crate::codegen::osutils::__openfile),
+        );
+        self.variables.insert(
+            "exec".to_string(),
+            Value::NativeFunction("exec".to_string(), crate::codegen::osutils::__exec),
+        );
+        self.variables.insert(
+            "socklisten".to_string(),
+            Value::NativeFunction("socklisten".to_string(), crate::codegen::osutils::__socklisten),
+        );
     }
 }
 
-pub fn uoe(v: Result<Value, VMError>, position: &NodePosition)->Value{ // unwrap or exit
-        match v {
-            Ok(a) => a,
-            Err(e) => {
-                error!("{}",vmerrorfmt(e, position));
-                process::exit(1);
-            }
+pub fn uoe(v: Result<Value, VMError>, position: &NodePosition) -> Value {
+    // unwrap or exit
+    match v {
+        Ok(a) => a,
+        Err(e) => {
+            error!("{}", vmerrorfmt(e, position));
+            process::exit(1);
         }
+    }
 }
 
-pub fn vmerrorfmt(err: VMError, position: &NodePosition) -> String{
+pub fn vmerrorfmt(err: VMError, position: &NodePosition) -> String {
     format!(
-                "
+        "
     {text}
     {pointy}
     {type_}: {cause}
 
         at {line}:{pos} in file `{file}`.",
-                text=read_to_string(position.file.clone())
-                    .unwrap()
-                    .lines()
-                    .collect::<Vec<_>>()[(position.line_no - 1) as usize],
-                pointy=("~".repeat(position.pos as usize) + "^").red(),
-                type_=err.type_.yellow(),
-                cause=err.cause.blue(),
-                line = position.line_no.green(),
-                pos=position.pos.green(),
-                file=position.file.green()
-            )
-            .to_string()
+        text = read_to_string(position.file.clone())
+            .unwrap()
+            .lines()
+            .collect::<Vec<_>>()[(position.line_no - 1) as usize],
+        pointy = ("~".repeat(position.pos as usize) + "^").red(),
+        type_ = err.type_.yellow(),
+        cause = err.cause.blue(),
+        line = position.line_no.green(),
+        pos = position.pos.green(),
+        file = position.file.green()
+    )
+    .to_string()
 }
-
 
 impl Default for Visitor {
     fn default() -> Self {

@@ -32,6 +32,10 @@ impl Parser {
 
         while unwrap_some!(self.tokens.peek()).type_ != TokenType::RBrace {
             // println!("{:#?}", self.tokens.peek());
+            match unwrap_some!(self.tokens.peek()).type_ {
+                TokenType::Def=>{},
+                _=>return Err(self.parser_error("SyntaxError: expected Function"))
+            }
             match self.parse_function() {
                 Ok((f, p)) => fns.insert(fns.len(), (f, p)),
                 Err(e) => {

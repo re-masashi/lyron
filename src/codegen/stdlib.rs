@@ -1,4 +1,4 @@
-use crate::codegen::{Value, Visitor, VMError};
+use crate::codegen::{VMError, Value, Visitor};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
@@ -35,9 +35,9 @@ pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
     match &args[0] {
         Value::Dict(attrs) => match attrs.get(&args[1].to_string()) {
             Some(s) => Ok(s.clone()),
-            None => Err(VMError{
+            None => Err(VMError {
                 type_: "KeyError".to_string(),
-                cause: format!("No such key {} in dict", &args[1].to_string())
+                cause: format!("No such key {} in dict", &args[1].to_string()),
             }),
         },
         Value::Array(a) => {
@@ -49,10 +49,10 @@ pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
         Value::Object(_name, _fns, _attrs, pos) => match &_visitor.objects[*pos] {
             Some(Value::Object(_n, _f, a, _)) => match a.get(&args[1].to_string()) {
                 Some(s) => Ok(s.clone()),
-                None => Err(VMError{
-                type_: "AttributError".to_string(),
-                cause: format!("No such attribute {} in object", &args[1].to_string())
-            }),
+                None => Err(VMError {
+                    type_: "AttributError".to_string(),
+                    cause: format!("No such attribute {} in object", &args[1].to_string()),
+                }),
             },
             _ => todo!(),
         },
@@ -93,7 +93,12 @@ pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
             attrs.clone(),
             *pos,
         ));
-        return Ok(Value::Object(name.clone(), fns.clone(), attrs.clone(), *pos));
+        return Ok(Value::Object(
+            name.clone(),
+            fns.clone(),
+            attrs.clone(),
+            *pos,
+        ));
     }
     Ok(Value::None)
 }
@@ -103,7 +108,7 @@ pub fn __dict(_args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMErro
 }
 
 pub fn __array(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
-    let mut arr:Vec<Value>=Vec::new();
+    let mut arr: Vec<Value> = Vec::new();
     for a in args {
         arr.push(a.clone());
     }

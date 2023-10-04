@@ -1,4 +1,4 @@
-use crate::codegen::{Callable, VMError, VMFunction, Value, Visitor, uoe};
+use crate::codegen::{uoe, Callable, VMError, VMFunction, Value, Visitor};
 use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
 use crate::parser::{ExprValue, Parser};
@@ -73,8 +73,10 @@ impl Visitor {
                                         None => unreachable!(),
                                     })
                                 } else {
-                                    let objcons =
-                                        uoe(f.clone().call_(&mut self.clone(), myargs.clone()), &self.position);
+                                    let objcons = uoe(
+                                        f.clone().call_(&mut self.clone(), myargs.clone()),
+                                        &self.position,
+                                    );
                                     if let Value::Object(_, _, _, _) = objcons {
                                         self.objects.push(Some(objcons));
                                         Ok(match &self.objects[self.objects.len() - 1] {
@@ -119,7 +121,10 @@ impl Visitor {
                 TokenType::Minus => Ok(Value::Float64(
                     (-1_f64) * f64::try_from(uoe(self.visit_expr(*expr), &self.position)).unwrap(),
                 )),
-                TokenType::Not => Ok(Value::Boolean(!bool::from(uoe(self.visit_expr(*expr), &self.position)))),
+                TokenType::Not => Ok(Value::Boolean(!bool::from(uoe(
+                    self.visit_expr(*expr),
+                    &self.position,
+                )))),
                 _ => Err(VMError {
                     type_: "OperatorError".to_string(),
                     cause: "Invalid op".to_string(),
@@ -138,39 +143,49 @@ impl Visitor {
                                 .to_owned(),
                     ),
                     _ => Value::Float64(
-                        f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
-                            + f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
+                        f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position))
+                            .unwrap()
+                            + f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position))
+                                .unwrap(),
                     ),
                 },
                 TokenType::Minus => Value::Float64(
                     f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
-                        - f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
+                        - f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position))
+                            .unwrap(),
                 ),
                 TokenType::Div => Value::Float64(
                     f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
-                        / f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
+                        / f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position))
+                            .unwrap(),
                 ),
                 TokenType::Mul => Value::Float64(
                     f64::try_from(uoe(self.visit_expr((*lhs).clone()), &self.position)).unwrap()
-                        * f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position)).unwrap(),
+                        * f64::try_from(uoe(self.visit_expr((*rhs).clone()), &self.position))
+                            .unwrap(),
                 ),
-                TokenType::Less => {
-                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) < uoe(self.visit_expr(*rhs), &self.position))
-                }
-                TokenType::Greater => {
-                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) > uoe(self.visit_expr(*rhs), &self.position))
-                }
-                TokenType::LessEq => {
-                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) <= uoe(self.visit_expr(*rhs), &self.position))
-                }
-                TokenType::GreaterEq => {
-                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) >= uoe(self.visit_expr(*rhs), &self.position))
-                }
-                TokenType::Equal => {
-                    Value::Boolean(uoe(self.visit_expr(*lhs), &self.position) == uoe(self.visit_expr(*rhs), &self.position))
-                }
+                TokenType::Less => Value::Boolean(
+                    uoe(self.visit_expr(*lhs), &self.position)
+                        < uoe(self.visit_expr(*rhs), &self.position),
+                ),
+                TokenType::Greater => Value::Boolean(
+                    uoe(self.visit_expr(*lhs), &self.position)
+                        > uoe(self.visit_expr(*rhs), &self.position),
+                ),
+                TokenType::LessEq => Value::Boolean(
+                    uoe(self.visit_expr(*lhs), &self.position)
+                        <= uoe(self.visit_expr(*rhs), &self.position),
+                ),
+                TokenType::GreaterEq => Value::Boolean(
+                    uoe(self.visit_expr(*lhs), &self.position)
+                        >= uoe(self.visit_expr(*rhs), &self.position),
+                ),
+                TokenType::Equal => Value::Boolean(
+                    uoe(self.visit_expr(*lhs), &self.position)
+                        == uoe(self.visit_expr(*rhs), &self.position),
+                ),
                 TokenType::Dot => {
-                    let obj =uoe(self.visit_expr(*lhs), &self.position) ;
+                    let obj = uoe(self.visit_expr(*lhs), &self.position);
                     if let Value::Object(_n, c, a, _) = obj.clone() {
                         match *rhs {
                             ExprValue::Identifier(n) => match c.get(&n) {
@@ -194,9 +209,13 @@ impl Visitor {
                                         myargs.push(obj.clone()); // self
                                     }
                                     for (_i, a) in args.into_iter().enumerate() {
-                                        myargs.push(uoe(self.clone().visit_expr(a), &self.position));
+                                        myargs
+                                            .push(uoe(self.clone().visit_expr(a), &self.position));
                                     }
-                                    let c = uoe(s.clone().call_(&mut self.clone(), myargs), &self.position);
+                                    let c = uoe(
+                                        s.clone().call_(&mut self.clone(), myargs),
+                                        &self.position,
+                                    );
                                     return Ok(c);
                                 }
                                 None => {
@@ -254,7 +273,8 @@ impl Visitor {
             }
             ExprValue::IfElse { cond, if_, else_ } => {
                 if bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) {
-                    let mut retval: Result<Value> = Ok(uoe(self.visit_expr((*cond).clone()), &self.position));
+                    let mut retval: Result<Value> =
+                        Ok(uoe(self.visit_expr((*cond).clone()), &self.position));
                     for ex in &(*if_) {
                         retval = self.visit_expr(ex.clone());
                     }
@@ -281,7 +301,10 @@ impl Visitor {
                     let tokens = lexer
                         .map(|t| unwrap_or_exit!(t, "Lexing"))
                         .collect::<Vec<_>>();
-                    let mut parser = Parser::new(tokens.into_iter().peekable(), &("iorekfiles/".to_owned() + &path[4..] + ".lyr"));
+                    let mut parser = Parser::new(
+                        tokens.into_iter().peekable(),
+                        &("iorekfiles/".to_owned() + &path[4..] + ".lyr"),
+                    );
                     let program = unwrap_or_exit!(parser.parse_program(), "Parsing");
                     let mut visitor = Visitor::new();
                     visitor.init();

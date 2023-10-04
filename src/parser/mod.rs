@@ -1,8 +1,8 @@
 use crate::lexer::tokens::{Token, TokenType};
 use crate::SymbolTable;
 
-use std::fs::{read_to_string};
-use std::io::{BufRead};
+use std::fs::read_to_string;
+use std::io::BufRead;
 use std::iter::Peekable;
 
 use std::vec::IntoIter;
@@ -171,15 +171,15 @@ impl Parser {
 {cause}
 
     at {line}:{pos} in file `{file}`.",
-            text=read_to_string(self.file.clone())
+            text = read_to_string(self.file.clone())
                 .unwrap()
                 .lines()
                 .collect::<Vec<_>>()[(self.line_no - 1) as usize],
-            pointy=("~".repeat(self.pos as usize) + "^").red(),
-            cause=cause.yellow(),
+            pointy = ("~".repeat(self.pos as usize) + "^").red(),
+            cause = cause.yellow(),
             line = self.line_no.green(),
-            pos=self.pos.green(),
-            file=self.file.green()
+            pos = self.pos.green(),
+            file = self.file.green()
         )
         .to_string()
     }

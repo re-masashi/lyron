@@ -1,4 +1,4 @@
-use crate::codegen::{VMError, Visitor, uoe};
+use crate::codegen::{uoe, VMError, Visitor};
 
 use crate::parser::{AstNode, NodePosition};
 
@@ -7,7 +7,7 @@ pub type Result<T> = std::result::Result<T, VMError>;
 impl Visitor {
     pub fn visit_program(&mut self, astnodes: Vec<(AstNode, NodePosition)>) {
         for (node, pos) in astnodes {
-            self.position =pos.clone();
+            self.position = pos.clone();
             match node {
                 AstNode::Expression(e) => {
                     let _ = uoe(self.visit_expr(e), &self.position);
