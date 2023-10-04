@@ -1,16 +1,16 @@
-use crate::codegen::{Value, Visitor};
+use crate::codegen::{Value, Visitor, VMError};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-pub fn print(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
+pub fn print(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     for arg in args {
         print!("{} ", String::try_from(arg.clone()).unwrap());
     }
     println!();
-    Value::None
+    Ok(Value::None)
 }
 
-pub fn input(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
+pub fn input(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     let mut line = String::new();
     let mut args = args.clone();
     if args.is_empty() {
@@ -24,38 +24,44 @@ pub fn input(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
         }
     );
     std::io::stdin().read_line(&mut line).unwrap();
-    Value::Str(line)
+    Ok(Value::Str(line))
 }
 
-pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
+pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     if args.len() != 2 {
-        return Value::None;
+        return Ok(Value::None);
     }
     // println!("getattr {:?}", _visitor.objects);
     match &args[0] {
         Value::Dict(attrs) => match attrs.get(&args[1].to_string()) {
-            Some(s) => s.clone(),
-            None => Value::None,
+            Some(s) => Ok(s.clone()),
+            None => Err(VMError{
+                type_: "KeyError".to_string(),
+                cause: format!("No such key {} in dict", &args[1].to_string())
+            }),
         },
         Value::Array(a) => {
             if f64::try_from(args[1].clone()).unwrap() as usize >= a.len() {
-                return Value::None;
+                return Ok(Value::None);
             }
-            a[f64::try_from(args[1].clone()).unwrap() as usize].clone()
+            Ok(a[f64::try_from(args[1].clone()).unwrap() as usize].clone())
         }
         Value::Object(_name, _fns, _attrs, pos) => match &_visitor.objects[*pos] {
             Some(Value::Object(_n, _f, a, _)) => match a.get(&args[1].to_string()) {
-                Some(s) => s.clone(),
-                None => Value::None,
+                Some(s) => Ok(s.clone()),
+                None => Err(VMError{
+                type_: "AttributError".to_string(),
+                cause: format!("No such attribute {} in object", &args[1].to_string())
+            }),
             },
             _ => todo!(),
         },
-        _ => Value::None,
+        _ => Ok(Value::None),
     }
 }
-pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
+pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     if args.len() != 3 {
-        return Value::None;
+        return Ok(Value::None);
     }
     let mut myattrs: HashMap<String, Value>;
     let att = args[1].clone();
@@ -63,20 +69,20 @@ pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
     if let Value::Dict(attrs) = &args[0] {
         myattrs = attrs.clone();
         myattrs.insert(att.to_string(), v);
-        return Value::Dict(myattrs);
+        return Ok(Value::Dict(myattrs));
     }
     let mut myarr: Vec<Value>;
     if let Value::Array(a) = &args[0] {
         if f64::try_from(att.clone()).unwrap() as usize > a.len() {
-            return Value::None;
+            return Ok(Value::None);
         }
         myarr = a.clone();
         if f64::try_from(att.clone()).unwrap() as usize == a.len() {
             myarr.push(v);
-            return Value::Array(myarr);
+            return Ok(Value::Array(myarr));
         }
         myarr[f64::try_from(att).unwrap() as usize] = v;
-        return Value::Array(myarr);
+        return Ok(Value::Array(myarr));
     }
     if let Value::Object(name, fns, attrs, pos) = &args[0] {
         let mut attrs = attrs.clone();
@@ -87,40 +93,40 @@ pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
             attrs.clone(),
             *pos,
         ));
-        return Value::Object(name.clone(), fns.clone(), attrs.clone(), *pos);
+        return Ok(Value::Object(name.clone(), fns.clone(), attrs.clone(), *pos));
     }
-    Value::None
+    Ok(Value::None)
 }
 
-pub fn __dict(_args: Vec<Value>, _visitor: &mut Visitor) -> Value {
-    Value::Dict(HashMap::new())
+pub fn __dict(_args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+    Ok(Value::Dict(HashMap::new()))
 }
 
-pub fn __array(_args: Vec<Value>, _visitor: &mut Visitor) -> Value {
-    Value::Array(Vec::new())
+pub fn __array(_args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+    Ok(Value::Array(Vec::new()))
 }
 
-pub fn __startswith(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
+pub fn __startswith(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     if args.len() != 2 {
-        return Value::None;
+        return Ok(Value::None);
     }
     if let Value::Str(s) = &args[0] {
         if args[1].to_string()[..] == s[..args[1].clone().to_string().len()] {
-            return Value::Boolean(true);
+            return Ok(Value::Boolean(true));
         }
     }
-    Value::Boolean(false)
+    Ok(Value::Boolean(false))
 }
 
-pub fn __len(args: Vec<Value>, _visitor: &mut Visitor) -> Value {
+pub fn __len(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     if args.len() != 1 {
-        return Value::None;
+        return Ok(Value::None);
     }
     if let Value::Dict(d) = &args[0] {
-        return Value::Float64(d.keys().len() as f64);
+        return Ok(Value::Float64(d.keys().len() as f64));
     }
     if let Value::Str(s) = &args[0] {
-        return Value::Float64(s.len() as f64);
+        return Ok(Value::Float64(s.len() as f64));
     }
-    Value::Float64(0.0)
+    Ok(Value::Float64(0.0))
 }

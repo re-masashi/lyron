@@ -152,6 +152,22 @@ impl Iterator for Lexer {
 
             token = Ok(TokenType::Str(value));
         }
+        else if current_char == '\'' {
+            let mut value = String::new();
+
+            self.get_next_char_while(&mut value, |c| c != '\'');
+            self.raw_data.next(); // Eat trailing "
+
+            token = Ok(TokenType::Str(value));
+        }
+        else if current_char == '`' {
+            let mut value = String::new();
+
+            self.get_next_char_while(&mut value, |c| c != '`');
+            self.raw_data.next(); // Eat trailing "
+
+            token = Ok(TokenType::Str(value));
+        }
         // Semicolon
         else if current_char == ';' {
             token = Ok(TokenType::Semicolon);

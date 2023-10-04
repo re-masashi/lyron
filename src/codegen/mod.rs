@@ -19,7 +19,7 @@ pub mod program;
 pub mod stdlib;
 pub mod json;
 
-type NativeFn = fn(Vec<Value>, &mut Visitor) -> Value;
+type NativeFn = fn(Vec<Value>, &mut Visitor) -> Result<Value, VMError>;
 // (arity, args)->return value
 
 pub trait Callable: Debug {

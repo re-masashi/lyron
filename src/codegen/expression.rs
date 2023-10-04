@@ -47,7 +47,7 @@ impl Visitor {
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(uoe(self.clone().visit_expr(a), &self.position));
                         }
-                        let c = f.clone()(myargs, self);
+                        let c = uoe(f.clone()(myargs, self), &self.position);
                         Ok(c)
                     }
                     Some(Value::Class(n, cl, _)) => {
