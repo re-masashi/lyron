@@ -314,6 +314,10 @@ impl Visitor {
             "json_parse".to_string(),
             Value::NativeFunction("json_parse".to_string(), crate::codegen::json::json_parse),
         );
+        self.variables.insert(
+            "json_dumps".to_string(),
+            Value::NativeFunction("json_dumps".to_string(), crate::codegen::json::json_dumps),
+        );
 
     }
 }

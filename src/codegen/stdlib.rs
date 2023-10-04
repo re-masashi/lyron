@@ -102,8 +102,12 @@ pub fn __dict(_args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMErro
     Ok(Value::Dict(HashMap::new()))
 }
 
-pub fn __array(_args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
-    Ok(Value::Array(Vec::new()))
+pub fn __array(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+    let mut arr:Vec<Value>=Vec::new();
+    for a in args {
+        arr.push(a.clone());
+    }
+    Ok(Value::Array(arr))
 }
 
 pub fn __startswith(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
