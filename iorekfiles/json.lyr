@@ -1,0 +1,8 @@
+class JSON{
+	def dumps(self: JSON, str: string)->Any{
+		json_dumps(str)
+	}
+	def loads(self: JSON, val: Any)->string{
+		json_parse(val)
+	}
+}
