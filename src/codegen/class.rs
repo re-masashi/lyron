@@ -9,9 +9,9 @@ impl Visitor {
         let mut fns: HashMap<String, VMFunction> = HashMap::new();
         for fun in c.fns {
             let (f, _) = fun;
-            fns.insert(f.name.clone(), self.visit_fn(f));
+            fns.insert(f.name.to_string(), self.visit_fn(f));
         }
         self.variables
-            .insert(c.name.clone(), Value::Class(c.name, fns, HashMap::new()));
+            .insert(c.name.to_string(), Value::Class(c.name, fns, HashMap::new()));
     }
 }
