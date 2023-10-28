@@ -12,9 +12,10 @@ impl Visitor {
                 f.name.clone(),
                 VMFunction {
                     decl: Rc::new(f.clone()),
+                    call_count:0
                 },
             ),
         );
-        VMFunction { decl: Rc::new(f) }
+        VMFunction { decl: Rc::new(f),call_count:0 }
     }
 }

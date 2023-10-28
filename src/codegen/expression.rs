@@ -1,4 +1,4 @@
-use crate::codegen::{uoe, Callable, VMError, VMFunction, Value, Visitor};
+use crate::codegen::{uoe, Callable, VMError, VMFunction, Value, Visitor, jit};
 use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
 use crate::parser::{ExprValue, Parser};
@@ -8,6 +8,9 @@ use std::convert::TryFrom;
 use std::process;
 
 type Result<T> = std::result::Result<T, VMError>;
+
+const MONITOR_THRESHOLD: usize = 300;
+const JIT_THRESHOLD: usize = 700;
 
 macro_rules! unwrap_or_exit {
     ($f:expr, $origin:tt) => {
@@ -33,13 +36,16 @@ impl Visitor {
             ExprValue::FnCall(name, args) => {
                 let n = self.variables.get(&name);
                 match n {
-                    Some(Value::Function(_n, f)) => {
+                    Some(Value::Function(fname, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(uoe(self.clone().visit_expr(a), &self.position));
                         }
-                        let c = uoe(f.clone().call_(&mut self.clone(), myargs), &self.position);
-                        // std::mem::replace(self, i);
+                        if f.call_count > JIT_THRESHOLD {
+                            // return Ok(jitfn(&mut self.clone(), myargs))
+                        }
+                        let c = uoe(f.call_(&mut self.clone(), myargs), &self.position);
+                        self.variables.insert(name, Value::Function(fname.to_owned(), VMFunction{decl:f.decl.clone(), call_count:f.call_count+1}));
                         Ok(c)
                     }
                     Some(Value::NativeFunction(_x, f)) => {
@@ -47,7 +53,7 @@ impl Visitor {
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(uoe(self.clone().visit_expr(a), &self.position));
                         }
-                        let c = uoe(f.clone()(myargs, self), &self.position);
+                        let c = uoe(f(myargs, self), &self.position);
                         Ok(c)
                     }
                     Some(Value::Class(n, cl, _)) => {
@@ -326,12 +332,20 @@ impl Visitor {
             }
             ExprValue::While(cond, exprs) => {
                 let mut retval: Result<Value> = Ok(Value::None);
-                while bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) {
+                let mut exec_count = 0;
+                while bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) && exec_count < MONITOR_THRESHOLD {
                     for expr in &exprs {
                         retval = self.visit_expr(expr.clone());
                     }
+                    exec_count+=1;
                 }
+                if exec_count < MONITOR_THRESHOLD {// loop exit
+                    return retval
+                }
+                // control comes here if cond is true and monitoring shall start.
+                // todo
                 retval
+                
             }
             // ExprValue::Walrus(obj, attr, val) => {
             //     let obj =self.visit_expr(*obj).unwrap();

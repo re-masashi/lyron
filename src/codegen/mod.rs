@@ -223,7 +223,8 @@ pub struct VMError {
 
 #[derive(Debug, Clone)]
 pub struct VMFunction {
-    decl: Rc<Function>,
+    pub decl: Rc<Function>,
+    pub call_count: usize,
 }
 
 impl Callable for VMFunction {
