@@ -18,7 +18,7 @@ pub mod function;
 pub mod json;
 pub mod program;
 pub mod stdlib;
-pub mod osutils;
+// pub mod osutils;
 
 type NativeFn = fn(Vec<Value>, &mut Visitor) -> Result<Value, VMError>;
 // (arity, args)->return value
@@ -156,6 +156,27 @@ impl TryFrom<Value> for String {
         }
     }
 }
+
+impl From<Value> for usize {
+    fn from(value: Value) -> usize {
+        match value {
+            Value::Str(_s) => 0,
+            Value::Int32(_f) =>1 ,
+            Value::Int64(_f) => 2,
+            Value::Float32(_f) =>3 ,
+            Value::Float64(_f) => 4,
+            Value::Boolean(_b) => 5,
+            Value::Function(_n, _f) => 6,
+            Value::NativeFunction(_n, _f) => 7,
+            Value::None =>8,
+            Value::Class(_name, _, _) =>9,
+            Value::Object(_classname, _, _, _) => 10,
+            Value::Dict(_d) =>11,
+            Value::Array(_a) => 12,
+        }
+    }
+}
+
 
 // impl TryFrom<Value> for bool {
 //     type Error = VMError;
@@ -319,18 +340,18 @@ impl Visitor {
             "json_dumps".to_string(),
             Value::NativeFunction("json_dumps".to_string(), crate::codegen::json::json_dumps),
         );
-        self.variables.insert(
-            "openfile".to_string(),
-            Value::NativeFunction("openfile".to_string(), crate::codegen::osutils::__openfile),
-        );
-        self.variables.insert(
-            "exec".to_string(),
-            Value::NativeFunction("exec".to_string(), crate::codegen::osutils::__exec),
-        );
-        self.variables.insert(
-            "socklisten".to_string(),
-            Value::NativeFunction("socklisten".to_string(), crate::codegen::osutils::__socklisten),
-        );
+        // self.variables.insert(
+        //     "openfile".to_string(),
+        //     Value::NativeFunction("openfile".to_string(), crate::codegen::osutils::__openfile),
+        // );
+        // self.variables.insert(
+        //     "exec".to_string(),
+        //     Value::NativeFunction("exec".to_string(), crate::codegen::osutils::__exec),
+        // );
+        // self.variables.insert(
+        //     "socklisten".to_string(),
+        //     Value::NativeFunction("socklisten".to_string(), crate::codegen::osutils::__socklisten),
+        // );
     }
 }
 

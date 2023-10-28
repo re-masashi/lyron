@@ -1,0 +1,8 @@
+class JSON{
+	def dumps(self:Self, obj:Any)->Str{
+		json_dumps(obj);
+	}
+	def loads(self:Self, data:Str)->Any{
+		json_parse(data);
+	}
+}

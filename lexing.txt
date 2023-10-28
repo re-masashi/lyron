@@ -52,4 +52,4 @@ HelloWorld();
 use "std:json";
 print(JSON().dumps(1));
 print(JSON().loads('{"A":1}'));
-exec("mkdir", "iwork");
+# exec("mkdir", "iwork");
