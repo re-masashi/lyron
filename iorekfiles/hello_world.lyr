@@ -1,6 +1,6 @@
 class HelloWorld{
-	def HelloWorld(self: HelloWorld)->None{
+	def HelloWorld(self: HelloWorld)->None do
 		print("Hello world!");
 		self
-	}
+	end
 }

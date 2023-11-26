@@ -1,0 +1,9 @@
+def jit()->Any do
+	i=0;
+	while i < 10000 do
+		print(i);
+		i = i+1;
+	end;
+end
+
+print(jit());

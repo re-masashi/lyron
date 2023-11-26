@@ -188,18 +188,18 @@ impl Parser {
 
         let cond = Box::new(self.parse_expression().unwrap().0);
 
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::LBrace {
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::Do {
             self.advance();
-            self.tokens.next(); // Eat '{'
+            self.tokens.next(); // Eat 'do'
         } else {
-            return Err(self.parser_error("expected '{' after condition."));
+            return Err(self.parser_error("expected 'do' after condition."));
         }
 
         loop {
             match self.parse_expression() {
                 Ok((expr, _)) => expressions_if.insert(expressions_if.len(), expr),
                 Err(e) if e == self.parser_error("Invalid expression") => {
-                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
+                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
                         || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                     {
                         break;
@@ -216,14 +216,14 @@ impl Parser {
                     self.tokens.next();
                     continue;
                 }
-                TokenType::RBrace => break,
-                _ => return Err(self.parser_error("Expected semicolon or '}'")),
+                TokenType::End => break,
+                _ => return Err(self.parser_error("Expected ';' or 'end'")),
             }
         }
 
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace {
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::End {
             self.advance();
-            self.tokens.next(); // Eat '}'
+            self.tokens.next(); // Eat 'end'
         } // No other case
 
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Else {
@@ -244,18 +244,18 @@ impl Parser {
             ));
         }
 
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::LBrace {
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::Do {
             self.advance();
-            self.tokens.next(); // Eat '{'
+            self.tokens.next(); // Eat 'do'
         } else {
-            return Err(self.parser_error("Expected '{' after x"));
+            return Err(self.parser_error("Expected 'do'"));
         }
 
         loop {
             match self.parse_expression() {
                 Ok((expr, _)) => expressions_else.insert(expressions_else.len(), expr),
                 Err(e) if e == self.parser_error("Invalid expression") => {
-                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
+                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
                         || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                     {
                         break;
@@ -272,16 +272,16 @@ impl Parser {
                     self.tokens.next();
                     continue;
                 }
-                TokenType::RBrace => break,
-                _ => return Err(self.parser_error("Expected semicolon or '}'")),
+                TokenType::End => break,
+                _ => return Err(self.parser_error("Expected ';' or 'end'")),
             }
         }
 
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace {
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::End {
             self.advance();
             self.tokens.next(); // Eat '}'
         } else {
-            return Err(self.parser_error("Missing closing '}' at else."));
+            return Err(self.parser_error("Missing closing 'end' at else."));
         }
         Ok((
             ExprValue::IfElse {
@@ -302,17 +302,17 @@ impl Parser {
         let nx = unwrap_some!(self.tokens.next()); // Eat 'while'
         let condition = self.parse_expression().unwrap().0;
         let mut expressions: Vec<ExprValue> = Vec::new();
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::LBrace {
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::Do {
             self.advance();
-            self.tokens.next(); // Eat '{'
+            self.tokens.next(); // Eat 'do'
         } else {
-            return Err(self.parser_error("Expected '{' after condition"));
+            return Err(self.parser_error("Expected 'do' after condition"));
         }
         loop {
             match self.parse_expression() {
                 Ok((expr, _)) => expressions.insert(expressions.len(), expr),
                 Err(e) if e == self.parser_error("Invalid expression") => {
-                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
+                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
                         || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                     {
                         break;
@@ -329,14 +329,14 @@ impl Parser {
                     self.tokens.next();
                     continue;
                 }
-                TokenType::RBrace => break,
-                _ => return Err(self.parser_error("Expected semicolon or '}'")),
+                TokenType::End => break,
+                _ => return Err(self.parser_error("Expected ';' or 'end'")),
             }
         }
 
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace {
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::End {
             self.advance();
-            self.tokens.next(); // Eat '}'
+            self.tokens.next(); // Eat 'end'
         } // No other case
         Ok((
             ExprValue::While(Box::new(condition), expressions),

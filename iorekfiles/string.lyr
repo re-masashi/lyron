@@ -1,27 +1,27 @@
 class String{
-	def String(self:Self)->None{
+	def String(self:Self)->None do
 		setattr(self, "a", 1);
 		self
-	}
-	def ascii_letters() -> Str{
+	end
+	def ascii_letters() -> Str do
 		"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	}
-	def ascii_lowercase() -> Str{
+	end
+	def ascii_lowercase() -> Str do
 		"abcdefghijklmnopqrstuvwxyz"
-	}
-	def ascii_uppercase() -> Str{
+	end
+	def ascii_uppercase() -> Str do
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	}
-	def digits() -> Str{
+	end
+	def digits() -> Str do
 		"0123456789"
-	}
-	def hexdigits() -> Str{
+	end
+	def hexdigits() -> Str do
 		"0123456789ABCDEFabcdef"
-	}
-	def octdigits() -> Str{
+	end
+	def octdigits() -> Str do
 		"01234567"
-	}
-	def punctuation() -> Str{
+	end
+	def punctuation() -> Str do
 		"!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
-	}
+	end
 }

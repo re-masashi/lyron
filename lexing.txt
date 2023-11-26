@@ -11,24 +11,23 @@
 # };
 a = 1;
 
-def count(curr: i32, end:i32) ->Any{
-	if curr<=end{
+def count(curr:i32, endval:i32) ->Any do
+	if curr<=endval do
 		print(curr);
 		curr = curr +1;
-		count(curr, end);
-	}else{
-	}
-}
+		count(curr, endval);
+	end
+end
 
 class ABC{
-	def ABC(self:Self, a: Any)->ABC{ # constuctor
+	def ABC(self:Self, a: Any)->ABC do # constuctor
 		print(1+2+3,a);
 		print(self);
 		self
-	};
-	def mydef(a:Any)->None{
+	end;
+	def mydef(a:Any)->None do
 		print("mydef",a);
-	};
+	end;
 }
 
 # a=1;

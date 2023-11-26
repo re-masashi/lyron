@@ -130,6 +130,8 @@ impl Iterator for Lexer {
                 s if *"class" == s => token = Ok(TokenType::Class),
                 s if *"mod" == s => token = Ok(TokenType::Module),
                 s if *"while" == s => token = Ok(TokenType::While),
+                s if *"do" == s => token = Ok(TokenType::Do),
+                s if *"end" == s => token = Ok(TokenType::End),
                 s => token = Ok(TokenType::Identifier(s)),
             };
         }

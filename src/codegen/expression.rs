@@ -1,11 +1,13 @@
 use crate::codegen::{uoe, Callable, VMError, VMFunction, Value, Visitor};
 use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
-use crate::parser::{ExprValue, Parser};
+use crate::parser::{ExprValue, Parser, Function};
 use log::error;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::process;
+use std::borrow::Borrow;
+
 
 type Result<T> = std::result::Result<T, VMError>;
 
@@ -38,20 +40,25 @@ impl Visitor {
                 match n {
                     Some(Value::Function(fname, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
+                        let mut selfclone = self.clone();
                         for (_i, a) in args.into_iter().enumerate() {
-                            myargs.push(uoe(self.clone().visit_expr(a), &self.position));
+                            myargs.push(uoe(selfclone.visit_expr(a), &self.position));
                         }
-                        if f.call_count > JIT_THRESHOLD {
-                            // return Ok(jitfn(&mut self.clone(), myargs))
-                        }
-                        let c = uoe(f.call_(&mut self.clone(), myargs), &self.position);
-                        self.variables.insert(name, Value::Function(fname.to_owned(), VMFunction{decl:f.decl.clone(), call_count:f.call_count+1}));
+                        // if f.call_count > MONITOR_THRESHOLD {
+                        //     monitor_fn();
+                        // }
+                        // if f.call_count > JIT_THRESHOLD {
+                        //     // return Ok(jitfn(&mut self.clone(), myargs))
+                        // }
+                        let c = uoe(f.clone().call_(self, myargs), &self.position);
+                        // self.variables.insert(name, Value::Function(fname.to_owned(), VMFunction{decl:f.decl.clone(), call_count:f.call_count+1}));
                         Ok(c)
                     }
                     Some(Value::NativeFunction(_x, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
+                        let mut selfclone = self.clone();
                         for (_i, a) in args.into_iter().enumerate() {
-                            myargs.push(uoe(self.clone().visit_expr(a), &self.position));
+                            myargs.push(uoe(selfclone.visit_expr(a), &self.position));
                         }
                         let c = uoe(f(myargs, self), &self.position);
                         Ok(c)
@@ -65,9 +72,10 @@ impl Visitor {
                             obj_pos,
                         )];
                         self.objects.push(Some(myargs[0].clone()));
+                        let mut selfclone = self.clone();
                         // self.objects.push(Some(myargs[0].clone()));
                         for (_i, a) in args.into_iter().enumerate() {
-                            myargs.push(uoe(self.clone().visit_expr(a), &self.position));
+                            myargs.push(uoe(selfclone.visit_expr(a), &self.position));
                         }
                         match cl.get(n) {
                             Some(f) => {
@@ -276,13 +284,13 @@ impl Visitor {
             ExprValue::IfElse { cond, if_, else_ } => {
                 if bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) {
                     let mut retval: Result<Value> =
-                        Ok(uoe(self.visit_expr((*cond)), &self.position));
+                        Ok(uoe(self.visit_expr(*cond), &self.position));
                     for ex in &(*if_) {
                         retval = self.visit_expr(ex.clone());
                     }
                     retval
                 } else {
-                    let mut retval: Result<Value> = Ok(self.visit_expr((*cond)).unwrap());
+                    let mut retval: Result<Value> = Ok(self.visit_expr(*cond).unwrap());
                     for ex in &(*else_) {
                         retval = self.visit_expr(ex.clone());
                     }
@@ -329,15 +337,15 @@ impl Visitor {
             ExprValue::While(cond, exprs) => {
                 let mut retval: Result<Value> = Ok(Value::None);
                 let mut exec_count = 0;
-                while bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) && exec_count < MONITOR_THRESHOLD {
+                while bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) /*&& exec_count < MONITOR_THRESHOLD */{
                     for expr in &exprs {
                         retval = self.visit_expr(expr.clone());
                     }
                     exec_count+=1;
                 }
-                if exec_count < MONITOR_THRESHOLD {// loop exit
-                    return retval
-                }
+                // if exec_count < MONITOR_THRESHOLD {// loop exit
+                //     return retval
+                // }
                 // control comes here if cond is true and monitoring shall start.
                 // todo
                 retval
@@ -359,11 +367,20 @@ impl Visitor {
             x => panic!("{:?}", x),
         }
     }
+    pub fn monitor_fn(args: Vec<Value>) -> bool {
+        for arg in args {
+            // if let Some(pat) = expr {
+            //     expr
+            // }
+            return true
+        }
+        return true
+    }
 }
 
 fn base_obj_hashmap() -> HashMap<String, VMFunction> {
-    let base = HashMap::new();
+    
     // base.insert("getattr".to_string(), Value::NativeFunction("getattr".to_string(), stdlib::__getattr));
     // base.insert("setattr".to_string(), Value::NativeFunction("setattr".to_string(), stdlib::__setattr));
-    base
+    HashMap::new()
 }

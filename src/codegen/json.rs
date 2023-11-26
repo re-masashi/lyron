@@ -7,9 +7,9 @@ pub fn json_parse(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VME
         return Ok(Value::None);
     }
     match serde_from_str::<SerdeValue>(args[0].to_string().as_str()) {
-        Ok(result) => return Ok(serde_to_value(&result)),
+        Ok(result) => Ok(serde_to_value(&result)),
         Err(e) => {
-            return Err(VMError {
+            Err(VMError {
                 type_: "InvalidJSONError".to_string(),
                 cause: format!(
                     "
@@ -17,19 +17,19 @@ pub fn json_parse(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VME
     {pointy}
         {line}: {pos}
     ",
-                    text = args[0].to_string().lines().collect::<Vec<_>>()[(e.line() - 1) as usize],
+                    text = args[0].to_string().lines().collect::<Vec<_>>()[e.line() - 1],
                     pointy = ("~".repeat(e.column()) + "^"),
                     line = e.line(),
                     pos = e.column(),
                 )
                 .to_string(),
-            });
+            })
         }
     }
 }
 
 pub fn json_dumps(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
-    return Ok(Value::Str(value_to_json(args[0].clone())));
+    Ok(Value::Str(value_to_json(args[0].clone())))
 }
 
 fn serde_to_value(ser: &SerdeValue) -> Value {

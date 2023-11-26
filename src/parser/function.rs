@@ -12,7 +12,10 @@ impl Parser {
                 line_no: _,
                 file: _,
             } => {}
-            _ => return Err("Syntax Error: expected Identifier".to_string()),
+            _ => {
+                println!("{:?}", self.tokens.peek());
+                return Err(self.parser_error("Expected Identifier"))
+            }
         }
         // Store identifier.
         self.advance();
@@ -231,17 +234,17 @@ impl Parser {
                 self.advance();
                 self.tokens.next(); // Eat the return_type
 
-                if unwrap_some!(self.tokens.peek()).type_ != TokenType::LBrace {
-                    return Err(self.parser_error("expected '{' in fn def"));
+                if unwrap_some!(self.tokens.peek()).type_ != TokenType::Do {
+                    return Err(self.parser_error("expected 'do' in fn def"));
                 }
                 self.advance();
-                self.tokens.next(); // Eat '{'
+                self.tokens.next(); // Eat 'do'
 
                 loop {
                     match self.parse_expression() {
                         Ok(expr) => expressions.insert(expressions.len(), expr.0),
                         Err(e) if e == self.parser_error("Invalid expression") => {
-                            if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrace
+                            if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
                                 || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
                             {
                                 break;
@@ -258,20 +261,20 @@ impl Parser {
                             self.tokens.next();
                             continue;
                         }
-                        TokenType::RBrace => break,
+                        TokenType::End => break,
                         _ => {
                             print!("{:?}", self.tokens.peek());
-                            return Err(self.parser_error("Expected semicolon or '}'"));
+                            return Err(self.parser_error("Expected semicolon or 'do'"));
                         }
                     }
                 }
 
-                if unwrap_some!(self.tokens.peek()).type_ != TokenType::RBrace {
+                if unwrap_some!(self.tokens.peek()).type_ != TokenType::End {
                     print!("{:?}", unwrap_some!(self.tokens.peek()).type_);
-                    return Err(self.parser_error("expected '}'"));
+                    return Err(self.parser_error("expected 'end'"));
                 }
                 self.advance();
-                self.tokens.next(); // Eat Rbrace
+                self.tokens.next(); // Eat Do
 
                 match self.tokens.peek() {
                     Some(t) if t.type_ == TokenType::Semicolon => {

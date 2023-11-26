@@ -1,15 +1,15 @@
-def count(curr: i32, end:i32) ->Any{
-	if curr<=end{
+def count(curr: i32, endval:i32) ->Any do
+	if curr<=endval do
 		print(curr);
 		curr = curr +1;
-		count(curr, end);
-	}
-}
+		count(curr, endval);
+	end
+end
 
 count(0,100);
 
 i = 0;
-while i < 10000{
+while i < 10000 do
 	i = i+1;
-	print(i);	
-};
+	print(i);
+end;
