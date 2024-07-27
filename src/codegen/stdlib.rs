@@ -1,6 +1,8 @@
 use crate::codegen::{VMError, Value, Visitor};
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use rayon::prelude::*;
+// use rayon::vec;
 
 pub fn print(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     for arg in args {
@@ -138,4 +140,11 @@ pub fn __len(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError>
         return Ok(Value::Float64(s.len() as f64));
     }
     Ok(Value::Float64(0.0))
+}
+
+pub fn map(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+    // map(array, function)
+    // function (array, index) -> array
+    return Ok(Value::Float64(0.0))
+
 }

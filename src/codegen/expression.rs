@@ -7,6 +7,8 @@ use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::process;
 use std::borrow::Borrow;
+use rayon::prelude::*;
+use std::sync::{Arc, Mutex};
 
 
 type Result<T> = std::result::Result<T, VMError>;
@@ -33,10 +35,10 @@ macro_rules! unwrap_or_exit {
 // }
 
 impl Visitor {
-    pub fn visit_expr(&mut self, expr: ExprValue) -> Result<Value> {
+    pub fn visit_expr(&mut self, expr: &ExprValue) -> Result<Value> {
         match expr {
             ExprValue::FnCall(name, args) => {
-                let n = self.variables.get(&name);
+                let n = self.variables.get(name);
                 match n {
                     Some(Value::Function(fname, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
@@ -130,13 +132,13 @@ impl Visitor {
                     }),
                 }
             }
-            ExprValue::UnOp(op, expr) => match *op {
-                TokenType::Plus => self.visit_expr(*expr),
+            ExprValue::UnOp(op, expr) => match **op {
+                TokenType::Plus => self.visit_expr(&*expr),
                 TokenType::Minus => Ok(Value::Float64(
-                    (-1_f64) * f64::try_from(uoe(self.visit_expr(*expr), &self.position)).unwrap(),
+                    (-1_f64) * f64::try_from(uoe(self.visit_expr(&*expr), &self.position)).unwrap(),
                 )),
                 TokenType::Not => Ok(Value::Boolean(!bool::from(uoe(
-                    self.visit_expr(*expr),
+                    self.visit_expr(&*expr),
                     &self.position,
                 )))),
                 _ => Err(VMError {
@@ -144,60 +146,60 @@ impl Visitor {
                     cause: "Invalid op".to_string(),
                 }),
             },
-            ExprValue::BinOp(lhs, op, rhs) => Ok(match *op {
-                TokenType::Plus => match ((*lhs).clone(), (*rhs).clone()) {
+            ExprValue::BinOp(lhs, op, rhs) => Ok(match **op {
+                TokenType::Plus => match ((**lhs).clone(), (**rhs).clone()) {
                     (ExprValue::Str(_), _) | (_, ExprValue::Str(_)) => Value::Str(
-                        uoe(self.visit_expr(*lhs), &self.position)
+                        uoe(self.visit_expr(&*lhs), &self.position)
                             .to_string()
-                            + &uoe(self.visit_expr(*rhs), &self.position)
+                            + &uoe(self.visit_expr(&*rhs), &self.position)
                                 .to_string(),
                     ),
                     _ => Value::Float64(
-                        f64::try_from(uoe(self.visit_expr(*lhs), &self.position))
+                        f64::try_from(uoe(self.visit_expr(&*lhs), &self.position))
                             .unwrap()
-                            + f64::try_from(uoe(self.visit_expr(*rhs), &self.position))
+                            + f64::try_from(uoe(self.visit_expr(&*rhs), &self.position))
                                 .unwrap(),
                     ),
                 },
                 TokenType::Minus => Value::Float64(
-                    f64::try_from(uoe(self.visit_expr(*lhs), &self.position)).unwrap()
-                        - f64::try_from(uoe(self.visit_expr(*rhs), &self.position))
+                    f64::try_from(uoe(self.visit_expr(&*lhs), &self.position)).unwrap()
+                        - f64::try_from(uoe(self.visit_expr(&*rhs), &self.position))
                             .unwrap(),
                 ),
                 TokenType::Div => Value::Float64(
-                    f64::try_from(uoe(self.visit_expr(*lhs), &self.position)).unwrap()
-                        / f64::try_from(uoe(self.visit_expr(*rhs), &self.position))
+                    f64::try_from(uoe(self.visit_expr(&*lhs), &self.position)).unwrap()
+                        / f64::try_from(uoe(self.visit_expr(&*rhs), &self.position))
                             .unwrap(),
                 ),
                 TokenType::Mul => Value::Float64(
-                    f64::try_from(uoe(self.visit_expr(*lhs), &self.position)).unwrap()
-                        * f64::try_from(uoe(self.visit_expr(*rhs), &self.position))
+                    f64::try_from(uoe(self.visit_expr(&*lhs), &self.position)).unwrap()
+                        * f64::try_from(uoe(self.visit_expr(&*rhs), &self.position))
                             .unwrap(),
                 ),
                 TokenType::Less => Value::Boolean(
-                    uoe(self.visit_expr(*lhs), &self.position)
-                        < uoe(self.visit_expr(*rhs), &self.position),
+                    uoe(self.visit_expr(&*lhs), &self.position)
+                        < uoe(self.visit_expr(&*rhs), &self.position),
                 ),
                 TokenType::Greater => Value::Boolean(
-                    uoe(self.visit_expr(*lhs), &self.position)
-                        > uoe(self.visit_expr(*rhs), &self.position),
+                    uoe(self.visit_expr(&*lhs), &self.position)
+                        > uoe(self.visit_expr(&*rhs), &self.position),
                 ),
                 TokenType::LessEq => Value::Boolean(
-                    uoe(self.visit_expr(*lhs), &self.position)
-                        <= uoe(self.visit_expr(*rhs), &self.position),
+                    uoe(self.visit_expr(&*lhs), &self.position)
+                        <= uoe(self.visit_expr(&*rhs), &self.position),
                 ),
                 TokenType::GreaterEq => Value::Boolean(
-                    uoe(self.visit_expr(*lhs), &self.position)
-                        >= uoe(self.visit_expr(*rhs), &self.position),
+                    uoe(self.visit_expr(&*lhs), &self.position)
+                        >= uoe(self.visit_expr(&*rhs), &self.position),
                 ),
                 TokenType::Equal => Value::Boolean(
-                    uoe(self.visit_expr(*lhs), &self.position)
-                        == uoe(self.visit_expr(*rhs), &self.position),
+                    uoe(self.visit_expr(&*lhs), &self.position)
+                        == uoe(self.visit_expr(&*rhs), &self.position),
                 ),
                 TokenType::Dot => {
-                    let obj = uoe(self.visit_expr(*lhs), &self.position);
+                    let obj = uoe(self.visit_expr(&*lhs), &self.position);
                     if let Value::Object(_n, c, a, _) = obj.clone() {
-                        match *rhs {
+                        match (**rhs).clone() {
                             ExprValue::Identifier(n) => match c.get(&n) {
                                 Some(s) => {
                                     return Ok(Value::Function(n, s.clone()));
@@ -218,12 +220,12 @@ impl Visitor {
                                     if !s.decl.args.name.is_empty() {
                                         myargs.push(obj); // self
                                     }
-                                    for (_i, a) in args.into_iter().enumerate() {
+                                    for (_i, mut a) in args.into_iter().enumerate() {
                                         myargs
-                                            .push(uoe(self.clone().visit_expr(a), &self.position));
+                                            .push(uoe(self.visit_expr(&mut a), &self.position));
                                     }
                                     let c = uoe(
-                                        s.call_(&mut self.clone(), myargs),
+                                        s.call_(self, myargs),
                                         &self.position,
                                     );
                                     return Ok(c);
@@ -251,7 +253,7 @@ impl Visitor {
                     }
                 }
                 // TokenType::Walrus => {
-                //     let obj = self.visit_expr(*lhs).unwrap();
+                //     let obj = self.visit_expr(&mut *lhs).unwrap();
                 //     println!("rsh{:?}", rhs);
                 //     match *rhs {
                 //         // ExprValue::BinOp=>{}
@@ -261,45 +263,45 @@ impl Visitor {
                 // }
                 _ => todo!(),
             }),
-            ExprValue::Boolean(b) => Ok(Value::Boolean(b)),
-            ExprValue::Integer(b) => Ok(Value::Float64(b as f64)),
+            ExprValue::Boolean(b) => Ok(Value::Boolean(*b)),
+            ExprValue::Integer(b) => Ok(Value::Float64(*b as f64)),
             ExprValue::Str(s) => Ok(Value::Str(s.clone())),
-            ExprValue::Identifier(i) => match self.variables.get(&i) {
+            ExprValue::Identifier(i) => match self.variables.get(i) {
                 Some(expr) => Ok(expr.clone()),
                 None => Err(VMError {
                     type_: "UnderclaredVariable".to_string(),
-                    cause: i,
+                    cause: i.to_string(),
                 }),
             },
             ExprValue::VarDecl { name, type_: _ } => {
-                if self.variables.get(&name).is_some() {
+                if self.variables.get(name).is_some() {
                     return Err(VMError {
                         type_: "Redeclaration".to_string(),
-                        cause: name,
+                        cause: name.to_string(),
                     });
                 }
-                self.variables.insert(name, Value::Int32(0));
+                self.variables.insert(name.to_string(), Value::Int32(0));
                 Ok(Value::Int32(0))
             }
             ExprValue::IfElse { cond, if_, else_ } => {
-                if bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) {
+                if bool::from(uoe(self.visit_expr(&*cond), &self.position)) {
                     let mut retval: Result<Value> =
-                        Ok(uoe(self.visit_expr(*cond), &self.position));
+                        Ok(uoe(self.visit_expr(&*cond), &self.position));
                     for ex in &(*if_) {
-                        retval = self.visit_expr(ex.clone());
+                        retval = self.visit_expr(&ex);
                     }
                     retval
                 } else {
-                    let mut retval: Result<Value> = Ok(self.visit_expr(*cond).unwrap());
+                    let mut retval: Result<Value> = Ok(self.visit_expr(&*cond).unwrap());
                     for ex in &(*else_) {
-                        retval = self.visit_expr(ex.clone());
+                        retval = self.visit_expr(&ex);
                     }
                     retval
                 }
             }
             ExprValue::Assign { name, value } => {
-                let val = uoe(self.visit_expr(*value), &self.position);
-                self.variables.insert(name, val.clone());
+                let val = uoe(self.visit_expr(&*value), &self.position);
+                self.variables.insert(name.to_string(), val.clone());
                 Ok(val)
             }
             ExprValue::Use(path) => {
@@ -322,7 +324,7 @@ impl Visitor {
                     self.variables.extend(visitor.variables.clone());
                     return Ok(Value::None);
                 }
-                let lexer = unwrap_or_exit!(Lexer::from_file(&path), "IO");
+                let lexer = unwrap_or_exit!(Lexer::from_file(&("iorekfiles/external/".to_owned() + &path)), "IO");
                 let tokens = lexer
                     .map(|t| unwrap_or_exit!(t, "Lexing"))
                     .collect::<Vec<_>>();
@@ -337,25 +339,27 @@ impl Visitor {
             ExprValue::While(cond, exprs) => {
                 let mut retval: Result<Value> = Ok(Value::None);
                 let mut exec_count = 0;
-                while bool::from(uoe(self.visit_expr((*cond).clone()), &self.position)) /*&& exec_count < MONITOR_THRESHOLD */{
-                    for expr in &exprs {
-                        retval = self.visit_expr(expr.clone());
+
+                while bool::from(uoe(self.visit_expr(&*cond), &self.position)) /*&& exec_count < MONITOR_THRESHOLD */{
+                    for mut expr in &*exprs {
+                        retval = self.visit_expr(&expr);
                     }
                     exec_count+=1;
                 }
-                // if exec_count < MONITOR_THRESHOLD {// loop exit
-                //     return retval
-                // }
+
+                if exec_count < MONITOR_THRESHOLD {// loop exit
+                    return retval
+                }
                 // control comes here if cond is true and monitoring shall start.
                 // todo
                 retval
                 
             }
             // ExprValue::Walrus(obj, attr, val) => {
-            //     let obj =self.visit_expr(*obj).unwrap();
+            //     let obj =self.visit_expr(&mut *obj).unwrap();
             //     match obj {
             //         Value::Object(n, c, mut a) => {
-            //             a.insert(n.clone(), self.visit_expr(*val).unwrap());
+            //             a.insert(n.clone(), self.visit_expr(&mut *val).unwrap());
             //             Ok(Value::Object(n.to_string(), c, a))
             //         },
             //         _ => return Err(VMError {

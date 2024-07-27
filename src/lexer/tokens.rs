@@ -59,6 +59,9 @@ pub enum TokenType {
     DivEq,   // /=
     Walrus,  // =:
 
+    Async, // async
+    Await, // await
+
     Unknown,
 }
 

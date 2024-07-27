@@ -9,8 +9,8 @@ impl Visitor {
         for (node, pos) in astnodes {
             self.position = pos.clone();
             match node {
-                AstNode::Expression(e) => {
-                    let _ = uoe(self.visit_expr(e), &self.position);
+                AstNode::Expression(mut e) => {
+                    let _ = uoe(self.visit_expr(&mut e), &self.position);
                 }
                 AstNode::FunctionDef(f) => {
                     let _ = self.visit_fn(f);

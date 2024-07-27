@@ -46,6 +46,7 @@ impl Parser {
                 }
 
                 TokenType::Str(_) => self.parse_string(),
+                TokenType::Async|TokenType::Await=> panic!("yet to be implemented"),
 
                 _ => return Err(self.parser_error("Invalid expression")),
             };

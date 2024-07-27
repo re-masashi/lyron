@@ -2,7 +2,7 @@ use crate::codegen::{VMFunction, Value, Visitor};
 
 use crate::parser::Function;
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 impl Visitor {
     pub fn visit_fn(&mut self, f: Function) -> VMFunction {
@@ -11,11 +11,11 @@ impl Visitor {
             Value::Function(
                 f.name.clone(),
                 VMFunction {
-                    decl: Rc::new(f.clone()),
+                    decl: Arc::new(f.clone()),
                     call_count:0
                 },
             ),
         );
-        VMFunction { decl: Rc::new(f), call_count:0 }
+        VMFunction { decl: Arc::new(f), call_count:0 }
     }
 }

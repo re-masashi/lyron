@@ -1,4 +1,4 @@
-use crate::parser::{Function, NodePosition};
+use crate::parser::{Function, NodePosition, ExprValue};
 
 use log::error;
 use owo_colors::OwoColorize;
@@ -10,7 +10,7 @@ use std::fmt;
 use std::fmt::Debug;
 use std::fs::read_to_string;
 use std::process;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub mod class;
 pub mod expression;
@@ -68,6 +68,7 @@ pub enum Value {
     ),
     Dict(HashMap<String, Value>),
     Array(Vec<Value>),
+    Task(Vec<ExprValue>),
     None,
 }
 
@@ -151,8 +152,9 @@ impl TryFrom<Value> for String {
             Value::Object(classname, _, _, _) => {
                 Ok(format!("Object of class <{:#}>", classname).to_string())
             }
-            Value::Dict(_d) => Ok("Dict ".to_string()),
-            Value::Array(_a) => Ok("array".to_string()),
+            Value::Dict(_d) => Ok("<dict>".to_string()),
+            Value::Array(_a) => Ok("<array>".to_string()),
+            Value::Task(_) => Ok("<task>".to_string()),
         }
     }
 }
@@ -173,6 +175,7 @@ impl From<Value> for usize {
             Value::Object(_classname, _, _, _) => 10,
             Value::Dict(_d) =>11,
             Value::Array(_a) => 12,
+            Value::Task(_)=>13,
         }
     }
 }
@@ -193,6 +196,7 @@ impl From<Value> for bool {
     fn from(value: Value) -> Self {
         match value {
             Value::Boolean(b) => b,
+            Value::None => false,
             _ => true,
         }
     }
@@ -207,6 +211,7 @@ impl TryFrom<Value> for () {
         })
     }
 }
+
 
 #[derive(Debug, Clone)]
 pub struct Visitor {
@@ -223,7 +228,7 @@ pub struct VMError {
 
 #[derive(Debug, Clone)]
 pub struct VMFunction {
-    pub decl: Rc<Function>,
+    pub decl: Arc<Function>,
     pub call_count: usize,
 }
 
@@ -257,7 +262,7 @@ impl Callable for VMFunction {
         let mut last: Result<Value, VMError> = Ok(Value::None);
         for ex in expressions {
             // println!("{:#?}", ex);
-            last = visitor.visit_expr(ex.clone());
+            last = visitor.visit_expr(&mut ex.clone());
             match last {
                 Ok(ref _v) => {}
                 Err(e) => {

@@ -41,5 +41,20 @@ pub fn main() {
     }
     let mut visitor = Visitor::new();
     visitor.init();
-    visitor.visit_program(program);
+    call_dynamic("puts");
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            visitor.visit_program(program);
+        })
+}
+
+fn call_dynamic(funname: &str) -> Result<u32, Box<dyn std::error::Error>> {
+    unsafe {
+        let lib = libloading::Library::new("/lib/libc.so.6")?;
+        let func: libloading::Symbol<unsafe extern fn(*mut u8) -> u32> = lib.get(funname.as_bytes())?;
+        Ok(func(b"Test\0".clone().as_mut_ptr()))
+    }
 }

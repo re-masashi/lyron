@@ -132,6 +132,8 @@ impl Iterator for Lexer {
                 s if *"while" == s => token = Ok(TokenType::While),
                 s if *"do" == s => token = Ok(TokenType::Do),
                 s if *"end" == s => token = Ok(TokenType::End),
+                s if *"async" == s => token = Ok(TokenType::Async),
+                s if *"await" == s => token = Ok(TokenType::Await),
                 s => token = Ok(TokenType::Identifier(s)),
             };
         }
