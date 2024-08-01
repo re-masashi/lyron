@@ -1,3 +1,0 @@
-# A program with err.
-
-pi = 314/100;

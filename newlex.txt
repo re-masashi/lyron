@@ -1,3 +1,0 @@
-use "pi.lyr";
-
-await print(PI);

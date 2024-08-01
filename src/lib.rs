@@ -1,8 +1,9 @@
 pub mod codegen;
 pub mod lexer;
 pub mod parser;
+pub mod ffi;
 
-use clap::{App, Arg};
+use clap::{command, Command, arg};
 use log::LevelFilter;
 use std::collections::HashMap;
 use std::path;
@@ -36,7 +37,7 @@ impl SymbolTable {
         0
     }
 
-    fn lookup(&mut self, name: String) -> Option<Symbol> {
+    fn _lookup(&mut self, name: String) -> Option<Symbol> {
         self.symbols.get(&name).cloned()
     }
 }
@@ -65,38 +66,56 @@ pub struct CLIInput {
     pub print_ast: bool,
     /// Whether to filter logs or not.
     pub verbose: u32,
+
+    pub matches: clap::ArgMatches,
 }
 
 /// Initialize command line application to parse arguments.
 pub fn init_cli() -> CLIInput {
-    let matches = App::new("yotc")
+    let matches = command!("lyronc")
         .version(env!("CARGO_PKG_VERSION"))
-        .about("Compiler for yot lang - a toy language")
+        .about("Compiler for lyronc - a toy language")
+        // .arg(
+        //     Arg::new("input")
+        //         .help("Path to the lyr file")
+        //         .required(true)
+        //         .index(1),
+        // )
+        .infer_subcommands(true)
         .arg(
-            Arg::with_name("input")
-                .help("Path to the yot file")
-                .required(true)
-                .index(1),
+            arg!([input] "Path to the lyron file to run")
+            .required(true)
         )
-        .arg(
-            Arg::with_name("print tokens")
-                .help("Print raw tokens from the lexer")
-                .long("print-tokens"),
-        )
-        .arg(
-            Arg::with_name("print AST")
-                .help("Print the raw abstract syntax tree")
-                .long("print-ast"),
-        )
-        .arg(
-            Arg::with_name("verbose")
-                .help("Level of logging (0-2)")
-                .short("v")
-                .multiple(true),
+        // .arg(
+        //     arg!(--print-tokens <PRINTTOKENS> "print tokens")
+        // )
+        // .arg(arg!(
+        //     -t --printtokens ... "Turn debugging information on"
+        // ))
+        // .arg(arg!(
+        //     -a --print-ast ... "Turn debugging information on"
+        // ))
+        // .arg(
+        //     Arg::new("verbose")
+        //         .help("Level of logging (0-2)")
+        //         .short("v")
+        //         .multiple(true),
+        // )
+        .subcommand(
+            Command::new("build-ffi")
+                .about("Builds an FFI from a given .cpp file")
         )
         .get_matches();
 
-    let input_path = matches.value_of("input").unwrap();
+    let input_path = match matches.get_one::<String>("input"){
+        Some(v)=>v,
+        _=>{
+            println!("[input] needed", );
+            unreachable!()
+        }
+    };
+
+    // let input_path = matches.value_of("input").unwrap();
     let input_name = path::Path::new(input_path)
         .file_stem()
         .unwrap()
@@ -106,9 +125,10 @@ pub fn init_cli() -> CLIInput {
     CLIInput {
         input_path: String::from(input_path),
         input_name: String::from(input_name),
-        print_tokens: matches.is_present("print tokens"),
-        print_ast: matches.is_present("print AST"),
-        verbose: matches.occurrences_of("verbose") as u32,
+        print_tokens: false, // matches.is_present("print tokens"),
+        print_ast: false, // matches.is_present("print AST"),
+        verbose: 0, // matches.occurrences_of("verbose") as u32,
+        matches: matches,
     }
 }
 

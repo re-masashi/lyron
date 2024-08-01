@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use std::convert::{From, TryFrom};
 use std::fmt;
 use std::fmt::Debug;
-use std::fs::read_to_string;
+use std::fs::{read_to_string, File};
 use std::process;
 use std::sync::Arc;
 
@@ -22,6 +22,7 @@ pub mod stdlib;
 
 type NativeFn = fn(Vec<Value>, &mut Visitor) -> Result<Value, VMError>;
 // (arity, args)->return value
+type DynFn = unsafe extern fn(i32, *mut *mut crate::ffi::LyValue) -> *mut crate::ffi::LyValue;
 
 pub trait Callable: Debug {
     fn arity(&self) -> usize;
@@ -49,6 +50,7 @@ impl PartialOrd for Box<dyn Callable> {
     }
 }
 
+#[no_mangle]
 #[derive(Debug, Clone)]
 pub enum Value {
     Int32(i32),
@@ -69,6 +71,7 @@ pub enum Value {
     Dict(HashMap<String, Value>),
     Array(Vec<Value>),
     Task(Vec<ExprValue>),
+    DynFn(String, String, i32),
     None,
 }
 
@@ -155,6 +158,7 @@ impl TryFrom<Value> for String {
             Value::Dict(_d) => Ok("<dict>".to_string()),
             Value::Array(_a) => Ok("<array>".to_string()),
             Value::Task(_) => Ok("<task>".to_string()),
+            Value::DynFn(..) => Ok("<dynamic funtion>".to_string()),
         }
     }
 }
@@ -176,6 +180,7 @@ impl From<Value> for usize {
             Value::Dict(_d) =>11,
             Value::Array(_a) => 12,
             Value::Task(_)=>13,
+            Value::DynFn(..)=>14,
         }
     }
 }
@@ -327,6 +332,10 @@ impl Visitor {
             Value::NativeFunction("dict".to_string(), stdlib::__dict),
         );
         self.variables.insert(
+            "__dict_keys".to_string(),
+            Value::NativeFunction("__dict_keys".to_string(), stdlib::__dict_keys),
+        );
+        self.variables.insert(
             "startswith".to_string(),
             Value::NativeFunction("startswith".to_string(), stdlib::__startswith),
         );
@@ -345,6 +354,18 @@ impl Visitor {
         self.variables.insert(
             "json_dumps".to_string(),
             Value::NativeFunction("json_dumps".to_string(), crate::codegen::json::json_dumps),
+        );
+        self.variables.insert(
+            "start_tcp_server".to_string(),
+            Value::NativeFunction("start_tcp_server".to_string(), crate::codegen::stdlib::start_tcp_server),
+        );
+        self.variables.insert(
+            "read_file".to_string(),
+            Value::NativeFunction("read_file".to_string(), crate::codegen::stdlib::read_file),
+        );
+        self.variables.insert(
+            "write_file".to_string(),
+            Value::NativeFunction("write_file".to_string(), crate::codegen::stdlib::write_file),
         );
         // self.variables.insert(
         //     "openfile".to_string(),

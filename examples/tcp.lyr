@@ -1,0 +1,12 @@
+use 'std:file';
+
+def handler(data: dict, req: str) -> str do
+	print(File('testfile').write("Hello everynyan"));
+	if (data.path) =="/" do
+		'hello everynyan';
+	end else do
+		"you visited "+data.path
+	end
+end
+
+start_tcp_server(handler);

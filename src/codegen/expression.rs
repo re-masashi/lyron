@@ -1,17 +1,17 @@
 use crate::codegen::{uoe, Callable, VMError, VMFunction, Value, Visitor};
 use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
-use crate::parser::{ExprValue, Parser, Function};
+use crate::parser::{ExprValue, Parser};
 use log::error;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::process;
-use std::borrow::Borrow;
 use rayon::prelude::*;
-use std::sync::{Arc, Mutex};
-
+use serde_json::{Value as SerdeValue};
+use std::convert::TryInto;
 
 type Result<T> = std::result::Result<T, VMError>;
+type DynFn = unsafe extern fn(i32, *mut *mut crate::ffi::LyValue) -> *mut crate::ffi::LyValue;
 
 const MONITOR_THRESHOLD: usize = 300;
 const JIT_THRESHOLD: usize = 700;
@@ -64,6 +64,26 @@ impl Visitor {
                         }
                         let c = uoe(f(myargs, self), &self.position);
                         Ok(c)
+                    }
+                    Some(Value::DynFn(name, file, arity)) => {
+                        let myargs: Vec<Value> = Vec::new();
+                        let mut mylyargs: Vec<*mut crate::ffi::LyValue> = Vec::new();
+                        let mut selfclone = self.clone();
+                        unsafe{
+                            let lib = libloading::Library::new(file).unwrap();
+                            for (_i, a) in args.into_iter().enumerate() {
+                                let arg: *mut crate::ffi::LyValue = &mut crate::ffi::rust_to_c_lyvalue(
+                                    uoe(selfclone.visit_expr(a), &self.position)
+                                );
+                                mylyargs.push(arg);
+                            }
+                            let func: libloading::Symbol<DynFn>
+                                = lib.get(name.as_str().as_bytes()).unwrap();
+
+                            Ok(crate::ffi::c_to_lyvalue(
+                                func(*arity, mylyargs.as_mut_ptr())
+                            ))
+                        }
                     }
                     Some(Value::Class(n, cl, _)) => {
                         let obj_pos = self.objects.len();
@@ -198,58 +218,78 @@ impl Visitor {
                 ),
                 TokenType::Dot => {
                     let obj = uoe(self.visit_expr(&*lhs), &self.position);
-                    if let Value::Object(_n, c, a, _) = obj.clone() {
-                        match (**rhs).clone() {
-                            ExprValue::Identifier(n) => match c.get(&n) {
-                                Some(s) => {
-                                    return Ok(Value::Function(n, s.clone()));
-                                }
-                                None => match a.get(&n) {
-                                    Some(expr) => return Ok(expr.clone()),
+                    match obj.clone() {
+                        Value::Object(_n, c, a, _) => {
+                            match (**rhs).clone() {
+                                ExprValue::Identifier(n) => match c.get(&n) {
+                                    Some(s) => {
+                                        return Ok(Value::Function(n, s.clone()));
+                                    }
+                                    None => match a.get(&n) {
+                                        Some(expr) => return Ok(expr.clone()),
+                                        None => {
+                                            return Err(VMError {
+                                                type_: "InvalidInvocation".to_string(),
+                                                cause: "Not founf".to_string(),
+                                            })
+                                        }
+                                    },
+                                },
+                                ExprValue::FnCall(n, args) => match c.get(&n) {
+                                    Some(s) => {
+                                        let mut myargs = Vec::new();
+                                        if !s.decl.args.name.is_empty() {
+                                            myargs.push(obj); // self
+                                        }
+                                        for (_i, mut a) in args.into_iter().enumerate() {
+                                            myargs
+                                                .push(uoe(self.visit_expr(&mut a), &self.position));
+                                        }
+                                        let c = uoe(
+                                            s.call_(self, myargs),
+                                            &self.position,
+                                        );
+                                        return Ok(c);
+                                    }
                                     None => {
+                                        println!("err");
                                         return Err(VMError {
                                             type_: "InvalidInvocation".to_string(),
-                                            cause: "Not founf".to_string(),
-                                        })
+                                            cause: "IDK".to_string(),
+                                        });
                                     }
                                 },
-                            },
-                            ExprValue::FnCall(n, args) => match c.get(&n) {
-                                Some(s) => {
-                                    let mut myargs = Vec::new();
-                                    if !s.decl.args.name.is_empty() {
-                                        myargs.push(obj); // self
-                                    }
-                                    for (_i, mut a) in args.into_iter().enumerate() {
-                                        myargs
-                                            .push(uoe(self.visit_expr(&mut a), &self.position));
-                                    }
-                                    let c = uoe(
-                                        s.call_(self, myargs),
-                                        &self.position,
-                                    );
-                                    return Ok(c);
-                                }
-                                None => {
-                                    println!("err");
+                                _ => {
                                     return Err(VMError {
                                         type_: "InvalidInvocation".to_string(),
-                                        cause: "IDK".to_string(),
-                                    });
+                                        cause: format!("Tried to invoke {obj}, which is not an object or a dict.").to_string(),
+                                    })
                                 }
-                            },
-                            _ => {
+                            }
+                        },
+                        Value::Dict(mut d) => {
+                            if let ExprValue::Identifier(i) = (**rhs).clone() {
+                                match d.get(&i) {
+                                    Some(expr) => return Ok(expr.clone()),
+                                    None => return Ok(Value::None),
+                                }
+                            // }else if let ExprValue::Assign { name, value } = (**rhs).clone() {
+                            //         let val = uoe(self.visit_expr(&*value), &self.position);
+                            //         d.insert(name.to_string(), val.clone());
+                            //         return Ok(val)
+                            } else {
                                 return Err(VMError {
                                     type_: "InvalidInvocation".to_string(),
-                                    cause: "IDK".to_string(),
-                                })
+                                    cause: format!("Tried to invoke {:?}, which is not an object or a dict.", obj).to_string(),
+                                });
                             }
+                        },
+                        _=>{
+                          return Err(VMError {
+                              type_: "InvalidInvocation".to_string(),
+                              cause: "IDK".to_string(),
+                          });  
                         }
-                    } else {
-                        return Err(VMError {
-                            type_: "InvalidInvocation".to_string(),
-                            cause: "IDK".to_string(),
-                        });
                     }
                 }
                 // TokenType::Walrus => {
@@ -264,6 +304,7 @@ impl Visitor {
                 _ => todo!(),
             }),
             ExprValue::Boolean(b) => Ok(Value::Boolean(*b)),
+            ExprValue::None => Ok(Value::None),
             ExprValue::Integer(b) => Ok(Value::Float64(*b as f64)),
             ExprValue::Str(s) => Ok(Value::Str(s.clone())),
             ExprValue::Identifier(i) => match self.variables.get(i) {
@@ -324,7 +365,27 @@ impl Visitor {
                     self.variables.extend(visitor.variables.clone());
                     return Ok(Value::None);
                 }
-                let lexer = unwrap_or_exit!(Lexer::from_file(&("iorekfiles/external/".to_owned() + &path)), "IO");
+                if &path[..2] == "@:"
+                 {
+                    let lexer = unwrap_or_exit!(
+                        Lexer::from_file(&("iorekfiles/external/".to_owned() + &path[2..] + ".lyr")),
+                        "IO"
+                    );
+                    let tokens = lexer
+                        .map(|t| unwrap_or_exit!(t, "Lexing"))
+                        .collect::<Vec<_>>();
+                    let mut parser = Parser::new(
+                        tokens.into_iter().peekable(),
+                        &("iorekfiles/external/".to_owned() + &path[2..] + ".lyr"),
+                    );
+                    let program = unwrap_or_exit!(parser.parse_program(), "Parsing");
+                    let mut visitor = Visitor::new();
+                    visitor.init();
+                    visitor.visit_program(program);
+                    self.variables.extend(visitor.variables.clone());
+                    return Ok(Value::None);
+                }
+                let lexer = unwrap_or_exit!(Lexer::from_file(path), "IO");
                 let tokens = lexer
                     .map(|t| unwrap_or_exit!(t, "Lexing"))
                     .collect::<Vec<_>>();
@@ -336,12 +397,53 @@ impl Visitor {
                 self.variables.extend(visitor.variables.clone());
                 Ok(Value::None)
             }
+            ExprValue::Extern(path) => {
+                unsafe{
+                    if &path[..4] == "std:" {
+                        let file = std::fs::read_to_string(path[4..].to_string()+".json")
+                            .unwrap();
+                        let v: SerdeValue = serde_json::from_str(&file).unwrap();
+                        // println!("{:?}", v)
+                        let mut functions: Vec<(String, u32, DynFn)> = vec![];
+                        let lib = libloading::Library::new(path[4..].to_string()+".so").unwrap();
+
+                        match &v["functions"] {
+                            SerdeValue::Array(a)=>{
+                                for x in a {
+                                    if let (SerdeValue::String(s), SerdeValue::Number(n)) = (&x["name"], &x["arity"]) {
+                                        if let Some(arity) = n.as_i64() {
+                                            let func: libloading::Symbol<DynFn>
+                                                = lib.get(s.as_str().as_bytes()).unwrap();
+
+                                            self.variables.insert(
+                                                s.to_string(),
+                                                Value::DynFn(s.to_string(), (path[4..].to_string()+".so").to_string(), arity.try_into().unwrap())
+                                            );
+
+                                            functions.push((s.to_string(), arity as u32, *func));
+                                        }
+                                    }
+                                }
+                            }
+                            _=>todo!()
+                        }
+                                                
+                        println!("functions {:?}", functions);
+                        return Ok(Value::None);
+                    }
+                    if &path[..2] == "@:"
+                     {
+                        return Ok(Value::None);
+                    }
+                    Ok(Value::None)
+                }
+            }
             ExprValue::While(cond, exprs) => {
                 let mut retval: Result<Value> = Ok(Value::None);
                 let mut exec_count = 0;
 
                 while bool::from(uoe(self.visit_expr(&*cond), &self.position)) /*&& exec_count < MONITOR_THRESHOLD */{
-                    for mut expr in &*exprs {
+                    for expr in &*exprs {
                         retval = self.visit_expr(&expr);
                     }
                     exec_count+=1;

@@ -8,13 +8,13 @@ impl Parser {
         loop {
             match self.tokens.peek() {
                 Some(s) => match s.type_ {
-                    TokenType::Extern => match self.parse_extern() {
-                        Ok((result, pos)) => {
-                            ast.insert(ast.len(), (AstNode::Extern(result), pos));
-                        }
-                        Err(e) if e == *"EOF".to_string() => return Ok(ast),
-                        Err(e) => return Err(e),
-                    },
+                    // TokenType::Extern => match self.parse_extern() {
+                    //     Ok((result, pos)) => {
+                    //         ast.insert(ast.len(), (AstNode::Extern(result), pos));
+                    //     }
+                    //     Err(e) if e == *"EOF".to_string() => return Ok(ast),
+                    //     Err(e) => return Err(e),
+                    // },
 
                     TokenType::Def => match self.parse_function() {
                         Ok((result, pos)) => {

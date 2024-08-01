@@ -20,10 +20,12 @@ pub enum TokenType {
     While,  // while
     Do,     // do
     End,    // end
+    None,   // none
 
     /// Literals
     Integer(i32),
     Str(String),
+    Double(f64),
 
     /// Punctuators
     Semicolon, // ;

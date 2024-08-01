@@ -32,6 +32,10 @@ impl Parser {
 
                 TokenType::Use => self.parse_use(),
 
+                TokenType::Extern => self.parse_extern(),
+
+                TokenType::None => self.parse_none(),
+
                 TokenType::Integer(i) => {
                     let nx = unwrap_some!(self.tokens.next());
                     self.advance();
@@ -48,7 +52,7 @@ impl Parser {
                 TokenType::Str(_) => self.parse_string(),
                 TokenType::Async|TokenType::Await=> panic!("yet to be implemented"),
 
-                _ => return Err(self.parser_error("Invalid expression")),
+                _ =>return Err(self.parser_error("Invalid expression"))
             };
         // The functions above will eat the value, then we can proceed to check for a bin op.
         loop {
@@ -407,6 +411,19 @@ impl Parser {
         ))
     }
 
+    pub fn parse_none(&mut self) -> Result<(ExprValue, NodePosition)> {
+        self.advance();
+        let nx = unwrap_some!(self.tokens.next()); // Eat `true`
+        Ok((
+            ExprValue::None,
+            NodePosition {
+                pos: nx.pos,
+                line_no: nx.line_no,
+                file: nx.file,
+            },
+        ))
+    }
+
     pub fn parse_identifier(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         // Eat the identifier and work.
@@ -527,6 +544,23 @@ impl Parser {
                 },
             )),
             _ => Err(self.parser_error("Invalid 'use' expression")),
+        }
+    }
+
+    pub fn parse_extern(&mut self) -> Result<(ExprValue, NodePosition)> {
+        self.advance();
+        let nx = unwrap_some!(self.tokens.next()); // Eat `extern`
+        self.advance();
+        match unwrap_some!(self.tokens.next()).type_ {
+            TokenType::Str(s) => Ok((
+                ExprValue::Extern(s.to_string()),
+                NodePosition {
+                    pos: nx.pos,
+                    line_no: nx.line_no,
+                    file: nx.file,
+                },
+            )),
+            _ => Err(self.parser_error("Invalid 'extern' expression")),
         }
     }
 }

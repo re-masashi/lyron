@@ -1,0 +1,6 @@
+use "@:mathutils/consts";
+# extern "std:examples/ffi/call_printf";
+
+print("pi="+PI);
+print("e="+EULER_E);
+# call_printf("hello");

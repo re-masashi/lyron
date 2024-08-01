@@ -1,66 +1,62 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-// #include <iostream>
+struct LyClass;
+struct LyValue;
+struct Map;
+struct LyArray;
 
-// using namespace std;
+union LyTypeValue {
+	// -1 is null
+	int IntVal; // 0
+	double DoubleVal; // 1
+	bool BoolVal; // 2
+	char* StringVal; // 3
+	LyValue* FunctionVal; // 4
+	LyClass* ClassVal; // 5
+	Map* DictVal; // 6
+	LyArray* ArrayVal;  // 7
+};
 
-extern "C"{
-	struct LyClass;
-	struct LyValue;
-	struct Map;
-	struct LyArray;
+struct LyValue{
+	short typeindex;
+	union LyTypeValue* val;
+};
 
-	union LyTypeValue {
-		// -1 is null
-		int IntVal; // 0
-		double DoubleVal; // 1
-		bool BoolVal; // 2
-		char* StringVal; // 3
-		LyValue* FunctionVal; // 4
-		LyClass* ClassVal; // 5
-		Map* DictVal; // 6
-		LyArray* ArrayVal;  // 7
-	};
+struct LyArray{
+	int size;
+	int max_size;
+	LyValue** values;
+};
 
-	struct LyValue{
-		short typeindex;
-		union LyTypeValue* val;
-	};
+struct Map{
+	int size;
+	int max_size;
+	LyValue** values;
+	char** keys;
+};
 
-	struct LyArray{
-		int size;
-		int max_size;
-		LyValue** values;
-	};
-
-	struct Map{
-		int size;
-		int max_size;
-		LyValue** values;
-		char** keys;
-	};
-
-	struct LyClass {
-		Map* variables;
-		Map* methods;
-		char* name;
-	};
+struct LyClass {
+	Map* variables;
+	Map* methods;
+	char* name;
+};
 
 	// typedef struct _LyClass LyClass;
 
-	union LyTypeValue* gen_type_val(){
-		union LyTypeValue* val;
-		val = (union LyTypeValue*) malloc(sizeof(LyTypeValue));
-		return val;
-	};
+union LyTypeValue* gen_type_val(){
+	union LyTypeValue* val;
+	val = (union LyTypeValue*) malloc(sizeof(LyTypeValue));
+	return val;
+};
 
-	LyValue gen_val(){
-		LyValue value;
-		value.val = gen_type_val();
-		value.typeindex = -1;
-		return value;
-	};
+LyValue gen_val(){
+	LyValue value;
+	value.val = gen_type_val();
+	value.typeindex = -1;
+	return value;
+};
 
 	LyValue* gen_val_ptr(){
 		LyValue* value; 
@@ -113,7 +109,7 @@ extern "C"{
 		}
 		if (prev_occurance!=-1)
 		{
-			map->values[prev_occurance] = value;
+			map->values[prev_occurance];
 		}else{
 			// length of array = map->size-1
 			map->keys[map->size] = key;
@@ -123,8 +119,8 @@ extern "C"{
 	}
 
 	LyClass* create_class(){
-		// Map variables;
-		// Map methods;
+		Map variables;
+		Map methods;
 		char* name;
 		name = (char*)"MyTestFFIClass\0";
 
@@ -253,4 +249,3 @@ extern "C"{
 	// 	// printf("%d\n", sizeof(val));
 	// 	return 0;
 	// }
-}

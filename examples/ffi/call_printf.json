@@ -1,0 +1,9 @@
+{
+	"functions": [
+		{
+			"name": "call_printf",
+			"arity": 1,
+			"doc": "print a lyvalue"
+		}
+	]
+}
