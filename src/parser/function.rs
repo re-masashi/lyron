@@ -157,7 +157,7 @@ impl Parser {
             name: vec![],
             type_: vec![],
         };
-        let mut expressions: Vec<ExprValue> = Vec::new();
+        let mut expressions: Vec<(ExprValue, NodePosition)> = Vec::new();
         match self.tokens.peek() {
             Some(Token {
                 type_: TokenType::Def,
@@ -242,7 +242,8 @@ impl Parser {
 
                 loop {
                     match self.parse_expression() {
-                        Ok(expr) => expressions.insert(expressions.len(), expr.0),
+
+                        Ok(expr) => expressions.insert(expressions.len(), expr),
                         Err(e) if e == self.parser_error("Invalid expression") => {
                             if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
                                 || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon

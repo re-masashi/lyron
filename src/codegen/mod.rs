@@ -267,7 +267,8 @@ impl Callable for VMFunction {
         let mut last: Result<Value, VMError> = Ok(Value::None);
         for ex in expressions {
             // println!("{:#?}", ex);
-            last = visitor.visit_expr(&mut ex.clone());
+            visitor.position = ex.1.clone();
+            last = visitor.visit_expr(&mut ex.clone().0);
             match last {
                 Ok(ref _v) => {}
                 Err(e) => {

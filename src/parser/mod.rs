@@ -88,7 +88,7 @@ pub struct External {
 pub struct Function {
     pub name: String,
     pub args: Args,
-    pub expressions: Vec<ExprValue>,
+    pub expressions: Vec<(ExprValue, NodePosition)>,
     pub return_type: String,
 }
 
