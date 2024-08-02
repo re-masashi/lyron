@@ -191,7 +191,13 @@ impl Parser {
         let mut expressions_if: Vec<ExprValue> = Vec::new();
         let mut expressions_else: Vec<ExprValue> = Vec::new();
 
-        let cond = Box::new(self.parse_expression().unwrap().0);
+        let cond = self.parse_expression();
+        
+        if let Err(e) = cond {
+            return Err(self.parser_error(&e))
+        }
+
+        let cond = Box::new(cond.unwrap().0);
 
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Do {
             self.advance();

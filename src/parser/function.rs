@@ -14,7 +14,7 @@ impl Parser {
             } => {}
             _ => {
                 println!("{:?}", self.tokens.peek());
-                return Err(self.parser_error("Expected Identifier"))
+                return Err(self.parser_error("Expected Identifier or ')'"))
             }
         }
         // Store identifier.

@@ -1,0 +1,5 @@
+# err.lyr
+# a file with very obvious syntax errors.
+def x() -> Any
+
+end
