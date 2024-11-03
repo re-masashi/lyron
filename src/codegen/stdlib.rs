@@ -1,11 +1,11 @@
 use crate::codegen::{VMError, Value, Visitor};
-use std::collections::HashMap;
+use gxhash::{HashMap, HashMapExt};
 use std::convert::TryFrom;
 use rayon::prelude::*;
 use std::net::TcpListener;
 use std::io::{BufReader, BufRead, Read, Write};
 use crate::codegen::Callable;
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 // use rayon::vec;
 
 pub fn print(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
@@ -243,7 +243,7 @@ pub fn start_tcp_server(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Valu
 }
 
 pub fn read_file(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
-    let mut file = OpenOptions::new().read(true).open(args[0].to_string());
+    let file = OpenOptions::new().read(true).open(args[0].to_string());
     if let Err(e) = file {
         return Err(VMError {
             type_: "FSError".to_string(),
@@ -261,7 +261,7 @@ pub fn read_file(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
 }
 
 pub fn write_file(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
-    let mut file = OpenOptions::new().write(true).open(args[0].to_string());
+    let file = OpenOptions::new().write(true).open(args[0].to_string());
     if let Err(e) = file {
         return Err(VMError {
             type_: "FSError".to_string(),

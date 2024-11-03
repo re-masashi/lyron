@@ -2,6 +2,7 @@ pub mod codegen;
 pub mod lexer;
 pub mod parser;
 pub mod ffi;
+pub mod vm;
 
 use clap::{command, Command, arg};
 use log::LevelFilter;

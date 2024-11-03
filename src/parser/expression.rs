@@ -32,6 +32,8 @@ impl Parser {
 
                 TokenType::Use => self.parse_use(),
 
+                TokenType::Do => self.parse_do(),
+
                 TokenType::Extern => self.parse_extern(),
 
                 TokenType::None => self.parse_none(),
@@ -49,57 +51,30 @@ impl Parser {
                     ))
                 }
 
+                TokenType::Double(f) => {
+                    let nx = unwrap_some!(self.tokens.next());
+                    self.advance();
+                    Ok((
+                        ExprValue::Double(f),
+                        NodePosition {
+                            pos: nx.pos,
+                            line_no: nx.line_no,
+                            file: nx.file,
+                        },
+                    ))
+                }
+
                 TokenType::Str(_) => self.parse_string(),
                 TokenType::Async|TokenType::Await=> panic!("yet to be implemented"),
 
-                _ =>return Err(self.parser_error("Invalid expression"))
+                _ =>{
+                    // println!("{:?}", x);
+                    return Err(self.parser_error("Invalid expression"))
+                }
             };
+
         // The functions above will eat the value, then we can proceed to check for a bin op.
         loop {
-            // match unwrap_some!(self.tokens.peek()).type_ {
-            //     TokenType::Walrus => {
-            //         self.advance();
-            //         self.tokens.next(); // eat `=:`
-            //         let mut attribute: String;
-            //         match unwrap_some!(self.tokens.peek()).clone().type_ {
-            //             TokenType::Str(s) => {
-            //                 self.advance();
-            //                 self.tokens.next();
-            //                 attribute = s.clone();
-            //             }
-            //             x => {
-            //                 // println!("{:?}", x);
-            //                 return Err(format!(
-            //                     "Invalid walrus expression 1 {:#?}:{:#?} in file {:#?}",
-            //                     self.line_no, self.pos, self.file
-            //                 )
-            //                 .to_string())
-            //             }
-            //         }
-            //         if let TokenType::Comma = unwrap_some!(self.tokens.peek()).type_ {
-            //             // println!("{:?}",self.tokens.peek() );
-            //             self.advance();
-            //             self.tokens.next(); // eat ','
-            //             // println!("{:?}", self.tokens.peek());
-            //             let exp = self.parse_expression();
-            //             return Ok(
-            //                 (ExprValue::Walrus(Box::new(l_value.unwrap().0), attribute, Box::new(exp.unwrap().0)),
-            //                 NodePosition {
-            //                     pos: 0,
-            //                     line_no: 0,
-            //                     file: "".to_string(),
-            //                 },)
-            //             )
-            //         } else {
-            //             return Err(format!(
-            //                 "Invalid walrus expression 2{:#?}:{:#?} in file {:#?}",
-            //                 self.line_no, self.pos, self.file
-            //             )
-            //             .to_string());
-            //         }
-            //     }
-            //     _ => {}
-            // }c
             let op: TokenType = match unwrap_some!(self.tokens.peek()).type_ {
                 TokenType::Plus
                 | TokenType::Minus
@@ -118,6 +93,10 @@ impl Parser {
                 _ => return l_value,
             };
             let r_value = self.parse_expression();
+            match r_value {
+                Ok(_) => {},
+                Err(ref e) => println!("{}",self.parser_error(&e)),
+            }
             match unwrap_some!(self.tokens.peek()).type_ {
                 TokenType::Plus
                 | TokenType::Minus
@@ -132,6 +111,7 @@ impl Parser {
                 _ => {
                     // println!("{:#?} {:?} {:#?}",l_value,op, r_value );
                     return Ok((
+                        // todo: match to avoid unwrap
                         ExprValue::BinOp(
                             Box::new(l_value.unwrap().0),
                             Box::new(op),
@@ -160,14 +140,14 @@ impl Parser {
         self.advance();
         let t = nx.type_;
         let op = Box::new(t);
-        let expr = Box::new(self.parse_expression().unwrap().0);
+        let expr = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
         Ok((ExprValue::UnOp(op, expr), start))
     }
 
     pub fn parse_paren_expression(&mut self) -> Result<(ExprValue, NodePosition)> {
         trace!("Parsing paren expr");
         let expr = self.parse_expression();
-        let expr = expr.unwrap().0;
+        let expr = expr.unwrap().0; // todo: remove unwrap
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::RParen {
             self.advance();
             let nx = unwrap_some!(self.tokens.next()); // Eat ')'
@@ -184,31 +164,23 @@ impl Parser {
         }
     }
 
-    pub fn parse_if_else(&mut self) -> Result<(ExprValue, NodePosition)> {
-        trace!("Parsing if else");
-        self.advance();
-        let nx = unwrap_some!(self.tokens.next()); // Eat 'if'
-        let mut expressions_if: Vec<ExprValue> = Vec::new();
-        let mut expressions_else: Vec<ExprValue> = Vec::new();
-
-        let cond = self.parse_expression();
+    pub fn parse_do(&mut self) -> Result<(ExprValue, NodePosition)>{
+        let mut exprs = vec![];
         
-        if let Err(e) = cond {
-            return Err(self.parser_error(&e))
-        }
+        // println!("some {:?}", self.tokens.peek());
 
-        let cond = Box::new(cond.unwrap().0);
+        self.advance();
+        self.tokens.next(); // eat 'do'
 
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::Do {
-            self.advance();
-            self.tokens.next(); // Eat 'do'
-        } else {
-            return Err(self.parser_error("expected 'do' after condition."));
-        }
+        let pos = NodePosition {
+            pos: self.pos,
+            line_no: self.line_no,
+            file: self.file.clone(),
+        };
 
         loop {
             match self.parse_expression() {
-                Ok((expr, _)) => expressions_if.insert(expressions_if.len(), expr),
+                Ok((expr, _)) => exprs.push(expr),
                 Err(e) if e == self.parser_error("Invalid expression") => {
                     if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
                         || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
@@ -228,7 +200,9 @@ impl Parser {
                     continue;
                 }
                 TokenType::End => break,
-                _ => return Err(self.parser_error("Expected ';' or 'end'")),
+                _ => {
+                    // return Err(self.parser_error("Expected ';' or 'end'"))
+                },
             }
         }
 
@@ -237,15 +211,57 @@ impl Parser {
             self.tokens.next(); // Eat 'end'
         } // No other case
 
+        return Ok((
+            ExprValue::Do(exprs),
+            pos
+        ))
+    }
+
+    pub fn parse_if_else(&mut self) -> Result<(ExprValue, NodePosition)> {
+        // trace!("Parsing if else");
+        self.advance();
+        let nx = unwrap_some!(self.tokens.next()); // Eat 'if'
+        let type_ = String::from("unavailable");
+        let hastype = !true;
+
+        let cond = Box::new(self.parse_expression().unwrap().0);
+
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::Then {
+            self.advance();
+            self.tokens.next(); // eat 'then'
+        }else {
+            // println!("{:?}", self.tokens.peek());
+            panic!("then expected after condition");
+        }
+
+        // println!("{:?} {:?}", self.pos, self.line_no);
+        let (expression_if, pos) = self.parse_expression().unwrap();
+
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Else {
             self.advance();
             self.tokens.next(); // Eat 'else'
+
+            let (expression_else, pos) = self.parse_expression().unwrap();
+
+            Ok((
+                ExprValue::IfElse {
+                    cond,
+                    if_: Box::new(expression_if),
+                    else_: Box::new(expression_else),
+                },
+                NodePosition {
+                    pos: nx.pos,
+                    line_no: nx.line_no,
+                    file: nx.file,
+                },
+            ))
+
         } else {
             return Ok((
                 ExprValue::IfElse {
                     cond,
-                    if_: expressions_if,
-                    else_: Vec::new(),
+                    if_: Box::new(expression_if),
+                    else_: Box::new(ExprValue::None),
                 },
                 NodePosition {
                     pos: nx.pos,
@@ -254,103 +270,16 @@ impl Parser {
                 },
             ));
         }
-
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::Do {
-            self.advance();
-            self.tokens.next(); // Eat 'do'
-        } else {
-            return Err(self.parser_error("Expected 'do'"));
-        }
-
-        loop {
-            match self.parse_expression() {
-                Ok((expr, _)) => expressions_else.insert(expressions_else.len(), expr),
-                Err(e) if e == self.parser_error("Invalid expression") => {
-                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
-                        || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
-                    {
-                        break;
-                    } else {
-                        return Err(e);
-                    }
-                }
-                Err(e) => return Err(e),
-            }
-            // Eat the semicolons
-            match unwrap_some!(self.tokens.peek()).type_ {
-                TokenType::Semicolon => {
-                    self.advance();
-                    self.tokens.next();
-                    continue;
-                }
-                TokenType::End => break,
-                _ => return Err(self.parser_error("Expected ';' or 'end'")),
-            }
-        }
-
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::End {
-            self.advance();
-            self.tokens.next(); // Eat '}'
-        } else {
-            return Err(self.parser_error("Missing closing 'end' at else."));
-        }
-        Ok((
-            ExprValue::IfElse {
-                cond,
-                if_: expressions_if,
-                else_: expressions_else,
-            },
-            NodePosition {
-                pos: nx.pos,
-                line_no: nx.line_no,
-                file: nx.file,
-            },
-        ))
     }
 
     pub fn parse_while(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat 'while'
-        let condition = self.parse_expression().unwrap().0;
-        let mut expressions: Vec<ExprValue> = Vec::new();
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::Do {
-            self.advance();
-            self.tokens.next(); // Eat 'do'
-        } else {
-            return Err(self.parser_error("Expected 'do' after condition"));
-        }
-        loop {
-            match self.parse_expression() {
-                Ok((expr, _)) => expressions.insert(expressions.len(), expr),
-                Err(e) if e == self.parser_error("Invalid expression") => {
-                    if unwrap_some!(self.tokens.peek()).type_ == TokenType::End
-                        || unwrap_some!(self.tokens.peek()).type_ == TokenType::Semicolon
-                    {
-                        break;
-                    } else {
-                        return Err(e);
-                    }
-                }
-                Err(e) => return Err(e),
-            }
-            // Eat the semicolons
-            match unwrap_some!(self.tokens.peek()).type_ {
-                TokenType::Semicolon => {
-                    self.advance();
-                    self.tokens.next();
-                    continue;
-                }
-                TokenType::End => break,
-                _ => return Err(self.parser_error("Expected ';' or 'end'")),
-            }
-        }
+        let condition = self.parse_expression().unwrap().0; // todo: remove unwrap
+        let expression = self.parse_expression().unwrap().0;
 
-        if unwrap_some!(self.tokens.peek()).type_ == TokenType::End {
-            self.advance();
-            self.tokens.next(); // Eat 'end'
-        } // No other case
         Ok((
-            ExprValue::While(Box::new(condition), expressions),
+            ExprValue::While(Box::new(condition), Box::new(expression)),
             NodePosition {
                 pos: nx.pos,
                 line_no: nx.line_no,
@@ -448,31 +377,31 @@ impl Parser {
             TokenType::Assign => {
                 self.advance();
                 self.tokens.next(); // Eat '='
-                let value = Box::new(self.parse_expression().unwrap().0);
+                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
                 return Ok((ExprValue::Assign { name, value }, start));
             }
             TokenType::PlusEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '+='
-                let value = Box::new(self.parse_expression().unwrap().0);
+                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::MinusEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '-='
-                let value = Box::new(self.parse_expression().unwrap().0);
+                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::DivEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '/='
-                let value = Box::new(self.parse_expression().unwrap().0);
+                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::MulEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '*='
-                let value = Box::new(self.parse_expression().unwrap().0);
+                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             _ => {}
@@ -509,7 +438,7 @@ impl Parser {
     pub fn parse_return(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat `return`
-        let expr = self.parse_expression().unwrap().0;
+        let expr = self.parse_expression().unwrap().0; // todo: remove unwrap
         Ok((
             ExprValue::Return(Box::new(expr)),
             NodePosition {

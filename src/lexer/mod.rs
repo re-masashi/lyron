@@ -135,6 +135,7 @@ impl Iterator for Lexer {
                 s if *"async" == s => token = Ok(TokenType::Async),
                 s if *"await" == s => token = Ok(TokenType::Await),
                 s if *"none" == s => token = Ok(TokenType::None),
+                s if *"then" == s => token = Ok(TokenType::Then),
                 s => token = Ok(TokenType::Identifier(s)),
             };
         }
@@ -142,10 +143,22 @@ impl Iterator for Lexer {
         else if current_char.is_numeric() {
             let mut value = current_char.to_string();
             self.get_next_char_while(&mut value, |c| c.is_numeric());
+            
+            // println!("{:?}", self.raw_data.peek());
 
-            token = match value.parse() {
-                Ok(i) => Ok(TokenType::Integer(i)),
-                Err(_) => Err(format!("Integer literal {} is invalid", value)),
+            if self.raw_data.peek() == Some(&'.') {
+                value += ".";
+                self.raw_data.next(); // eat '.'
+                self.get_next_char_while(&mut value, |c| c.is_numeric());
+                token = match value.parse() {
+                    Ok(i) => Ok(TokenType::Double(i)),
+                    Err(_) => Err(format!("float literal {} is invalid", value)),
+                }
+            }else{
+                token = match value.parse() {
+                    Ok(i) => Ok(TokenType::Integer(i)),
+                    Err(_) => Err(format!("Integer literal {} is invalid", value)),
+                }
             }
         }
         // String Literal

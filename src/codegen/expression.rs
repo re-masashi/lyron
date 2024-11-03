@@ -3,7 +3,7 @@ use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
 use crate::parser::{ExprValue, Parser};
 use log::error;
-use std::collections::HashMap;
+use gxhash::{HashMap, HashMapExt};
 use std::convert::TryFrom;
 use std::process;
 use rayon::prelude::*;
@@ -267,7 +267,7 @@ impl Visitor {
                                 }
                             }
                         },
-                        Value::Dict(mut d) => {
+                        Value::Dict(d) => {
                             if let ExprValue::Identifier(i) = (**rhs).clone() {
                                 match d.get(&i) {
                                     Some(expr) => return Ok(expr.clone()),
@@ -306,6 +306,7 @@ impl Visitor {
             ExprValue::Boolean(b) => Ok(Value::Boolean(*b)),
             ExprValue::None => Ok(Value::None),
             ExprValue::Integer(b) => Ok(Value::Float64(*b as f64)),
+            ExprValue::Double(b) => Ok(Value::Float64(*b as f64)),
             ExprValue::Str(s) => Ok(Value::Str(s.clone())),
             ExprValue::Identifier(i) => match self.variables.get(i) {
                 Some(expr) => Ok(expr.clone()),
@@ -325,19 +326,11 @@ impl Visitor {
                 Ok(Value::Int32(0))
             }
             ExprValue::IfElse { cond, if_, else_ } => {
+                // println!("ifelse");
                 if bool::from(uoe(self.visit_expr(&*cond), &self.position)) {
-                    let mut retval: Result<Value> =
-                        Ok(uoe(self.visit_expr(&*cond), &self.position));
-                    for ex in &(*if_) {
-                        retval = self.visit_expr(&ex);
-                    }
-                    retval
+                    self.visit_expr(&*if_)
                 } else {
-                    let mut retval: Result<Value> = Ok(self.visit_expr(&*cond).unwrap());
-                    for ex in &(*else_) {
-                        retval = self.visit_expr(&ex);
-                    }
-                    retval
+                    self.visit_expr(&*else_)
                 }
             }
             ExprValue::Assign { name, value } => {
@@ -438,16 +431,20 @@ impl Visitor {
                     Ok(Value::None)
                 }
             }
-            ExprValue::While(cond, exprs) => {
-                let mut retval: Result<Value> = Ok(Value::None);
+            ExprValue::While(cond, expr) => {
+                let retval: Result<Value> = Ok(Value::None);
                 let mut exec_count = 0;
 
-                while bool::from(uoe(self.visit_expr(&*cond), &self.position)) /*&& exec_count < MONITOR_THRESHOLD */{
-                    for expr in &*exprs {
-                        retval = self.visit_expr(&expr);
-                    }
+                while bool::from(uoe(self.visit_expr(&*cond), &self.position)) /*&& exec_count < MONITOR_THRESHOLD */
+                {
+                    // println!("loopin");
+                    // println!("{:?}", cond);
+                    self.visit_expr(&*expr);
                     exec_count+=1;
                 }
+                
+                // println!("{:?}", cond);
+                // println!("{:?}", self.variables.get("i"));
 
                 if exec_count < MONITOR_THRESHOLD {// loop exit
                     return retval
@@ -456,6 +453,16 @@ impl Visitor {
                 // todo
                 retval
                 
+            }
+            ExprValue::Do(expressions) => {
+                // println!("doin");
+                let mut retval = Ok(Value::None);
+                for expr in expressions {
+                    retval = self.visit_expr(&expr);
+                    // println!("ret {:?} {:?}", retval, expr);
+                }
+                // println!("ret final {:?}", retval);
+                retval
             }
             // ExprValue::Walrus(obj, attr, val) => {
             //     let obj =self.visit_expr(&mut *obj).unwrap();

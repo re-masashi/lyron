@@ -1,15 +1,5 @@
-def count(curr: i32, endval:i32) ->Any do
-	if curr<=endval do
-		print(curr);
-		curr = curr +1;
-		count(curr, endval);
-	end
-end
-
-count(0,100);
-
-i = 0;
-while i < 10000 do
-	i = i+1;
-	print(i);
+i = 0.0
+while i < 10000.0 do
+	i = i+1.0
+	print(i)
 end;

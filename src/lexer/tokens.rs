@@ -21,6 +21,7 @@ pub enum TokenType {
     Do,     // do
     End,    // end
     None,   // none
+    Then,   // then
 
     /// Literals
     Integer(i32),

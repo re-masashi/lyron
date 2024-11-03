@@ -1,6 +1,6 @@
 use crate::codegen::{VMError, Value, Visitor};
 use serde_json::{from_str as serde_from_str, Value as SerdeValue};
-use std::collections::HashMap;
+use gxhash::{HashMap, HashMapExt};
 
 pub fn json_parse(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
     if args.is_empty() {

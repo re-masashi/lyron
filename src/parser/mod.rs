@@ -16,14 +16,6 @@ pub mod program;
 
 type TokenIter = Peekable<IntoIter<Token>>;
 
-// #[derive(Debug)]
-// pub struct Node{
-//     pub ast_node: AstNode,
-//     pub pos: i32,
-//     pub line_no: i32,
-//     pub file: String
-// }
-
 #[derive(Debug, Clone)]
 pub struct NodePosition {
     pub pos: i32,
@@ -47,6 +39,7 @@ pub enum ExprValue {
     BinOp(Box<ExprValue>, Box<TokenType>, Box<ExprValue>),
     Boolean(bool),
     Integer(i32),
+    Double(f64),
     Str(String),
     Identifier(String),
     VarDecl {
@@ -55,8 +48,8 @@ pub enum ExprValue {
     },
     IfElse {
         cond: Box<ExprValue>,
-        if_: Vec<ExprValue>,
-        else_: Vec<ExprValue>,
+        if_: Box<ExprValue>,
+        else_: Box<ExprValue>,
     },
     Assign {
         name: String,
@@ -72,7 +65,8 @@ pub enum ExprValue {
     Extern(String),
     None,
     // Walrus(Box<ExprValue>, String, Box<ExprValue>),
-    While(Box<ExprValue>, Vec<ExprValue>),
+    While(Box<ExprValue>, Box<ExprValue>),
+    Do(Vec<ExprValue>)
 }
 
 // 'extern' name (args) '->' return_type
@@ -83,12 +77,12 @@ pub struct External {
     pub return_type: String,
 }
 
-// 'def' name (args) '->' return_type { expressions}
+// 'def' name (args) '->' return_type expression 
 #[derive(Debug, Clone)]
 pub struct Function {
     pub name: String,
     pub args: Args,
-    pub expressions: Vec<(ExprValue, NodePosition)>,
+    pub expression: Box<(ExprValue, NodePosition)>,
     pub return_type: String,
 }
 

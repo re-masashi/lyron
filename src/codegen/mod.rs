@@ -4,11 +4,12 @@ use log::error;
 use owo_colors::OwoColorize;
 use std::borrow::Borrow;
 use std::cmp::Ordering;
-use std::collections::HashMap;
+// use std::collections::HashMap;
+use gxhash::{HashMap, HashMapExt};
 use std::convert::{From, TryFrom};
 use std::fmt;
 use std::fmt::Debug;
-use std::fs::{read_to_string, File};
+use std::fs::read_to_string;
 use std::process;
 use std::sync::Arc;
 
@@ -242,19 +243,21 @@ impl Callable for VMFunction {
         let Function {
             name: _,
             ref args,
-            expressions: _,
+            expression: _,
             return_type: _,
         } = self.decl.borrow();
         args.name.len()
     }
     fn call_(&self, visitor: &mut Visitor, arguments: Vec<Value>) -> Result<Value, VMError> {
-        // println!("Called");
         let Function {
-            name: _,
+            name,
             args,
-            expressions,
+            expression,
             return_type: _,
         } = self.decl.borrow();
+        
+        println!("Called {}", name);
+
         if args.name.is_empty() {
         } else if arguments.len() != self.arity() {
             panic!("Tried to call an invalid function");
@@ -264,19 +267,7 @@ impl Callable for VMFunction {
             }
         }
 
-        let mut last: Result<Value, VMError> = Ok(Value::None);
-        for ex in expressions {
-            // println!("{:#?}", ex);
-            visitor.position = ex.1.clone();
-            last = visitor.visit_expr(&mut ex.clone().0);
-            match last {
-                Ok(ref _v) => {}
-                Err(e) => {
-                    println!("err {:?}", e);
-                    return Err(e);
-                }
-            }
-        }
+        let last = visitor.visit_expr(&expression.clone().0);
         match last {
             Ok(v) => Ok(v),
             Err(e) => {
