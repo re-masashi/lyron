@@ -1,19 +1,20 @@
+
 class File{
+
 	def File(
 		self: File, 
 		path: Str, 
 		# permissions: Str
-	)->None do
-		self = setattr(self, "path", path);
-		# self = setattr(self, "permissions", permissions);
-		self
-	end
+	) -> None
+		setattr(self, "path", path)
 
 	def read(self: Self)->Str do
-		read_file(self.path);
+		read_file(self.path)
 	end
 
 	def write(self:Self, data: Str)->Any do
-		write_file(self.path, data);
+		write_file(self.path, data)
 	end
+
 }
+none

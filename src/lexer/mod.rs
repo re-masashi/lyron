@@ -24,8 +24,17 @@ impl Lexer {
     /// # Arguments
     /// * `file_path` - The path to the program file.
     pub fn from_file(file_path: &str) -> io::Result<Self> {
-        Ok(Self::from_text(&fs::read_to_string(file_path)?, file_path))
+        let mut contents = fs::read_to_string(file_path)?;
+        if contents.as_str()=="" {
+            return Ok(Self::from_text("", file_path))
+        }
+        if contents.chars().last().unwrap()!=';' {
+            contents+=";";
+        }
+        Ok(Self::from_text(&contents, file_path))
     }
+    // adding a ';' as a temporary fix to the "EOF" errors.
+    // will be fixed soon
 
     /// Create a lexer with the program data in plain text.
     ///

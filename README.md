@@ -1,52 +1,57 @@
 # Lyron
-A...programming language...
+A... programming language...
 
 ***NOTE:** It is a work in progress..*
 
 # Syntax
-* Note: The syntax is subject to change.
+* Note: The syntax might (and most probably will) undergo changes.
 * Functions:
-    * Regular function
-        ```
-        def sum(a:i32, b:i32) -> i32 {
-            return a + b;
-        }
-        ```
-    * External functions
-        ```
-        extern sin(num:f32);
-        ```
+    * Defining a function
+    ```
+    def sum(a:i32, b:i32) -> i32
+        a+b
+    end 
+    ```
     * Calling a function
         ```
-        sum(a, b);
+    sum(a, b)
         ```
-* Classes:
-    ```
-    class Name{
-        // functions
-    }
-    
-    ```
+* Class
+    * A class in lyron is just a collection of functions and attributes
+    * Constructors should have the same name as the class. Eg:
+        ```
+        class Animal{
+            def Animal(self: Self, age: i32)->Animal do
+                print("i'm an animal ")
+                print("i'm "+age+" years old.")
+                self = setattr(self, "age", age) # `self.age = age` is invalid!
+                self
+            end
+
+            def sound(self: Self) -> Animal
+                print("i make a sound")
+        }
+        ```
 
 * Variables:
     * Declaration:
     ```
-        let x: i32;    
+        let x: i32    
     ```
     * Assignment:
     ```
-        x = 42;    
+        x = 42 
     ```
     Note: Both need to be done separately.
 
 * Operations
     * Available operations `=`, `+`, `-`, `*`, `/`, `==`, `!=`, `<`, `>`, `<=`, `>=`, `+=`, `-=`, `*=`, `/=`
         ```
-        let a:i32 = (-b + 5) - 10 / -(5 - -2);
+        let a:i32 = (-b + 5) - 10 / -(5 - -2)
         ```
 * Comments
-    * Comments start with `#` and go until the end of the line
+    * Comments start with `#` and continue until the end of the line
 
 * Programs
-    * A program consists of just top-level functions, `extern` definitions, and expressions.
+    * A program consists of just top-level functions, classes, and expressions.
 

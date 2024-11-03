@@ -38,4 +38,4 @@ print(JSON().dumps(1))
 print(JSON().loads('{"A":1}'))
 
 if true then
-  print("hi");
+  print("hi")

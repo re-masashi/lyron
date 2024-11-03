@@ -160,16 +160,39 @@ pub fn __dict_keys(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VM
 }
 
 pub fn start_tcp_server(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
-    let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
     // let handle = &args[0];
+
+    let mut handle = &Value::None;
+    let mut port = &Value::Str("7878".to_string());
+    let mut address = &Value::Str("127.0.0.1".to_string());
+
+    match args.len() {
+        1=>{
+            handle = &args[0];
+        }
+        2=>{
+            handle = &args[0];
+            port = &args[1];
+        }
+        3=>{
+            handle = &args[0];
+            port = &args[1];
+            address = &args[2];
+        }
+        _=>return Err(VMError {
+            type_: "RuntimeError".to_string(),
+            cause: format!("Invalid number of arguments in `start_tcp_server`. found `{}`", &args.len()),
+        })
+    }
+
+    let listener = TcpListener::bind(address.to_string()+":"+&port.to_string()).unwrap();
+    
     for stream in listener.incoming() {
         let mut stream = stream.unwrap();
         let mut headers = [httparse::EMPTY_HEADER; 64];
         let mut req = httparse::Request::new(&mut headers);
         let mut data: HashMap<String, Value> = HashMap::new();
         let mut headers: HashMap<String, Value> = HashMap::new();
-
-        let handle = &args[0];
 
         data.insert(
             "addr".to_string(),
