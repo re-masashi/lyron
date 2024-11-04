@@ -12,6 +12,7 @@ use std::fmt::Debug;
 use std::fs::read_to_string;
 use std::process;
 use std::sync::Arc;
+use std::cell::RefCell;
 
 pub mod class;
 pub mod expression;
@@ -21,14 +22,14 @@ pub mod program;
 pub mod stdlib;
 // pub mod osutils;
 
-type NativeFn = fn(Vec<Value>, &mut Visitor) -> Result<Value, VMError>;
+type NativeFn = fn(Vec<Value>, &Visitor) -> Result<Value, VMError>;
 // (arity, args)->return value
-type DynFn = unsafe extern fn(i32, *mut *mut crate::ffi::LyValue) -> *mut crate::ffi::LyValue;
+// type DynFn = unsafe extern fn(i32, *mut *mut crate::ffi::LyValue) -> *mut crate::ffi::LyValue;
 
 pub trait Callable: Debug {
     fn arity(&self) -> usize;
 
-    fn call_(&self, visitor: &mut Visitor, arguments: Vec<Value>) -> Result<Value, VMError>;
+    fn call_(&self, visitor: &Visitor, arguments: Vec<Value>) -> Result<Value, VMError>;
 
     fn box_clone(&self) -> Box<dyn Callable>;
 }
@@ -51,7 +52,6 @@ impl PartialOrd for Box<dyn Callable> {
     }
 }
 
-#[no_mangle]
 #[derive(Debug, Clone)]
 pub enum Value {
     Int32(i32),
@@ -222,8 +222,8 @@ impl TryFrom<Value> for () {
 #[derive(Debug, Clone)]
 pub struct Visitor {
     pub position: NodePosition,
-    pub variables: HashMap<String, Value>,
-    pub objects: Vec<Option<Value>>,
+    pub variables: RefCell<HashMap<String, Value>>,
+    pub objects: RefCell<Vec<Option<Value>>>,
 }
 
 #[derive(Debug)]
@@ -248,27 +248,29 @@ impl Callable for VMFunction {
         } = self.decl.borrow();
         args.name.len()
     }
-    fn call_(&self, visitor: &mut Visitor, arguments: Vec<Value>) -> Result<Value, VMError> {
+
+    fn call_(&self, visitor: &Visitor, arguments: Vec<Value>) -> Result<Value, VMError> {
         let Function {
-            name,
+            name: _,
             args,
             expression,
             return_type: _,
         } = self.decl.borrow();
+
+        let v = visitor.clone(); // todo: any better way?
         
-        println!("Called {}", name);
+        // println!("Called {}", name);
 
         if args.name.is_empty() {
         } else if arguments.len() != self.arity() {
             panic!("Tried to call an invalid function");
         } else {
             for (i, arg) in args.name.clone().into_iter().enumerate() {
-                visitor.variables.insert(arg, arguments[i].clone());
+                v.variables.borrow_mut().insert(arg, arguments[i].clone());
             }
         }
 
-        let last = visitor.visit_expr(&expression.clone().0);
-        match last {
+        match v.visit_expr(&expression.clone().0) {
             Ok(v) => Ok(v),
             Err(e) => {
                 println!("err {:?}", e);
@@ -276,6 +278,7 @@ impl Callable for VMFunction {
             }
         }
     }
+
     fn box_clone(&self) -> Box<dyn Callable> {
         Box::new((*self).clone())
     }
@@ -283,7 +286,7 @@ impl Callable for VMFunction {
 
 // macro_rules! define_native {
 //     ($f:expr) => {
-//         self.variables.insert(
+//         self.variables.borrow_mut().insert(
 //             $f.to_string(),
 //             Value::NativeFunction("$f".to_string(), stdlib::$f),
 //         );
@@ -298,76 +301,72 @@ impl Visitor {
                 line_no: 0,
                 file: "main".to_string(),
             },
-            variables: HashMap::new(),
-            objects: Vec::new(),
+            variables: RefCell::new(HashMap::new()),
+            objects: RefCell::new(Vec::new()),
         }
     }
     pub fn init(&mut self) {
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "print".to_string(),
             Value::NativeFunction("print".to_string(), stdlib::print),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "input".to_string(),
             Value::NativeFunction("input".to_string(), stdlib::input),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "getattr".to_string(),
             Value::NativeFunction("getattr".to_string(), stdlib::__getattr),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "setattr".to_string(),
             Value::NativeFunction("setattr".to_string(), stdlib::__setattr),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "dict".to_string(),
             Value::NativeFunction("dict".to_string(), stdlib::__dict),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "__dict_keys".to_string(),
             Value::NativeFunction("__dict_keys".to_string(), stdlib::__dict_keys),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "startswith".to_string(),
             Value::NativeFunction("startswith".to_string(), stdlib::__startswith),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "len".to_string(),
             Value::NativeFunction("len".to_string(), stdlib::__len),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "array".to_string(),
             Value::NativeFunction("array".to_string(), stdlib::__array),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "json_parse".to_string(),
             Value::NativeFunction("json_parse".to_string(), crate::codegen::json::json_parse),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "json_dumps".to_string(),
             Value::NativeFunction("json_dumps".to_string(), crate::codegen::json::json_dumps),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "start_tcp_server".to_string(),
             Value::NativeFunction("start_tcp_server".to_string(), crate::codegen::stdlib::start_tcp_server),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "read_file".to_string(),
             Value::NativeFunction("read_file".to_string(), crate::codegen::stdlib::read_file),
         );
-        self.variables.insert(
+        self.variables.borrow_mut().insert(
             "write_file".to_string(),
             Value::NativeFunction("write_file".to_string(), crate::codegen::stdlib::write_file),
         );
-        // self.variables.insert(
-        //     "openfile".to_string(),
-        //     Value::NativeFunction("openfile".to_string(), crate::codegen::osutils::__openfile),
-        // );
-        // self.variables.insert(
+        // self.variables.borrow_mut().insert(
         //     "exec".to_string(),
         //     Value::NativeFunction("exec".to_string(), crate::codegen::osutils::__exec),
         // );
-        // self.variables.insert(
+        // self.variables.borrow_mut().insert(
         //     "socklisten".to_string(),
         //     Value::NativeFunction("socklisten".to_string(), crate::codegen::osutils::__socklisten),
         // );

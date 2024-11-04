@@ -10,6 +10,7 @@ readme = "README.md"
 
 [profile.release]
 debug = true
+lto = true
 
 #[[bench]]
 #name = "bench"

@@ -36,6 +36,7 @@ HelloWorld()
 use "std:json"
 print(JSON().dumps(1))
 print(JSON().loads('{"A":1}'))
+print([1,2]) # arrays work natively!
 
 if true then
   print("hi")

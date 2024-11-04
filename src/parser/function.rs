@@ -1,6 +1,6 @@
 use crate::lexer::tokens::{Token, TokenType};
-use crate::parser::{Args, ExprValue, Function, NodePosition, Parser};
-use crate::{unwrap_some, Result, Symbol};
+use crate::parser::{Args, Function, NodePosition, Parser};
+use crate::{unwrap_some, Result};
 
 impl Parser {
     fn parse_type_annot(&mut self) -> Result<(String, String)> {
@@ -61,7 +61,6 @@ impl Parser {
             name: vec![],
             type_: vec![],
         };
-        let expressions: Vec<(ExprValue, NodePosition)> = Vec::new();
         match self.tokens.peek() {
             Some(Token {
                 type_: TokenType::Def,
@@ -148,10 +147,6 @@ impl Parser {
                     _ => {}
                 }
                 self.current_scope = "global".to_string();
-                self.symtab.insert(
-                    name.clone(),
-                    Symbol::new(return_type.clone(), self.current_scope.clone()),
-                );
                 Ok((
                     Function {
                         name,

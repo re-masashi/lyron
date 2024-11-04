@@ -1,22 +1,30 @@
 use crate::codegen::{VMError, Value, Visitor};
 use gxhash::{HashMap, HashMapExt};
 use std::convert::TryFrom;
-use rayon::prelude::*;
+// use rayon::prelude::*;
 use std::net::TcpListener;
 use std::io::{BufReader, BufRead, Read, Write};
 use crate::codegen::Callable;
 use std::fs::OpenOptions;
 // use rayon::vec;
+// use std::borrow::{Borrow};
 
-pub fn print(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn print(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
+    // let mut stdout = std::io::stdout();
+    // let mut lock = stdout.lock();
+
+    // for arg in args {
+    //     write!(lock, "{} ", String::try_from(arg.clone()).unwrap());
+    // }
+    // writeln!(lock, "");
     for arg in args {
         print!("{} ", String::try_from(arg.clone()).unwrap());
     }
-    println!();
+    println!("");
     Ok(Value::None)
 }
 
-pub fn input(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn input(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     let mut line = String::new();
     let mut args = args.clone();
     if args.is_empty() {
@@ -33,7 +41,7 @@ pub fn input(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError>
     Ok(Value::Str(line))
 }
 
-pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn __getattr(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     if args.len() != 2 {
         return Ok(Value::None);
     }
@@ -53,7 +61,7 @@ pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
             }
             Ok(a[f64::try_from(args[1].clone()).unwrap() as usize].clone())
         }
-        Value::Object(_name, _fns, _attrs, pos) => match &_visitor.objects[*pos] {
+        Value::Object(_name, _fns, _attrs, pos) => match &_visitor.objects.borrow()[*pos] {
             Some(Value::Object(_n, _f, a, _)) => match a.get(&args[1].to_string()) {
                 Some(s) => Ok(s.clone()),
                 None => Err(VMError {
@@ -67,7 +75,7 @@ pub fn __getattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
     }
 }
 
-pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn __setattr(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     if args.len() != 3 {
         return Ok(Value::None);
     }
@@ -95,7 +103,7 @@ pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
     if let Value::Object(name, fns, attrs, pos) = &args[0] {
         let mut attrs = attrs.clone();
         attrs.insert(att.to_string(), v);
-        _visitor.objects[*pos] = Some(Value::Object(
+        _visitor.objects.borrow_mut()[*pos] = Some(Value::Object(
             name.clone(),
             fns.clone(),
             attrs.clone(),
@@ -111,11 +119,11 @@ pub fn __setattr(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
     Ok(Value::None)
 }
 
-pub fn __dict(_args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn __dict(_args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     Ok(Value::Dict(HashMap::new()))
 }
 
-pub fn __array(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn __array(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     let mut arr: Vec<Value> = Vec::new();
     for a in args {
         arr.push(a.clone());
@@ -123,7 +131,7 @@ pub fn __array(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMErro
     Ok(Value::Array(arr))
 }
 
-pub fn __startswith(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn __startswith(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     if args.len() != 2 {
         return Ok(Value::None);
     }
@@ -135,7 +143,7 @@ pub fn __startswith(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, V
     Ok(Value::Boolean(false))
 }
 
-pub fn __len(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn __len(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     if args.len() != 1 {
         return Ok(Value::None);
     }
@@ -148,7 +156,7 @@ pub fn __len(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError>
     Ok(Value::Float64(0.0))
 }
 
-pub fn __dict_keys(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn __dict_keys(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     let mut items: Vec<Value> = vec![];
     if let Value::Dict(map) = &args[0] {
         for key in map.keys() {
@@ -159,10 +167,10 @@ pub fn __dict_keys(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VM
     return Ok(Value::Array(items))
 }
 
-pub fn start_tcp_server(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn start_tcp_server(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     // let handle = &args[0];
 
-    let mut handle = &Value::None;
+    let handle;
     let mut port = &Value::Str("7878".to_string());
     let mut address = &Value::Str("127.0.0.1".to_string());
 
@@ -186,7 +194,7 @@ pub fn start_tcp_server(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Valu
     }
 
     let listener = TcpListener::bind(address.to_string()+":"+&port.to_string()).unwrap();
-    
+
     for stream in listener.incoming() {
         let mut stream = stream.unwrap();
         let mut headers = [httparse::EMPTY_HEADER; 64];
@@ -230,7 +238,7 @@ pub fn start_tcp_server(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Valu
             }
         }
 
-        if let Value::Function(name, fn_) = handle {
+        if let Value::Function(_name, fn_) = handle {
             data.insert(
                 "headers".to_string(),
                 Value::Dict(headers),
@@ -265,16 +273,16 @@ pub fn start_tcp_server(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Valu
     return Ok(Value::Float64(0.0))
 }
 
-pub fn read_file(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn read_file(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     let file = OpenOptions::new().read(true).open(args[0].to_string());
-    if let Err(e) = file {
+    if let Err(_e) = file {
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("No such file `{}` found", &args[0].to_string()),
         }) 
     }
     let mut contents = String::new();
-    if let Err(e) = file.unwrap().read_to_string(&mut contents){
+    if let Err(_e) = file.unwrap().read_to_string(&mut contents){
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("Failed to read file `{}`", &args[0].to_string()),
@@ -283,15 +291,15 @@ pub fn read_file(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMEr
     return Ok(Value::Str(contents))
 }
 
-pub fn write_file(args: Vec<Value>, _visitor: &mut Visitor) -> Result<Value, VMError> {
+pub fn write_file(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     let file = OpenOptions::new().write(true).open(args[0].to_string());
-    if let Err(e) = file {
+    if let Err(_e) = file {
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("No such file `{}` found", &args[0].to_string()),
         }) 
     }
-    if let Err(e) = file.unwrap().write_all(args[1].to_string().as_bytes()){
+    if let Err(_e) = file.unwrap().write_all(args[1].to_string().as_bytes()){
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("Failed to read file `{}`", &args[0].to_string()),

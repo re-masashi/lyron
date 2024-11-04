@@ -1,12 +1,12 @@
-def count(curr:int, end:int):
+def count(curr, end):
 	if curr<=end:
 		print(curr)
 		curr = curr +1
 		count(curr, end)
 
-count(0,100)
+#count(0,100)
 
 i = 0
-while i < 10000:
+while i < 1000000:
 	i = i + 1
 	print(i)

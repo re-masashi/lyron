@@ -1,0 +1,11 @@
+
+def count(curr:i32, endval:i32) ->Any do
+	if curr<=endval then do
+		print(curr);
+		curr = curr +1;
+		count(curr, endval);
+	end else
+		none
+end
+
+count(1, 100)

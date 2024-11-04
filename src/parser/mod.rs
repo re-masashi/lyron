@@ -1,8 +1,6 @@
 use crate::lexer::tokens::{Token, TokenType};
-use crate::SymbolTable;
-
 use std::fs::read_to_string;
-use std::io::BufRead;
+// use std::io::BufRead;
 use std::iter::Peekable;
 
 use std::vec::IntoIter;
@@ -66,7 +64,8 @@ pub enum ExprValue {
     None,
     // Walrus(Box<ExprValue>, String, Box<ExprValue>),
     While(Box<ExprValue>, Box<ExprValue>),
-    Do(Vec<ExprValue>)
+    Do(Vec<ExprValue>),
+    Array(Vec<ExprValue>),
 }
 
 // 'extern' name (args) '->' return_type
@@ -103,7 +102,6 @@ pub struct Module {
 /// A parser that generates an abstract syntax tree.
 pub struct Parser {
     tokens: TokenIter,
-    pub symtab: SymbolTable,
     current_scope: String,
     pos: i32,
     line_no: i32,
@@ -120,7 +118,6 @@ impl Parser {
     pub fn new(tokens: TokenIter, file_path: &str) -> Self {
         Parser {
             tokens,
-            symtab: SymbolTable::new(),
             current_scope: "global".to_string(),
             pos: -1,
             line_no: 1,

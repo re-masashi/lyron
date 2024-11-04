@@ -46,6 +46,13 @@ impl Parser {
         }
         self.advance();
         self.tokens.next(); // eat '}'
+        match self.tokens.peek() {
+            Some(t) if t.type_ == TokenType::Semicolon => {
+                self.advance();
+                self.tokens.next(); // Eat semicolon, if present
+            }
+            _ => {}
+        }
         Ok((Class { name, fns }, start))
     }
 }

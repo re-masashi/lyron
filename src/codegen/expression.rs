@@ -1,4 +1,4 @@
-use crate::codegen::{uoe, Callable, VMError, VMFunction, Value, Visitor};
+use crate::codegen::{uoe, Callable, VMError, Value, Visitor};
 use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
 use crate::parser::{ExprValue, Parser};
@@ -6,15 +6,48 @@ use log::error;
 use gxhash::{HashMap, HashMapExt};
 use std::convert::TryFrom;
 use std::process;
-use rayon::prelude::*;
-use serde_json::{Value as SerdeValue};
-use std::convert::TryInto;
+// use rayon::prelude::*;
+// use serde_json::{Value as SerdeValue};
+// use std::convert::TryInto;
+// use std::borrow::{BorrowMut};
 
 type Result<T> = std::result::Result<T, VMError>;
-type DynFn = unsafe extern fn(i32, *mut *mut crate::ffi::LyValue) -> *mut crate::ffi::LyValue;
+// type DynFn = unsafe extern fn(i32, *mut *mut crate::ffi::LyValue) -> *mut crate::ffi::LyValue;
 
 const MONITOR_THRESHOLD: usize = 300;
-const JIT_THRESHOLD: usize = 700;
+const _JIT_THRESHOLD: usize = 700;
+
+// macro_rules! call_ {
+//     ($f:expr, $v: expr, $arguments: expr) => {
+
+//         if $arguments.len() != $f.arity() {
+//             panic!("Tried to call an invalid function")
+//         } else {
+//             let Function {
+//                 name,
+//                 args,
+//                 expression,
+//                 return_type: _,
+//             } = $f.decl.borrow();
+
+//             let v = $v.clone();
+            
+//             println!("Called {}", name);
+
+//             for (i, arg) in args.name.clone().into_iter().enumerate() {
+//                 v.variables.borrow_mut().insert(arg, $arguments[i].clone());
+//             }
+
+//             match v.visit_expr(&expression.clone().0) {
+//                 Ok(v) => Ok(v),
+//                 Err(e) => {
+//                     println!("err {:?}", e);
+//                     Err(e)
+//                 }
+//             }
+//         }
+//     }
+// }
 
 macro_rules! unwrap_or_exit {
     ($f:expr, $origin:tt) => {
@@ -35,15 +68,18 @@ macro_rules! unwrap_or_exit {
 // }
 
 impl Visitor {
-    pub fn visit_expr(&mut self, expr: &ExprValue) -> Result<Value> {
+    pub fn visit_expr(&self, expr: &ExprValue) -> Result<Value> {
+        // let mut stack = vec![];
+
         match expr {
             ExprValue::FnCall(name, args) => {
-                let n = self.variables.get(name);
+                let n_ = self.variables.borrow();
+                let n = n_.get(name);
                 match n {
-                    Some(Value::Function(fname, f)) => {
+                    Some(Value::Function(_fname, f)) => {
                         let mut myargs: Vec<Value> = Vec::new();
-                        let mut selfclone = self.clone();
-                        for (_i, a) in args.into_iter().enumerate() {
+                        let selfclone = self;
+                        for a in args {
                             myargs.push(uoe(selfclone.visit_expr(a), &self.position));
                         }
                         // if f.call_count > MONITOR_THRESHOLD {
@@ -52,70 +88,58 @@ impl Visitor {
                         // if f.call_count > JIT_THRESHOLD {
                         //     // return Ok(jitfn(&mut self.clone(), myargs))
                         // }
-                        let c = uoe(f.clone().call_(self, myargs), &self.position);
-                        // self.variables.insert(name, Value::Function(fname.to_owned(), VMFunction{decl:f.decl.clone(), call_count:f.call_count+1}));
-                        Ok(c)
+                        // let c = uoe(f.clone().call_(self, myargs), &self.position);
+                        // println!("before crash 2 {:?}", self.position);
+
+                        Ok(uoe(
+                            f.call_(self, myargs), 
+                            &self.position
+                        ))
+                        // stack.push(uoe(f.clone().call_(self, myargs), &self.position));
+                        // self.variables.borrow().insert(name, Value::Function(fname.to_owned(), VMFunction{decl:f.decl.clone(), call_count:f.call_count+1}));
+                        // Ok(stack.pop().expect("unreachable"))
                     }
                     Some(Value::NativeFunction(_x, f)) => {
+                        // println!("before crash{:?}", self.position);
                         let mut myargs: Vec<Value> = Vec::new();
-                        let mut selfclone = self.clone();
+                        
                         for (_i, a) in args.into_iter().enumerate() {
-                            myargs.push(uoe(selfclone.visit_expr(a), &self.position));
+                            myargs.push(uoe(self.visit_expr(a), &self.position));
                         }
                         let c = uoe(f(myargs, self), &self.position);
                         Ok(c)
                     }
-                    Some(Value::DynFn(name, file, arity)) => {
-                        let myargs: Vec<Value> = Vec::new();
-                        let mut mylyargs: Vec<*mut crate::ffi::LyValue> = Vec::new();
-                        let mut selfclone = self.clone();
-                        unsafe{
-                            let lib = libloading::Library::new(file).unwrap();
-                            for (_i, a) in args.into_iter().enumerate() {
-                                let arg: *mut crate::ffi::LyValue = &mut crate::ffi::rust_to_c_lyvalue(
-                                    uoe(selfclone.visit_expr(a), &self.position)
-                                );
-                                mylyargs.push(arg);
-                            }
-                            let func: libloading::Symbol<DynFn>
-                                = lib.get(name.as_str().as_bytes()).unwrap();
-
-                            Ok(crate::ffi::c_to_lyvalue(
-                                func(*arity, mylyargs.as_mut_ptr())
-                            ))
-                        }
-                    }
                     Some(Value::Class(n, cl, _)) => {
-                        let obj_pos = self.objects.len();
+                        let obj_pos = self.objects.borrow().len();
                         let mut myargs: Vec<Value> = vec![Value::Object(
                             n.clone(),
                             cl.clone(),
                             HashMap::new(),
                             obj_pos,
                         )];
-                        self.objects.push(Some(myargs[0].clone()));
-                        let mut selfclone = self.clone();
-                        // self.objects.push(Some(myargs[0].clone()));
+                        {self.objects.borrow_mut().push(Some(myargs[0].clone()));}
+                        let selfclone = self;
+                        // self.objects.borrow().push(Some(myargs[0].clone()));
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(uoe(selfclone.visit_expr(a), &self.position));
                         }
                         match cl.get(n) {
                             Some(f) => {
                                 if f.arity() == 0 {
-                                    uoe(f.call_(&mut self.clone(), vec![]), &self.position);
-                                    self.objects.push(Some(myargs[0].clone()));
-                                    Ok(match &self.objects[self.objects.len() - 1] {
+                                    uoe(f.call_(&self, vec![]), &self.position);
+                                    self.objects.borrow_mut().push(Some(myargs[0].clone()));
+                                    Ok(match &self.objects.borrow()[self.objects.borrow().len() - 1] {
                                         Some(s) => s.clone(),
                                         None => unreachable!(),
                                     })
                                 } else {
                                     let objcons = uoe(
-                                        f.call_(&mut self.clone(), myargs),
+                                        f.call_(&self, myargs),
                                         &self.position,
                                     );
                                     if let Value::Object(_, _, _, _) = objcons {
-                                        self.objects.push(Some(objcons));
-                                        Ok(match &self.objects[self.objects.len() - 1] {
+                                        self.objects.borrow_mut().push(Some(objcons));
+                                        Ok(match &self.objects.borrow()[self.objects.borrow().len() - 1] {
                                             Some(s) => s.clone(),
                                             None => unreachable!(),
                                         })
@@ -133,10 +157,10 @@ impl Visitor {
                                     n.to_string(),
                                     cl.clone(),
                                     HashMap::new(),
-                                    self.objects.len(),
+                                    self.objects.borrow().len(),
                                 );
-                                self.objects.push(Some(obj));
-                                Ok(match &self.objects[self.objects.len() - 1] {
+                                self.objects.borrow_mut().push(Some(obj));
+                                Ok(match &self.objects.borrow()[self.objects.borrow().len() - 1] {
                                     Some(s) => s.clone(),
                                     None => unreachable!(),
                                 })
@@ -308,7 +332,7 @@ impl Visitor {
             ExprValue::Integer(b) => Ok(Value::Float64(*b as f64)),
             ExprValue::Double(b) => Ok(Value::Float64(*b as f64)),
             ExprValue::Str(s) => Ok(Value::Str(s.clone())),
-            ExprValue::Identifier(i) => match self.variables.get(i) {
+            ExprValue::Identifier(i) => match self.variables.borrow().get(i) {
                 Some(expr) => Ok(expr.clone()),
                 None => Err(VMError {
                     type_: "UnderclaredVariable".to_string(),
@@ -316,13 +340,13 @@ impl Visitor {
                 }),
             },
             ExprValue::VarDecl { name, type_: _ } => {
-                if self.variables.get(name).is_some() {
+                if self.variables.borrow().get(name).is_some() {
                     return Err(VMError {
                         type_: "Redeclaration".to_string(),
                         cause: name.to_string(),
                     });
                 }
-                self.variables.insert(name.to_string(), Value::Int32(0));
+                self.variables.borrow_mut().insert(name.to_string(), Value::Int32(0));
                 Ok(Value::Int32(0))
             }
             ExprValue::IfElse { cond, if_, else_ } => {
@@ -335,7 +359,7 @@ impl Visitor {
             }
             ExprValue::Assign { name, value } => {
                 let val = uoe(self.visit_expr(&*value), &self.position);
-                self.variables.insert(name.to_string(), val.clone());
+                self.variables.borrow_mut().insert(name.to_string(), val.clone());
                 Ok(val)
             }
             ExprValue::Use(path) => {
@@ -355,7 +379,7 @@ impl Visitor {
                     let mut visitor = Visitor::new();
                     visitor.init();
                     visitor.visit_program(program);
-                    self.variables.extend(visitor.variables.clone());
+                    self.variables.borrow_mut().extend(visitor.variables.borrow().clone());
                     return Ok(Value::None);
                 }
                 if &path[..2] == "@:"
@@ -375,7 +399,7 @@ impl Visitor {
                     let mut visitor = Visitor::new();
                     visitor.init();
                     visitor.visit_program(program);
-                    self.variables.extend(visitor.variables.clone());
+                    self.variables.borrow_mut().extend(visitor.variables.borrow().clone());
                     return Ok(Value::None);
                 }
                 let lexer = unwrap_or_exit!(Lexer::from_file(path), "IO");
@@ -387,49 +411,8 @@ impl Visitor {
                 let mut visitor = Visitor::new();
                 visitor.init();
                 visitor.visit_program(program);
-                self.variables.extend(visitor.variables.clone());
+                self.variables.borrow_mut().extend(visitor.variables.borrow().clone());
                 Ok(Value::None)
-            }
-            ExprValue::Extern(path) => {
-                unsafe{
-                    if &path[..4] == "std:" {
-                        let file = std::fs::read_to_string(path[4..].to_string()+".json")
-                            .unwrap();
-                        let v: SerdeValue = serde_json::from_str(&file).unwrap();
-                        // println!("{:?}", v)
-                        let mut functions: Vec<(String, u32, DynFn)> = vec![];
-                        let lib = libloading::Library::new(path[4..].to_string()+".so").unwrap();
-
-                        match &v["functions"] {
-                            SerdeValue::Array(a)=>{
-                                for x in a {
-                                    if let (SerdeValue::String(s), SerdeValue::Number(n)) = (&x["name"], &x["arity"]) {
-                                        if let Some(arity) = n.as_i64() {
-                                            let func: libloading::Symbol<DynFn>
-                                                = lib.get(s.as_str().as_bytes()).unwrap();
-
-                                            self.variables.insert(
-                                                s.to_string(),
-                                                Value::DynFn(s.to_string(), (path[4..].to_string()+".so").to_string(), arity.try_into().unwrap())
-                                            );
-
-                                            functions.push((s.to_string(), arity as u32, *func));
-                                        }
-                                    }
-                                }
-                            }
-                            _=>todo!()
-                        }
-                                                
-                        println!("functions {:?}", functions);
-                        return Ok(Value::None);
-                    }
-                    if &path[..2] == "@:"
-                     {
-                        return Ok(Value::None);
-                    }
-                    Ok(Value::None)
-                }
             }
             ExprValue::While(cond, expr) => {
                 let retval: Result<Value> = Ok(Value::None);
@@ -439,20 +422,19 @@ impl Visitor {
                 {
                     // println!("loopin");
                     // println!("{:?}", cond);
-                    self.visit_expr(&*expr);
+                    let _ = self.visit_expr(&*expr);
                     exec_count+=1;
                 }
                 
                 // println!("{:?}", cond);
-                // println!("{:?}", self.variables.get("i"));
+                // println!("{:?}", self.variables.borrow().get("i"));
 
                 if exec_count < MONITOR_THRESHOLD {// loop exit
                     return retval
                 }
                 // control comes here if cond is true and monitoring shall start.
                 // todo
-                retval
-                
+                retval               
             }
             ExprValue::Do(expressions) => {
                 // println!("doin");
@@ -464,25 +446,19 @@ impl Visitor {
                 // println!("ret final {:?}", retval);
                 retval
             }
-            // ExprValue::Walrus(obj, attr, val) => {
-            //     let obj =self.visit_expr(&mut *obj).unwrap();
-            //     match obj {
-            //         Value::Object(n, c, mut a) => {
-            //             a.insert(n.clone(), self.visit_expr(&mut *val).unwrap());
-            //             Ok(Value::Object(n.to_string(), c, a))
-            //         },
-            //         _ => return Err(VMError {
-            //             type_: "ValueError".to_string(),
-            //             cause: "IDDDKKK".to_string(),
-            //         }),
-            //     }
-            // }
+            ExprValue::Array(arr)=>{
+                let mut exprs = vec![];
+                for x in arr {
+                    exprs.push(self.visit_expr(x).unwrap());
+                }
+                Ok(Value::Array(exprs))
+            }
             x => panic!("{:?}", x),
         }
     }
     
     pub fn monitor_fn(args: Vec<Value>) -> bool {
-        for arg in args {
+        for _arg in args {
             // if let Some(pat) = expr {
             //     expr
             // }
@@ -490,11 +466,4 @@ impl Visitor {
         }
         return true
     }
-}
-
-fn base_obj_hashmap() -> HashMap<String, VMFunction> {
-    
-    // base.insert("getattr".to_string(), Value::NativeFunction("getattr".to_string(), stdlib::__getattr));
-    // base.insert("setattr".to_string(), Value::NativeFunction("setattr".to_string(), stdlib::__setattr));
-    HashMap::new()
 }

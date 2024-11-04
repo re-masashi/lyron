@@ -1,6 +1,6 @@
 use crate::lexer::tokens::TokenType;
 use crate::parser::{ExprValue, NodePosition, Parser};
-use crate::{unwrap_some, Result, Symbol};
+use crate::{unwrap_some, Result};
 use log::trace;
 
 impl Parser {
@@ -66,6 +66,7 @@ impl Parser {
 
                 TokenType::Str(_) => self.parse_string(),
                 TokenType::Async|TokenType::Await=> panic!("yet to be implemented"),
+                TokenType::LBrack => self.parse_array(),
 
                 _ =>{
                     // println!("{:?}", x);
@@ -126,6 +127,46 @@ impl Parser {
                 }
             };
         }
+    }
+
+    pub fn parse_array(&mut self) -> Result<(ExprValue, NodePosition)> {
+        self.advance();
+        let pos = unwrap_some!(self.tokens.next());
+        let mut pos = NodePosition {
+            pos: pos.pos,
+            line_no: pos.line_no,
+            file: pos.file,
+        };
+        let mut expressions = vec![];
+
+        if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrack {
+            self.advance();
+            self.tokens.next(); // Eat ']'
+        } else {
+            loop {
+                if unwrap_some!(self.tokens.peek()).type_ == TokenType::Comma {
+                    self.advance();
+                    self.tokens.next(); // Eat ','
+                    continue;
+                }
+                if unwrap_some!(self.tokens.peek()).type_ == TokenType::RBrack {
+                    self.advance();
+                    self.tokens.next(); // Eat ']'
+                    break;
+                }
+                let expr = self.parse_expression();
+                match expr {
+                    Ok((expr, p)) => {
+                        expressions.insert(expressions.len(), expr);
+                        pos = p;
+                    }
+                    Err(e) => {
+                        return Err(e);
+                    }
+                };
+            }
+        }
+        Ok((ExprValue::Array(expressions), pos))
     }
 
     pub fn parse_unop(&mut self) -> Result<(ExprValue, NodePosition)> {
@@ -221,8 +262,8 @@ impl Parser {
         // trace!("Parsing if else");
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat 'if'
-        let type_ = String::from("unavailable");
-        let hastype = !true;
+        // let type_ = String::from("unavailable");
+        // let hastype = !true;
 
         let cond = Box::new(self.parse_expression().unwrap().0);
 
@@ -235,13 +276,13 @@ impl Parser {
         }
 
         // println!("{:?} {:?}", self.pos, self.line_no);
-        let (expression_if, pos) = self.parse_expression().unwrap();
+        let (expression_if, _pos) = self.parse_expression().unwrap();
 
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Else {
             self.advance();
             self.tokens.next(); // Eat 'else'
 
-            let (expression_else, pos) = self.parse_expression().unwrap();
+            let (expression_else, _pos) = self.parse_expression().unwrap();
 
             Ok((
                 ExprValue::IfElse {
@@ -306,10 +347,6 @@ impl Parser {
             TokenType::Identifier(t) => t,
             _ => return Err(self.parser_error("Expected an identifier")),
         };
-        self.symtab.insert(
-            name.clone(),
-            Symbol::new(type_.clone(), self.current_scope.clone()),
-        );
         Ok((
             ExprValue::VarDecl { name, type_ },
             NodePosition {

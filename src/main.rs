@@ -44,27 +44,7 @@ pub fn main() {
             }
             let mut visitor = Visitor::new();
             visitor.init();
-            // call_dynamic("puts");
-            // future
-                // ::block_on(async {
-                    // unsafe {
-                    //     let lib = libloading::Library::new("/usr/lib/liblyron.so").unwrap();
-                    //     let func: libloading::Symbol<unsafe extern fn() -> *mut lyronc::ffi::LyValue> = lib.get("gen_val_ptr\0".as_bytes()).unwrap();
-                    //     let lyval = func();
-                    //     (*(*lyval).val).StringVal = "Hey\0"
-                    //                             .as_ptr() as *mut core::ffi::c_char;
-                    //     (*lyval).typeindex = 3;
-
-                    //     println!("typeindex of call_printf: {:?}", (
-                    //         *call_dynamic(
-                    //             "call_printf\0", 
-                    //             1,
-                    //             [lyval].as_mut_ptr()
-                    //         ).unwrap()).typeindex
-                    //     );
-                    // }
-                    visitor.visit_program(program);
-                // })
+            visitor.visit_program(program);
         },
         Some("build-ffi")=>{
             Command::new("g++")
@@ -79,12 +59,4 @@ pub fn main() {
         }
         Some(_)=>todo!()
     };
-}
-
-fn call_dynamic(funname: &str, arity: i32, args: *mut *mut lyronc::ffi::LyValue) -> Result<*mut lyronc::ffi::LyValue, Box<dyn std::error::Error>> {
-    unsafe {
-        let lib = libloading::Library::new("./examples/ffi/call_printf.so")?;
-        let func: libloading::Symbol<unsafe extern fn(i32, *mut *mut lyronc::ffi::LyValue) -> *mut lyronc::ffi::LyValue> = lib.get(funname.as_bytes())?;
-        Ok(func(arity, args))
-    }
 }
