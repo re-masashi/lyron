@@ -1,0 +1,11 @@
+def sq(v: Number) -> Number v*v
+
+do
+	x = 1212
+	[x, 2, 3]
+	x+1
+	3+4
+	sq(3)
+	1+1
+end
+2-2
