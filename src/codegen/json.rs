@@ -1,8 +1,8 @@
-use crate::codegen::{VMError, Value, Visitor};
+use crate::codegen::{VMError, Value, Visitor, program::VM};
 use serde_json::{from_str as serde_from_str, Value as SerdeValue};
 use gxhash::{HashMap, HashMapExt};
 
-pub fn json_parse(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
+pub fn json_parse(args: Vec<Value>, ) -> Result<Value, VMError> {
     if args.is_empty() {
         return Ok(Value::None);
     }
@@ -28,7 +28,7 @@ pub fn json_parse(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError
     }
 }
 
-pub fn json_dumps(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
+pub fn json_dumps(args: Vec<Value>, ) -> Result<Value, VMError> {
     Ok(Value::Str(value_to_json(args[0].clone())))
 }
 

@@ -106,8 +106,9 @@ impl Visitor {
                         for (_i, a) in args.into_iter().enumerate() {
                             myargs.push(uoe(self.visit_expr(a), &self.position));
                         }
-                        let c = uoe(f(myargs, self), &self.position);
-                        Ok(c)
+                        Ok(Value::None)
+                        // let c = uoe(f(myargs, self), &self.position);
+                        // Ok(c)
                     }
                     Some(Value::Class(n, cl, _)) => {
                         let obj_pos = self.objects.borrow().len();
@@ -117,7 +118,7 @@ impl Visitor {
                             HashMap::new(),
                             obj_pos,
                         )];
-                        {self.objects.borrow_mut().push(Some(myargs[0].clone()));}
+                        self.objects.borrow_mut().push(Some(myargs[0].clone()));
                         let selfclone = self;
                         // self.objects.borrow().push(Some(myargs[0].clone()));
                         for (_i, a) in args.into_iter().enumerate() {
@@ -127,22 +128,17 @@ impl Visitor {
                             Some(f) => {
                                 if f.arity() == 0 {
                                     uoe(f.call_(&self, vec![]), &self.position);
-                                    self.objects.borrow_mut().push(Some(myargs[0].clone()));
-                                    Ok(match &self.objects.borrow()[self.objects.borrow().len() - 1] {
-                                        Some(s) => s.clone(),
-                                        None => unreachable!(),
-                                    })
+                                    let retval = myargs[0].clone();
+                                    self.objects.borrow_mut().push(Some(retval.clone()));
+                                    Ok(retval)
                                 } else {
                                     let objcons = uoe(
                                         f.call_(&self, myargs),
                                         &self.position,
                                     );
                                     if let Value::Object(_, _, _, _) = objcons {
-                                        self.objects.borrow_mut().push(Some(objcons));
-                                        Ok(match &self.objects.borrow()[self.objects.borrow().len() - 1] {
-                                            Some(s) => s.clone(),
-                                            None => unreachable!(),
-                                        })
+                                        self.objects.borrow_mut().push(Some(objcons.clone()));
+                                        Ok(objcons)
                                     } else {
                                         println!("{:?}", objcons);
                                         Err(VMError {

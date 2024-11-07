@@ -7,6 +7,8 @@ def count(curr:i32, endval:i32) ->Any do
 		none
 end
 
+print("started")
+
 class ABC {
 	
 	def ABC(self:Self, a: Any)->ABC do # constuctor
@@ -21,7 +23,12 @@ class ABC {
 
 }
 
+print("started 1")
+
 myobj = ABC(1)
+
+print("started 2")
+
 myobj.mydef()
 
 count(1,10)

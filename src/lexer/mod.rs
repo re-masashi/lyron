@@ -287,7 +287,7 @@ impl Iterator for Lexer {
                 self.raw_data.next(); // Eat =
                 token = Ok(TokenType::GreaterEq);
             } else {
-                token = Ok(TokenType::GreaterEq);
+                token = Ok(TokenType::Greater);
             }
         }
         // Assign and Equal
