@@ -1,5 +1,5 @@
 i = 0.0
-while i < 1000000 do
+while i < 100000 do
 	i = i+1.0
-	print(i)
+	#print(i)
 end

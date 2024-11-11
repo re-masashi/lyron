@@ -14,7 +14,7 @@ A... programming language...
     ```
     * Calling a function
         ```
-    sum(a, b)
+        sum(a, b)
         ```
 * Class
     * A class in lyron is just a collection of functions and attributes
