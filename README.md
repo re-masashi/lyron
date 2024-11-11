@@ -7,11 +7,11 @@ A... programming language...
 * Note: The syntax might (and most probably will) undergo changes.
 * Functions:
     * Defining a function
-    ```
-    def sum(a:i32, b:i32) -> i32
-        a+b
-    end 
-    ```
+        ```
+        def sum(a:i32, b:i32) -> i32
+            a+b
+        end 
+        ```
     * Calling a function
         ```
         sum(a, b)
@@ -35,13 +35,13 @@ A... programming language...
 
 * Variables:
     * Declaration:
-    ```
+        ```
         let x: i32    
-    ```
+        ```
     * Assignment:
-    ```
+        ```
         x = 42 
-    ```
+        ```
     Note: Both need to be done separately.
 
 * Operations
@@ -51,6 +51,9 @@ A... programming language...
         ```
 * Comments
     * Comments start with `#` and continue until the end of the line
+        ```
+        # this is a comment
+        ```
 
 * Programs
     * A program consists of just top-level functions, classes, and expressions.
