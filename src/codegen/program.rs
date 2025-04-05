@@ -3,7 +3,7 @@ use crate::codegen::{uoe, VMError, Visitor, Value};
 use crate::parser::{AstNode, NodePosition, Function, ExprValue};
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex};
-use gxhash::HashMap;
+// use gxhash::HashMap;
 
 pub type Result<T> = std::result::Result<T, VMError>;
 

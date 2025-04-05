@@ -2,7 +2,8 @@ use crate::codegen::{VMFunction, Value, Visitor};
 
 use crate::parser::Class;
 
-use gxhash::{HashMap, HashMapExt};
+// use gxhash::{HashMap, HashMapExt};
+use std::collections::HashMap;
 
 impl Visitor {
     pub fn visit_class(&self, c: Class) {

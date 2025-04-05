@@ -1,5 +1,6 @@
 use crate::codegen::{VMError, Value, Visitor};
-use gxhash::{HashMap, HashMapExt};
+// use gxhash::{HashMap, HashMapExt};
+use std::collections::HashMap;
 use std::convert::TryFrom;
 // use rayon::prelude::*;
 use std::net::TcpListener;

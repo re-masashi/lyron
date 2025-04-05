@@ -3,9 +3,14 @@ use crate::lexer::tokens::TokenType;
 use crate::lexer::Lexer;
 use crate::parser::{ExprValue, Parser};
 use log::error;
-use gxhash::{HashMap, HashMapExt};
+
+// use gxhash::{HashMap, HashMapExt};
+
+use std::collections::HashMap;
+
 use std::convert::TryFrom;
 use std::process;
+
 // use rayon::prelude::*;
 // use serde_json::{Value as SerdeValue};
 // use std::convert::TryInto;
