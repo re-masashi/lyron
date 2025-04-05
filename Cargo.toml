@@ -35,3 +35,6 @@ httparse = "1.9.4"
 gxhash = {version= "3.4.1", optional = true}
 #futures-lite = "2.3.0"
 #smol = "2.0.0"
+
+[features]
+gxhash = ["dep:gxhash"]

@@ -1,8 +1,6 @@
-use crate::codegen::{uoe, VMError, Visitor, Value};
+use crate::codegen::{uoe, VMError, Visitor};
 
-use crate::parser::{AstNode, NodePosition, Function, ExprValue};
-use std::cell::RefCell;
-use std::sync::{Arc, Mutex};
+use crate::parser::{AstNode, NodePosition};
 // use gxhash::HashMap;
 
 pub type Result<T> = std::result::Result<T, VMError>;
