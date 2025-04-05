@@ -1,0 +1,1728 @@
+desc: (none)
+cmd: target/release/lyronc bench.txt
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=4118865
+mem_heap_B=185859
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=11514087
+mem_heap_B=210435
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=detailed
+n5: 210435 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 36920 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 36920 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 36920 0x14368F: realloc (alloc.rs:136)
+    n1: 36920 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 36920 0x14368F: grow (alloc.rs:282)
+      n3: 36920 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 32768 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 32768 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 32768 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 32768 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 32768 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 32768 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 32768 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 32768 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 32768 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 32768 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 32768 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 32768 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 32768 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 32768 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 32768 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 32768 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 32768 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 32768 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 32768 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 32768 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n1: 4096 0x14355F: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n2: 4096 0x14355F: alloc::raw_vec::RawVecInner<A>::reserve::do_reserve_and_handle (raw_vec.rs:551)
+         n1: 4096 0x21D02A: UnknownInlinedFun (raw_vec.rs:557)
+          n1: 4096 0x21D02A: UnknownInlinedFun (raw_vec.rs:333)
+           n1: 4096 0x21D02A: UnknownInlinedFun (mod.rs:1271)
+            n1: 4096 0x21D02A: UnknownInlinedFun (mod.rs:3539)
+             n1: 4096 0x21D02A: UnknownInlinedFun (spec_extend.rs:19)
+              n1: 4096 0x21D02A: UnknownInlinedFun (spec_from_iter_nested.rs:42)
+               n1: 4096 0x21D02A: UnknownInlinedFun (spec_from_iter.rs:34)
+                n1: 4096 0x21D02A: from_iter<lyronc::lexer::tokens::Token, core::iter::adapters::map::Map<lyronc::lexer::Lexer, lyronc::main::{closure_env#0}>> (mod.rs:3427)
+                 n1: 4096 0x21D02A: collect<core::iter::adapters::map::Map<lyronc::lexer::Lexer, lyronc::main::{closure_env#0}>, alloc::vec::Vec<lyronc::lexer::tokens::Token, alloc::alloc::Global>> (iterator.rs:1971)
+                  n1: 4096 0x21D02A: lyronc::main (main.rs:32)
+                   n1: 4096 0x218E62: call_once<fn(), ()> (function.rs:250)
+                    n1: 4096 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                     n1: 4096 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                      n1: 4096 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                       n1: 4096 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                        n1: 4096 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                         n1: 4096 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                          n1: 4096 0x2E82D3: {closure#1} (rt.rs:174)
+                           n1: 4096 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                            n1: 4096 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                             n1: 4096 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                              n1: 4096 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                               n0: 4096 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+         n0: 0 in 6 places, all below massif's threshold (1.00%)
+       n0: 56 in 2 places, all below massif's threshold (1.00%)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 5680 0x142373: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 5680 0x142373: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 5680 0x142373: alloc (alloc.rs:96)
+    n1: 5680 0x142373: UnknownInlinedFun (alloc.rs:192)
+     n1: 5680 0x142373: allocate (alloc.rs:254)
+      n1: 5680 0x142373: do_alloc<alloc::alloc::Global> (alloc.rs:15)
+       n1: 5680 0x142373: new_uninitialized<alloc::alloc::Global> (mod.rs:1445)
+        n1: 5680 0x142373: fallible_with_capacity<alloc::alloc::Global> (mod.rs:1484)
+         n1: 5680 0x142373: prepare_resize<alloc::alloc::Global> (mod.rs:2551)
+          n1: 5680 0x142373: resize_inner<alloc::alloc::Global> (mod.rs:2749)
+           n1: 5680 0x142373: reserve_rehash_inner<alloc::alloc::Global> (mod.rs:2637)
+            n1: 5680 0x142373: hashbrown::raw::RawTable<T,A>::reserve_rehash (mod.rs:954)
+             n1: 5680 0x214922: UnknownInlinedFun (mod.rs:902)
+              n1: 5680 0x214922: find_or_find_insert_slot<(alloc::string::String, lyronc::codegen::Value), alloc::alloc::Global, hashbrown::map::equivalent_key::{closure_env#0}<alloc::string::String, alloc::string::String, lyronc::codegen::Value>, hashbrown::map::make_hasher::{closure_env#0}<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher>> (mod.rs:1115)
+               n1: 5680 0x214922: find_or_find_insert_slot<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher, alloc::alloc::Global, alloc::string::String> (map.rs:1812)
+                n2: 5680 0x214922: hashbrown::map::HashMap<K,V,S,A>::insert (map.rs:1792)
+                 n1: 5680 0x1EB61C: UnknownInlinedFun (map.rs:1191)
+                  n1: 5680 0x1EB61C: UnknownInlinedFun (program.rs:893)
+                   n1: 5680 0x1EB61C: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+                    n1: 5680 0x21E6B3: lyronc::main (main.rs:47)
+                     n1: 5680 0x218E62: call_once<fn(), ()> (function.rs:250)
+                      n1: 5680 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                       n1: 5680 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                        n1: 5680 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                         n1: 5680 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                          n1: 5680 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                           n1: 5680 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                            n1: 5680 0x2E82D3: {closure#1} (rt.rs:174)
+                             n1: 5680 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                              n1: 5680 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                               n1: 5680 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                                n1: 5680 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                                 n0: 5680 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+                 n0: 0 in 1 place, below massif's threshold (1.00%)
+ n0: 1947 in 77 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=3
+#-----------
+time=17985528
+mem_heap_B=243203
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=23750034
+mem_heap_B=243211
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=27905106
+mem_heap_B=243211
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=32788096
+mem_heap_B=308739
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=38149972
+mem_heap_B=308739
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=44718652
+mem_heap_B=308739
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=51287332
+mem_heap_B=308739
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=detailed
+n5: 308739 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 135224 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 135224 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 135224 0x14368F: realloc (alloc.rs:136)
+    n1: 135224 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 135224 0x14368F: grow (alloc.rs:282)
+      n3: 135224 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 131072 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 131072 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 131072 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 131072 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 131072 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 131072 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 131072 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 131072 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 131072 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 131072 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 131072 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 131072 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 131072 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 131072 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 131072 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 131072 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 131072 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 131072 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 131072 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 131072 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n1: 4096 0x14355F: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n2: 4096 0x14355F: alloc::raw_vec::RawVecInner<A>::reserve::do_reserve_and_handle (raw_vec.rs:551)
+         n1: 4096 0x21D02A: UnknownInlinedFun (raw_vec.rs:557)
+          n1: 4096 0x21D02A: UnknownInlinedFun (raw_vec.rs:333)
+           n1: 4096 0x21D02A: UnknownInlinedFun (mod.rs:1271)
+            n1: 4096 0x21D02A: UnknownInlinedFun (mod.rs:3539)
+             n1: 4096 0x21D02A: UnknownInlinedFun (spec_extend.rs:19)
+              n1: 4096 0x21D02A: UnknownInlinedFun (spec_from_iter_nested.rs:42)
+               n1: 4096 0x21D02A: UnknownInlinedFun (spec_from_iter.rs:34)
+                n1: 4096 0x21D02A: from_iter<lyronc::lexer::tokens::Token, core::iter::adapters::map::Map<lyronc::lexer::Lexer, lyronc::main::{closure_env#0}>> (mod.rs:3427)
+                 n1: 4096 0x21D02A: collect<core::iter::adapters::map::Map<lyronc::lexer::Lexer, lyronc::main::{closure_env#0}>, alloc::vec::Vec<lyronc::lexer::tokens::Token, alloc::alloc::Global>> (iterator.rs:1971)
+                  n1: 4096 0x21D02A: lyronc::main (main.rs:32)
+                   n1: 4096 0x218E62: call_once<fn(), ()> (function.rs:250)
+                    n1: 4096 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                     n1: 4096 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                      n1: 4096 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                       n1: 4096 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                        n1: 4096 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                         n1: 4096 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                          n1: 4096 0x2E82D3: {closure#1} (rt.rs:174)
+                           n1: 4096 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                            n1: 4096 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                             n1: 4096 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                              n1: 4096 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                               n0: 4096 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+         n0: 0 in 6 places, all below massif's threshold (1.00%)
+       n0: 56 in 2 places, all below massif's threshold (1.00%)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 5680 0x142373: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 5680 0x142373: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 5680 0x142373: alloc (alloc.rs:96)
+    n1: 5680 0x142373: UnknownInlinedFun (alloc.rs:192)
+     n1: 5680 0x142373: allocate (alloc.rs:254)
+      n1: 5680 0x142373: do_alloc<alloc::alloc::Global> (alloc.rs:15)
+       n1: 5680 0x142373: new_uninitialized<alloc::alloc::Global> (mod.rs:1445)
+        n1: 5680 0x142373: fallible_with_capacity<alloc::alloc::Global> (mod.rs:1484)
+         n1: 5680 0x142373: prepare_resize<alloc::alloc::Global> (mod.rs:2551)
+          n1: 5680 0x142373: resize_inner<alloc::alloc::Global> (mod.rs:2749)
+           n1: 5680 0x142373: reserve_rehash_inner<alloc::alloc::Global> (mod.rs:2637)
+            n1: 5680 0x142373: hashbrown::raw::RawTable<T,A>::reserve_rehash (mod.rs:954)
+             n1: 5680 0x214922: UnknownInlinedFun (mod.rs:902)
+              n1: 5680 0x214922: find_or_find_insert_slot<(alloc::string::String, lyronc::codegen::Value), alloc::alloc::Global, hashbrown::map::equivalent_key::{closure_env#0}<alloc::string::String, alloc::string::String, lyronc::codegen::Value>, hashbrown::map::make_hasher::{closure_env#0}<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher>> (mod.rs:1115)
+               n1: 5680 0x214922: find_or_find_insert_slot<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher, alloc::alloc::Global, alloc::string::String> (map.rs:1812)
+                n2: 5680 0x214922: hashbrown::map::HashMap<K,V,S,A>::insert (map.rs:1792)
+                 n1: 5680 0x1EB61C: UnknownInlinedFun (map.rs:1191)
+                  n1: 5680 0x1EB61C: UnknownInlinedFun (program.rs:893)
+                   n1: 5680 0x1EB61C: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+                    n1: 5680 0x21E6B3: lyronc::main (main.rs:47)
+                     n1: 5680 0x218E62: call_once<fn(), ()> (function.rs:250)
+                      n1: 5680 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                       n1: 5680 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                        n1: 5680 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                         n1: 5680 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                          n1: 5680 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                           n1: 5680 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                            n1: 5680 0x2E82D3: {closure#1} (rt.rs:174)
+                             n1: 5680 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                              n1: 5680 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                               n1: 5680 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                                n1: 5680 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                                 n0: 5680 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+                 n0: 0 in 1 place, below massif's threshold (1.00%)
+ n0: 1947 in 77 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=10
+#-----------
+time=56849059
+mem_heap_B=308739
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=60489810
+mem_heap_B=308797
+mem_heap_extra_B=1107
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=66096094
+mem_heap_B=439867
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=70465030
+mem_heap_B=439867
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=detailed
+n5: 439867 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 266296 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 266296 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 266296 0x14368F: realloc (alloc.rs:136)
+    n1: 266296 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 266296 0x14368F: grow (alloc.rs:282)
+      n2: 266296 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 262144 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 262144 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 262144 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 262144 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 262144 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 262144 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 262144 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 262144 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 262144 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 262144 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 262144 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 262144 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 262144 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 262144 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 262144 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 262144 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 262144 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 262144 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 262144 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 262144 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 5680 0x142373: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 5680 0x142373: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 5680 0x142373: alloc (alloc.rs:96)
+    n1: 5680 0x142373: UnknownInlinedFun (alloc.rs:192)
+     n1: 5680 0x142373: allocate (alloc.rs:254)
+      n1: 5680 0x142373: do_alloc<alloc::alloc::Global> (alloc.rs:15)
+       n1: 5680 0x142373: new_uninitialized<alloc::alloc::Global> (mod.rs:1445)
+        n1: 5680 0x142373: fallible_with_capacity<alloc::alloc::Global> (mod.rs:1484)
+         n1: 5680 0x142373: prepare_resize<alloc::alloc::Global> (mod.rs:2551)
+          n1: 5680 0x142373: resize_inner<alloc::alloc::Global> (mod.rs:2749)
+           n1: 5680 0x142373: reserve_rehash_inner<alloc::alloc::Global> (mod.rs:2637)
+            n1: 5680 0x142373: hashbrown::raw::RawTable<T,A>::reserve_rehash (mod.rs:954)
+             n1: 5680 0x214922: UnknownInlinedFun (mod.rs:902)
+              n1: 5680 0x214922: find_or_find_insert_slot<(alloc::string::String, lyronc::codegen::Value), alloc::alloc::Global, hashbrown::map::equivalent_key::{closure_env#0}<alloc::string::String, alloc::string::String, lyronc::codegen::Value>, hashbrown::map::make_hasher::{closure_env#0}<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher>> (mod.rs:1115)
+               n1: 5680 0x214922: find_or_find_insert_slot<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher, alloc::alloc::Global, alloc::string::String> (map.rs:1812)
+                n2: 5680 0x214922: hashbrown::map::HashMap<K,V,S,A>::insert (map.rs:1792)
+                 n1: 5680 0x1EB61C: UnknownInlinedFun (map.rs:1191)
+                  n1: 5680 0x1EB61C: UnknownInlinedFun (program.rs:893)
+                   n1: 5680 0x1EB61C: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+                    n1: 5680 0x21E6B3: lyronc::main (main.rs:47)
+                     n1: 5680 0x218E62: call_once<fn(), ()> (function.rs:250)
+                      n1: 5680 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                       n1: 5680 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                        n1: 5680 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                         n1: 5680 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                          n1: 5680 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                           n1: 5680 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                            n1: 5680 0x2E82D3: {closure#1} (rt.rs:174)
+                             n1: 5680 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                              n1: 5680 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                               n1: 5680 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                                n1: 5680 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                                 n0: 5680 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+                 n0: 0 in 1 place, below massif's threshold (1.00%)
+ n0: 2003 in 77 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=14
+#-----------
+time=74833966
+mem_heap_B=439867
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=79202902
+mem_heap_B=439867
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=83571838
+mem_heap_B=439867
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=87940774
+mem_heap_B=439867
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=92717856
+mem_heap_B=439811
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=detailed
+n5: 439811 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 266296 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 266296 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 266296 0x14368F: realloc (alloc.rs:136)
+    n1: 266296 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 266296 0x14368F: grow (alloc.rs:282)
+      n2: 266296 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 262144 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 262144 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 262144 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 262144 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 262144 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 262144 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 262144 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 262144 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 262144 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 262144 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 262144 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 262144 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 262144 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 262144 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 262144 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 262144 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 262144 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 262144 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 262144 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 262144 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 5680 0x142373: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 5680 0x142373: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 5680 0x142373: alloc (alloc.rs:96)
+    n1: 5680 0x142373: UnknownInlinedFun (alloc.rs:192)
+     n1: 5680 0x142373: allocate (alloc.rs:254)
+      n1: 5680 0x142373: do_alloc<alloc::alloc::Global> (alloc.rs:15)
+       n1: 5680 0x142373: new_uninitialized<alloc::alloc::Global> (mod.rs:1445)
+        n1: 5680 0x142373: fallible_with_capacity<alloc::alloc::Global> (mod.rs:1484)
+         n1: 5680 0x142373: prepare_resize<alloc::alloc::Global> (mod.rs:2551)
+          n1: 5680 0x142373: resize_inner<alloc::alloc::Global> (mod.rs:2749)
+           n1: 5680 0x142373: reserve_rehash_inner<alloc::alloc::Global> (mod.rs:2637)
+            n1: 5680 0x142373: hashbrown::raw::RawTable<T,A>::reserve_rehash (mod.rs:954)
+             n1: 5680 0x214922: UnknownInlinedFun (mod.rs:902)
+              n1: 5680 0x214922: find_or_find_insert_slot<(alloc::string::String, lyronc::codegen::Value), alloc::alloc::Global, hashbrown::map::equivalent_key::{closure_env#0}<alloc::string::String, alloc::string::String, lyronc::codegen::Value>, hashbrown::map::make_hasher::{closure_env#0}<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher>> (mod.rs:1115)
+               n1: 5680 0x214922: find_or_find_insert_slot<alloc::string::String, lyronc::codegen::Value, gxhash::hasher::GxBuildHasher, alloc::alloc::Global, alloc::string::String> (map.rs:1812)
+                n2: 5680 0x214922: hashbrown::map::HashMap<K,V,S,A>::insert (map.rs:1792)
+                 n1: 5680 0x1EB61C: UnknownInlinedFun (map.rs:1191)
+                  n1: 5680 0x1EB61C: UnknownInlinedFun (program.rs:893)
+                   n1: 5680 0x1EB61C: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+                    n1: 5680 0x21E6B3: lyronc::main (main.rs:47)
+                     n1: 5680 0x218E62: call_once<fn(), ()> (function.rs:250)
+                      n1: 5680 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                       n1: 5680 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                        n1: 5680 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                         n1: 5680 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                          n1: 5680 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                           n1: 5680 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                            n1: 5680 0x2E82D3: {closure#1} (rt.rs:174)
+                             n1: 5680 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                              n1: 5680 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                               n1: 5680 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                                n1: 5680 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                                 n0: 5680 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+                 n0: 0 in 1 place, below massif's threshold (1.00%)
+ n0: 1947 in 77 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=19
+#-----------
+time=99535313
+mem_heap_B=439868
+mem_heap_extra_B=1084
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=105217190
+mem_heap_B=439819
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=109762298
+mem_heap_B=439819
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=116580063
+mem_heap_B=439869
+mem_heap_extra_B=1107
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=122261640
+mem_heap_B=439811
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=125753763
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=detailed
+n4: 701963 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 528440 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 528440 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 528440 0x14368F: realloc (alloc.rs:136)
+    n1: 528440 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 528440 0x14368F: grow (alloc.rs:282)
+      n2: 528440 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 524288 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 524288 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 524288 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 524288 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 524288 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 524288 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 524288 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 524288 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 524288 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 524288 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 524288 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 524288 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 524288 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 524288 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 524288 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 524288 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 524288 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 524288 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 524288 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 524288 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n0: 7635 in 78 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=25
+#-----------
+time=131435247
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=135980154
+mem_heap_B=702012
+mem_heap_extra_B=1084
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=141662031
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=147343313
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=155653457
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=163963601
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=172273745
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=176428817
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=180583889
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=184738961
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=188894033
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=193049105
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=197204177
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=201359249
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=205514321
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=209669393
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=213824465
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=217979537
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=222134609
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=226289681
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=230444753
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=234599825
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=238754897
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=242909969
+mem_heap_B=701963
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=250894879
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=detailed
+n4: 1226251 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 1052728 0x14368F: realloc (alloc.rs:136)
+    n1: 1052728 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 1052728 0x14368F: grow (alloc.rs:282)
+      n2: 1052728 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 1048576 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 1048576 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 1048576 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 1048576 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 1048576 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 1048576 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 1048576 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 1048576 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 1048576 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 1048576 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 1048576 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 1048576 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 1048576 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 1048576 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 1048576 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 1048576 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 1048576 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 1048576 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 1048576 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 1048576 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n0: 7635 in 78 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=50
+#-----------
+time=254387206
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=257879374
+mem_heap_B=1226301
+mem_heap_extra_B=1107
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=261371904
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=264864131
+mem_heap_B=1226302
+mem_heap_extra_B=1130
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=268356343
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=271848544
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=275340796
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=278832997
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=282325158
+mem_heap_B=1226299
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=285817323
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=detailed
+n4: 1226251 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 1052728 0x14368F: realloc (alloc.rs:136)
+    n1: 1052728 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 1052728 0x14368F: grow (alloc.rs:282)
+      n2: 1052728 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 1048576 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 1048576 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 1048576 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 1048576 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 1048576 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 1048576 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 1048576 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 1048576 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 1048576 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 1048576 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 1048576 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 1048576 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 1048576 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 1048576 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 1048576 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 1048576 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 1048576 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 1048576 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 1048576 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 1048576 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n0: 7635 in 78 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=60
+#-----------
+time=289309550
+mem_heap_B=1226302
+mem_heap_extra_B=1130
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=292801762
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=62
+#-----------
+time=296293963
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=299786215
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=303278416
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=306770577
+mem_heap_B=1226299
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=310262742
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=313754969
+mem_heap_B=1226302
+mem_heap_extra_B=1130
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=317247181
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=320739382
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=detailed
+n4: 1226251 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 1052728 0x14368F: realloc (alloc.rs:136)
+    n1: 1052728 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 1052728 0x14368F: grow (alloc.rs:282)
+      n2: 1052728 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 1048576 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 1048576 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 1048576 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 1048576 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 1048576 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 1048576 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 1048576 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 1048576 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 1048576 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 1048576 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 1048576 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 1048576 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 1048576 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 1048576 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 1048576 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 1048576 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 1048576 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 1048576 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 1048576 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 1048576 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n0: 7635 in 78 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=70
+#-----------
+time=324231634
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=327723835
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=72
+#-----------
+time=331215996
+mem_heap_B=1226299
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=73
+#-----------
+time=334708161
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=74
+#-----------
+time=338200388
+mem_heap_B=1226302
+mem_heap_extra_B=1130
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=75
+#-----------
+time=341692600
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=76
+#-----------
+time=345184801
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=77
+#-----------
+time=348677053
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=78
+#-----------
+time=352169254
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=79
+#-----------
+time=355661415
+mem_heap_B=1226299
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=detailed
+n4: 1226299 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 1052728 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 1052728 0x14368F: realloc (alloc.rs:136)
+    n1: 1052728 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 1052728 0x14368F: grow (alloc.rs:282)
+      n2: 1052728 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 1048576 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 1048576 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 1048576 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 1048576 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 1048576 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 1048576 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 1048576 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 1048576 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 1048576 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 1048576 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 1048576 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 1048576 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 1048576 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 1048576 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 1048576 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 1048576 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 1048576 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 1048576 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 1048576 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 1048576 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 147456 0x1E7492: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:96)
+    n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:192)
+     n1: 147456 0x1E7492: UnknownInlinedFun (alloc.rs:254)
+      n1: 147456 0x1E7492: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 147456 0x1E7492: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 147456 0x1E7492: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 147456 0x1E7492: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 147456 0x1E7492: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:77)
+            n1: 147456 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 147456 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 147456 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 147456 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 147456 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 147456 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 147456 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 147456 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 147456 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 147456 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 147456 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 147456 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 147456 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 147456 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:14)
+  n1: 18432 0x1E75D4: UnknownInlinedFun (library/std/src/alloc.rs:401)
+   n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:96)
+    n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:192)
+     n1: 18432 0x1E75D4: UnknownInlinedFun (alloc.rs:254)
+      n1: 18432 0x1E75D4: UnknownInlinedFun (raw_vec.rs:474)
+       n1: 18432 0x1E75D4: with_capacity_in<alloc::alloc::Global> (raw_vec.rs:420)
+        n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (raw_vec.rs:192)
+         n1: 18432 0x1E75D4: with_capacity_in<lyronc::codegen::Value, alloc::alloc::Global> (mod.rs:803)
+          n1: 18432 0x1E75D4: with_capacity<lyronc::codegen::Value> (mod.rs:483)
+           n1: 18432 0x1E75D4: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:84)
+            n1: 18432 0x21E6B3: lyronc::main (main.rs:47)
+             n1: 18432 0x218E62: call_once<fn(), ()> (function.rs:250)
+              n1: 18432 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+               n1: 18432 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                n1: 18432 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                 n1: 18432 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                  n1: 18432 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                   n1: 18432 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                    n1: 18432 0x2E82D3: {closure#1} (rt.rs:174)
+                     n1: 18432 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                      n1: 18432 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                       n1: 18432 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                        n1: 18432 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                         n0: 18432 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+ n0: 7683 in 78 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=80
+#-----------
+time=359153580
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=81
+#-----------
+time=362645807
+mem_heap_B=1226302
+mem_heap_extra_B=1130
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=82
+#-----------
+time=366138019
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=83
+#-----------
+time=369630220
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=84
+#-----------
+time=373122472
+mem_heap_B=1226243
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=85
+#-----------
+time=376614673
+mem_heap_B=1226251
+mem_heap_extra_B=1053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=86
+#-----------
+time=380106834
+mem_heap_B=1226299
+mem_heap_extra_B=1061
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=87
+#-----------
+time=383686478
+mem_heap_B=3567107
+mem_heap_extra_B=1021
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=88
+#-----------
+time=387201098
+mem_heap_B=10644995
+mem_heap_extra_B=5053
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=89
+#-----------
+time=391887048
+mem_heap_B=20082179
+mem_heap_extra_B=5053
+mem_stacks_B=0
+heap_tree=detailed
+n2: 20082179 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 19927096 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 19927096 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 19927096 0x14368F: realloc (alloc.rs:136)
+    n1: 19927096 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 19927096 0x14368F: grow (alloc.rs:282)
+      n3: 19927096 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 18874368 0x2186C4: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 18874368 0x2186C4: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 18874368 0x2186C4: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 18874368 0x1EA58A: UnknownInlinedFun (mod.rs:2422)
+           n1: 18874368 0x1EA58A: UnknownInlinedFun (program.rs:690)
+            n1: 18874368 0x1EA58A: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 18874368 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 18874368 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 18874368 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 18874368 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 18874368 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 18874368 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 18874368 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 18874368 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 18874368 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 18874368 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 18874368 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 18874368 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 18874368 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 18874368 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n1: 1048576 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 1048576 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 1048576 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 1048576 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 1048576 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 1048576 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 1048576 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 1048576 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 1048576 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 1048576 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 1048576 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 1048576 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 1048576 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 1048576 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 1048576 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 1048576 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 1048576 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 1048576 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 1048576 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 1048576 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n0: 155083 in 80 places, all below massif's threshold (1.00%)
+#-----------
+snapshot=90
+#-----------
+time=396815574
+mem_heap_B=20082179
+mem_heap_extra_B=5053
+mem_stacks_B=0
+heap_tree=peak
+n2: 20082179 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 19927096 0x14368F: UnknownInlinedFun (library/std/src/sys/alloc/unix.rs:54)
+  n1: 19927096 0x14368F: UnknownInlinedFun (library/std/src/alloc.rs:423)
+   n1: 19927096 0x14368F: realloc (alloc.rs:136)
+    n1: 19927096 0x14368F: UnknownInlinedFun (alloc.rs:225)
+     n1: 19927096 0x14368F: grow (alloc.rs:282)
+      n3: 19927096 0x14368F: alloc::raw_vec::finish_grow (raw_vec.rs:775)
+       n1: 18874368 0x2186C4: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 18874368 0x2186C4: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 18874368 0x2186C4: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 18874368 0x1EA58A: UnknownInlinedFun (mod.rs:2422)
+           n1: 18874368 0x1EA58A: UnknownInlinedFun (program.rs:690)
+            n1: 18874368 0x1EA58A: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 18874368 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 18874368 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 18874368 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 18874368 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 18874368 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 18874368 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 18874368 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 18874368 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 18874368 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 18874368 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 18874368 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 18874368 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 18874368 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 18874368 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n1: 1048576 0x1B1A5E: grow_amortized<alloc::alloc::Global> (raw_vec.rs:658)
+        n1: 1048576 0x1B1A5E: grow_one<alloc::alloc::Global> (raw_vec.rs:565)
+         n1: 1048576 0x1B1A5E: alloc::raw_vec::RawVec<T,A>::grow_one (raw_vec.rs:342)
+          n1: 1048576 0x1EB6EC: UnknownInlinedFun (mod.rs:2422)
+           n1: 1048576 0x1EB6EC: UnknownInlinedFun (program.rs:896)
+            n1: 1048576 0x1EB6EC: lyronc::codegen::program::<impl lyronc::codegen::Visitor>::visit_program (program.rs:108)
+             n1: 1048576 0x21E6B3: lyronc::main (main.rs:47)
+              n1: 1048576 0x218E62: call_once<fn(), ()> (function.rs:250)
+               n1: 1048576 0x218E62: std::sys::backtrace::__rust_begin_short_backtrace (backtrace.rs:152)
+                n1: 1048576 0x218E58: std::rt::lang_start::{{closure}} (rt.rs:195)
+                 n1: 1048576 0x2E82D3: call_once<(), (dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (function.rs:284)
+                  n1: 1048576 0x2E82D3: do_call<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panicking.rs:584)
+                   n1: 1048576 0x2E82D3: try<i32, &(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe)> (panicking.rs:547)
+                    n1: 1048576 0x2E82D3: catch_unwind<&(dyn core::ops::function::Fn<(), Output=i32> + core::marker::Sync + core::panic::unwind_safe::RefUnwindSafe), i32> (panic.rs:358)
+                     n1: 1048576 0x2E82D3: {closure#1} (rt.rs:174)
+                      n1: 1048576 0x2E82D3: do_call<std::rt::lang_start_internal::{closure_env#1}, isize> (panicking.rs:584)
+                       n1: 1048576 0x2E82D3: try<isize, std::rt::lang_start_internal::{closure_env#1}> (panicking.rs:547)
+                        n1: 1048576 0x2E82D3: catch_unwind<std::rt::lang_start_internal::{closure_env#1}, isize> (panic.rs:358)
+                         n1: 1048576 0x2E82D3: std::rt::lang_start_internal (rt.rs:174)
+                          n0: 1048576 0x21A010: main (in /home/nafi/projects/lyron-bytecode-v/target/release/lyronc)
+       n0: 4152 in 3 places, all below massif's threshold (1.00%)
+ n0: 155083 in 80 places, all below massif's threshold (1.00%)
