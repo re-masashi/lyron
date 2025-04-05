@@ -1,7 +1,5 @@
 use crate::codegen::{uoe, VMError, Visitor};
-
 use crate::parser::{AstNode, NodePosition};
-// use gxhash::HashMap;
 
 pub type Result<T> = std::result::Result<T, VMError>;
 

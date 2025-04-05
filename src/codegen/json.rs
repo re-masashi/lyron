@@ -1,8 +1,11 @@
 use crate::codegen::{VMError, Value, Visitor};
 use serde_json::{from_str as serde_from_str, Value as SerdeValue};
-// use gxhash::{HashMap, HashMapExt};
+
+#[cfg(not(feature = "gxhash"))]
 use std::collections::HashMap;
 
+#[cfg(feature = "gxhash")]
+use gxhash::{HashMap, HashMapExt};
 
 pub fn json_parse(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
     if args.is_empty() {
@@ -10,23 +13,21 @@ pub fn json_parse(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError
     }
     match serde_from_str::<SerdeValue>(args[0].to_string().as_str()) {
         Ok(result) => Ok(serde_to_value(&result)),
-        Err(e) => {
-            Err(VMError {
-                type_: "InvalidJSONError".to_string(),
-                cause: format!(
-                    "
+        Err(e) => Err(VMError {
+            type_: "InvalidJSONError".to_string(),
+            cause: format!(
+                "
     {text}
     {pointy}
         {line}: {pos}
     ",
-                    text = args[0].to_string().lines().collect::<Vec<_>>()[e.line() - 1],
-                    pointy = ("~".repeat(e.column()) + "^"),
-                    line = e.line(),
-                    pos = e.column(),
-                )
-                .to_string(),
-            })
-        }
+                text = args[0].to_string().lines().collect::<Vec<_>>()[e.line() - 1],
+                pointy = ("~".repeat(e.column()) + "^"),
+                line = e.line(),
+                pos = e.column(),
+            )
+            .to_string(),
+        }),
     }
 }
 

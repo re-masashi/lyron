@@ -76,7 +76,7 @@ pub struct External {
     pub return_type: String,
 }
 
-// 'def' name (args) '->' return_type expression 
+// 'def' name (args) '->' return_type expression
 #[derive(Debug, Clone)]
 pub struct Function {
     pub name: String,

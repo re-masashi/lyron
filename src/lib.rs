@@ -4,7 +4,7 @@ pub mod parser;
 // pub mod ffi;
 // pub mod vm;
 
-use clap::{command, Command, arg};
+use clap::{arg, command, Command};
 use log::LevelFilter;
 use std::path;
 
@@ -48,10 +48,7 @@ pub fn init_cli() -> CLIInput {
         //         .index(1),
         // )
         .infer_subcommands(true)
-        .arg(
-            arg!([input] "Path to the lyron file to run")
-            .required(true)
-        )
+        .arg(arg!([input] "Path to the lyron file to run").required(true))
         // .arg(
         //     arg!(--print-tokens <PRINTTOKENS> "print tokens")
         // )
@@ -67,16 +64,13 @@ pub fn init_cli() -> CLIInput {
         //         .short("v")
         //         .multiple(true),
         // )
-        .subcommand(
-            Command::new("build-ffi")
-                .about("Builds an FFI from a given .cpp file")
-        )
+        .subcommand(Command::new("build-ffi").about("Builds an FFI from a given .cpp file"))
         .get_matches();
 
-    let input_path = match matches.get_one::<String>("input"){
-        Some(v)=>v,
-        _=>{
-            println!("[input] needed", );
+    let input_path = match matches.get_one::<String>("input") {
+        Some(v) => v,
+        _ => {
+            println!("[input] needed",);
             unreachable!()
         }
     };
@@ -92,8 +86,8 @@ pub fn init_cli() -> CLIInput {
         input_path: String::from(input_path),
         input_name: String::from(input_name),
         print_tokens: false, // matches.is_present("print tokens"),
-        print_ast: false, // matches.is_present("print AST"),
-        verbose: 0, // matches.occurrences_of("verbose") as u32,
+        print_ast: false,    // matches.is_present("print AST"),
+        verbose: 0,          // matches.occurrences_of("verbose") as u32,
         matches: matches,
     }
 }

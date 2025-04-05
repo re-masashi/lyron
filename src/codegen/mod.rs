@@ -1,18 +1,23 @@
-use crate::parser::{Function, NodePosition, ExprValue};
+use crate::parser::{ExprValue, Function, NodePosition};
 
 use log::error;
 use owo_colors::OwoColorize;
 use std::borrow::Borrow;
 use std::cmp::Ordering;
+
+#[cfg(not(feature = "gxhash"))]
 use std::collections::HashMap;
-// use gxhash::{HashMap, HashMapExt};
+
+#[cfg(feature = "gxhash")]
+use gxhash::{HashMap, HashMapExt};
+
+use std::cell::RefCell;
 use std::convert::{From, TryFrom};
 use std::fmt;
 use std::fmt::Debug;
 use std::fs::read_to_string;
 use std::process;
 use std::sync::Arc;
-use std::cell::RefCell;
 
 pub mod class;
 pub mod expression;
@@ -168,24 +173,23 @@ impl From<Value> for usize {
     fn from(value: Value) -> usize {
         match value {
             Value::Str(_s) => 0,
-            Value::Int32(_f) =>1 ,
+            Value::Int32(_f) => 1,
             Value::Int64(_f) => 2,
-            Value::Float32(_f) =>3 ,
+            Value::Float32(_f) => 3,
             Value::Float64(_f) => 4,
             Value::Boolean(_b) => 5,
             Value::Function(_n, _f) => 6,
             Value::NativeFunction(_n, _f) => 7,
-            Value::None =>8,
-            Value::Class(_name, _, _) =>9,
+            Value::None => 8,
+            Value::Class(_name, _, _) => 9,
             Value::Object(_classname, _, _, _) => 10,
-            Value::Dict(_d) =>11,
+            Value::Dict(_d) => 11,
             Value::Array(_a) => 12,
-            Value::Task(_)=>13,
-            Value::DynFn(..)=>14,
+            Value::Task(_) => 13,
+            Value::DynFn(..) => 14,
         }
     }
 }
-
 
 // impl TryFrom<Value> for bool {
 //     type Error = VMError;
@@ -217,7 +221,6 @@ impl TryFrom<Value> for () {
         })
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct Visitor {
@@ -258,7 +261,7 @@ impl Callable for VMFunction {
         } = self.decl.borrow();
 
         let v = visitor.clone(); // todo: any better way?
-        
+
         // println!("Called {}", name);
 
         if args.name.is_empty() {
@@ -352,7 +355,10 @@ impl Visitor {
         );
         self.variables.borrow_mut().insert(
             "start_tcp_server".to_string(),
-            Value::NativeFunction("start_tcp_server".to_string(), crate::codegen::stdlib::start_tcp_server),
+            Value::NativeFunction(
+                "start_tcp_server".to_string(),
+                crate::codegen::stdlib::start_tcp_server,
+            ),
         );
         self.variables.borrow_mut().insert(
             "read_file".to_string(),

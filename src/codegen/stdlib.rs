@@ -1,12 +1,17 @@
 use crate::codegen::{VMError, Value, Visitor};
-// use gxhash::{HashMap, HashMapExt};
+
+#[cfg(not(feature = "gxhash"))]
 use std::collections::HashMap;
+
+#[cfg(feature = "gxhash")]
+use gxhash::{HashMap, HashMapExt};
+
 use std::convert::TryFrom;
 // use rayon::prelude::*;
-use std::net::TcpListener;
-use std::io::{BufReader, BufRead, Read, Write};
 use crate::codegen::Callable;
 use std::fs::OpenOptions;
+use std::io::{BufRead, BufReader, Read, Write};
+use std::net::TcpListener;
 // use rayon::vec;
 // use std::borrow::{Borrow};
 
@@ -54,7 +59,7 @@ pub fn __getattr(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError>
             //     type_: "KeyError".to_string(),
             //     cause: format!("No such key {} in dict", &args[1].to_string()),
             // }),
-            None => Ok(Value::None)
+            None => Ok(Value::None),
         },
         Value::Array(a) => {
             if f64::try_from(args[1].clone()).unwrap() as usize >= a.len() {
@@ -165,7 +170,7 @@ pub fn __dict_keys(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMErro
             items.push(Value::Str(key.to_string()));
         }
     }
-    return Ok(Value::Array(items))
+    return Ok(Value::Array(items));
 }
 
 pub fn start_tcp_server(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
@@ -176,25 +181,30 @@ pub fn start_tcp_server(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, V
     let mut address = &Value::Str("127.0.0.1".to_string());
 
     match args.len() {
-        1=>{
+        1 => {
             handle = &args[0];
         }
-        2=>{
+        2 => {
             handle = &args[0];
             port = &args[1];
         }
-        3=>{
+        3 => {
             handle = &args[0];
             port = &args[1];
             address = &args[2];
         }
-        _=>return Err(VMError {
-            type_: "RuntimeError".to_string(),
-            cause: format!("Invalid number of arguments in `start_tcp_server`. found `{}`", &args.len()),
-        })
+        _ => {
+            return Err(VMError {
+                type_: "RuntimeError".to_string(),
+                cause: format!(
+                    "Invalid number of arguments in `start_tcp_server`. found `{}`",
+                    &args.len()
+                ),
+            })
+        }
     }
 
-    let listener = TcpListener::bind(address.to_string()+":"+&port.to_string()).unwrap();
+    let listener = TcpListener::bind(address.to_string() + ":" + &port.to_string()).unwrap();
 
     for stream in listener.incoming() {
         let mut stream = stream.unwrap();
@@ -205,20 +215,20 @@ pub fn start_tcp_server(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, V
 
         data.insert(
             "addr".to_string(),
-            Value::Str(stream.local_addr().unwrap().to_string())
+            Value::Str(stream.local_addr().unwrap().to_string()),
         );
         data.insert(
             "peer".to_string(),
-            Value::Str(stream.peer_addr().unwrap().to_string())
+            Value::Str(stream.peer_addr().unwrap().to_string()),
         );
-        
+
         let buf_reader = BufReader::new(&mut stream);
 
         // println!("{:?}", data);
         // uoe(handle.clone().call_(
-        //     self, 
+        //     self,
         // ), &self.position);
-        
+
         let http_request: String = buf_reader
             .lines()
             .map(|result| result.unwrap())
@@ -231,47 +241,49 @@ pub fn start_tcp_server(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, V
         }
 
         for header in req.headers {
-            if header.name!="" {
+            if header.name != "" {
                 // println!("{:?}", header);
-                headers.insert(header.name.to_lowercase().to_string(), Value::Str(
-                    std::str::from_utf8(header.value).unwrap().to_string()
-                ));
+                headers.insert(
+                    header.name.to_lowercase().to_string(),
+                    Value::Str(std::str::from_utf8(header.value).unwrap().to_string()),
+                );
             }
         }
 
         if let Value::Function(_name, fn_) = handle {
-            data.insert(
-                "headers".to_string(),
-                Value::Dict(headers),
-            );
+            data.insert("headers".to_string(), Value::Dict(headers));
 
             data.insert(
                 "path".to_string(),
                 match req.path {
-                    Some(path)=>Value::Str(path.to_string()),
-                    _=>Value::Str('/'.to_string())
-                }
+                    Some(path) => Value::Str(path.to_string()),
+                    _ => Value::Str('/'.to_string()),
+                },
             );
 
-            let resp = crate::codegen::uoe(fn_.clone().call_(
-                _visitor,
-                vec![
-                    Value::Dict(data),
-                    Value::Str(http_request.clone())
-                ],
-            ), &_visitor.position).to_string();
+            let resp = crate::codegen::uoe(
+                fn_.clone().call_(
+                    _visitor,
+                    vec![Value::Dict(data), Value::Str(http_request.clone())],
+                ),
+                &_visitor.position,
+            )
+            .to_string();
 
             // println!("{:?}", req.parse(http_request.as_bytes()).unwrap());
 
-
             println!("\n\nRequest: {http_request:}\n\n");
             println!("Connection established!");
-            stream.write_all(format!("HTTP/1.1 200 OK\r\n\r\n{resp}\r\n\r\n").as_bytes()).unwrap();
-        }else{
-            stream.write_all(format!("HTTP/1.1 200 OK\r\n\r\nHELLO\r\n\r\n").as_bytes()).unwrap();            
+            stream
+                .write_all(format!("HTTP/1.1 200 OK\r\n\r\n{resp}\r\n\r\n").as_bytes())
+                .unwrap();
+        } else {
+            stream
+                .write_all(format!("HTTP/1.1 200 OK\r\n\r\nHELLO\r\n\r\n").as_bytes())
+                .unwrap();
         }
     }
-    return Ok(Value::Float64(0.0))
+    return Ok(Value::Float64(0.0));
 }
 
 pub fn read_file(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
@@ -280,16 +292,16 @@ pub fn read_file(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError>
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("No such file `{}` found", &args[0].to_string()),
-        }) 
+        });
     }
     let mut contents = String::new();
-    if let Err(_e) = file.unwrap().read_to_string(&mut contents){
+    if let Err(_e) = file.unwrap().read_to_string(&mut contents) {
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("Failed to read file `{}`", &args[0].to_string()),
-        }) 
+        });
     };
-    return Ok(Value::Str(contents))
+    return Ok(Value::Str(contents));
 }
 
 pub fn write_file(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError> {
@@ -298,13 +310,13 @@ pub fn write_file(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("No such file `{}` found", &args[0].to_string()),
-        }) 
+        });
     }
-    if let Err(_e) = file.unwrap().write_all(args[1].to_string().as_bytes()){
+    if let Err(_e) = file.unwrap().write_all(args[1].to_string().as_bytes()) {
         return Err(VMError {
             type_: "FSError".to_string(),
             cause: format!("Failed to read file `{}`", &args[0].to_string()),
-        }) 
+        });
     };
-    return Ok(Value::Boolean(true))
+    return Ok(Value::Boolean(true));
 }

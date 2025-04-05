@@ -25,11 +25,11 @@ impl Lexer {
     /// * `file_path` - The path to the program file.
     pub fn from_file(file_path: &str) -> io::Result<Self> {
         let mut contents = fs::read_to_string(file_path)?;
-        if contents.as_str()=="" {
-            return Ok(Self::from_text("", file_path))
+        if contents.as_str() == "" {
+            return Ok(Self::from_text("", file_path));
         }
-        if contents.chars().last().unwrap()!=';' {
-            contents+=";";
+        if contents.chars().last().unwrap() != ';' {
+            contents += ";";
         }
         Ok(Self::from_text(&contents, file_path))
     }
@@ -152,7 +152,7 @@ impl Iterator for Lexer {
         else if current_char.is_numeric() {
             let mut value = current_char.to_string();
             self.get_next_char_while(&mut value, |c| c.is_numeric());
-            
+
             // println!("{:?}", self.raw_data.peek());
 
             if self.raw_data.peek() == Some(&'.') {
@@ -163,7 +163,7 @@ impl Iterator for Lexer {
                     Ok(i) => Ok(TokenType::Double(i)),
                     Err(_) => Err(format!("float literal {} is invalid", value)),
                 }
-            }else{
+            } else {
                 token = match value.parse() {
                     Ok(i) => Ok(TokenType::Integer(i)),
                     Err(_) => Err(format!("Integer literal {} is invalid", value)),
