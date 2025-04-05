@@ -3,6 +3,8 @@ def count(i: i32, n: i32) -> i32 do
 
 	if i<=n then
 		count(i+1, n)
+	else
+		0
 end
 
 count(1, 100000)

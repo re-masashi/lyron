@@ -1,5 +1,7 @@
-i = 0.0
-while i < 100000 do
-	i = i+1.0
-	print(i)
+def count(i: i32, n: i32) -> i32 do
+#	print(i)
+	if i<=n then
+		count(i+1, n)
 end
+
+count(1, 100000)

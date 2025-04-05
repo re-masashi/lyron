@@ -3,7 +3,13 @@ use crate::codegen::Visitor;
 use cranelift::prelude::*;
 use cranelift_jit::{JITBuilder, JITModule};
 use cranelift_module::{DataDescription, Linkage, Module};
+
+#[cfg(not(feature = "gxhash"))]
+use std::collections::HashMap;
+
+#[cfg(feature = "gxhash")]
 use gxhash::{HashMap, HashMapExt};
+
 use std::{slice, mem};
 use crate::lexer::tokens::TokenType;
 use crate::codegen::Value::Function as VMFunBase;

@@ -65,12 +65,12 @@ impl Parser {
                 }
 
                 TokenType::Str(_) => self.parse_string(),
-                TokenType::Async|TokenType::Await=> panic!("yet to be implemented"),
+                TokenType::Async | TokenType::Await => panic!("yet to be implemented"),
                 TokenType::LBrack => self.parse_array(),
 
-                _ =>{
+                _ => {
                     // println!("{:?}", x);
-                    return Err(self.parser_error("Invalid expression"))
+                    return Err(self.parser_error("Invalid expression"));
                 }
             };
 
@@ -95,8 +95,8 @@ impl Parser {
             };
             let r_value = self.parse_expression();
             match r_value {
-                Ok(_) => {},
-                Err(ref e) => println!("{}",self.parser_error(&e)),
+                Ok(_) => {}
+                Err(ref e) => println!("{}", self.parser_error(&e)),
             }
             match unwrap_some!(self.tokens.peek()).type_ {
                 TokenType::Plus
@@ -205,9 +205,9 @@ impl Parser {
         }
     }
 
-    pub fn parse_do(&mut self) -> Result<(ExprValue, NodePosition)>{
+    pub fn parse_do(&mut self) -> Result<(ExprValue, NodePosition)> {
         let mut exprs = vec![];
-        
+
         // println!("some {:?}", self.tokens.peek());
 
         self.advance();
@@ -243,7 +243,7 @@ impl Parser {
                 TokenType::End => break,
                 _ => {
                     // return Err(self.parser_error("Expected ';' or 'end'"))
-                },
+                }
             }
         }
 
@@ -252,25 +252,22 @@ impl Parser {
             self.tokens.next(); // Eat 'end'
         } // No other case
 
-        return Ok((
-            ExprValue::Do(exprs),
-            pos
-        ))
+        return Ok((ExprValue::Do(exprs), pos));
     }
 
     pub fn parse_if_else(&mut self) -> Result<(ExprValue, NodePosition)> {
         // trace!("Parsing if else");
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat 'if'
-        // let type_ = String::from("unavailable");
-        // let hastype = !true;
+                                                   // let type_ = String::from("unavailable");
+                                                   // let hastype = !true;
 
         let cond = Box::new(self.parse_expression().unwrap().0);
 
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Then {
             self.advance();
             self.tokens.next(); // eat 'then'
-        }else {
+        } else {
             // println!("{:?}", self.tokens.peek());
             panic!("then expected after condition");
         }
@@ -296,7 +293,6 @@ impl Parser {
                     file: nx.file,
                 },
             ))
-
         } else {
             return Ok((
                 ExprValue::IfElse {

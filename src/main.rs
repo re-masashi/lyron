@@ -23,8 +23,8 @@ pub fn main() {
     let cli_input = init_cli();
     init_logger(cli_input.verbose);
 
-    match cli_input.matches.subcommand_name(){
-        None=>{
+    match cli_input.matches.subcommand_name() {
+        None => {
             // Lexer
             let lexer = unwrap_or_exit!(Lexer::from_file(&cli_input.input_path), "IO");
             let tokens = lexer
@@ -45,18 +45,24 @@ pub fn main() {
             let mut visitor = Visitor::new();
             visitor.init();
             visitor.visit_program(program);
-        },
-        Some("build-ffi")=>{
+        }
+        Some("build-ffi") => {
             Command::new("g++")
-                .args(["-fPIC", "-c", "-Wall", &(cli_input.input_path.clone()+".o"), "-fpermissive", ])
+                .args([
+                    "-fPIC",
+                    "-c",
+                    "-Wall",
+                    &(cli_input.input_path.clone() + ".o"),
+                    "-fpermissive",
+                ])
                 .output()
                 .expect("failed to execute process");
             Command::new("ld")
-                .args(["-shared", "-Wall", &(cli_input.input_path+".so")])
+                .args(["-shared", "-Wall", &(cli_input.input_path + ".so")])
                 .output()
                 .expect("failed to execute process");
             println!("ffi");
         }
-        Some(_)=>todo!()
+        Some(_) => todo!(),
     };
 }

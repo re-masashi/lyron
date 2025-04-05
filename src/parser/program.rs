@@ -8,7 +8,6 @@ impl Parser {
         loop {
             match self.tokens.peek() {
                 Some(s) => match s.type_ {
-
                     TokenType::Def => match self.parse_function() {
                         Ok((result, pos)) => {
                             ast.insert(ast.len(), (AstNode::FunctionDef(result), pos));

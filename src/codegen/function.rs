@@ -12,10 +12,13 @@ impl Visitor {
                 f.name.clone(),
                 VMFunction {
                     decl: Arc::new(f.clone()),
-                    call_count:0
+                    call_count: 0,
                 },
             ),
         );
-        VMFunction { decl: Arc::new(f), call_count:0 }
+        VMFunction {
+            decl: Arc::new(f),
+            call_count: 0,
+        }
     }
 }

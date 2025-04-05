@@ -6,7 +6,7 @@ pub enum TokenType {
     /// An identifier of a variable or function with its name.
     Identifier(String),
     /// Keywords
-    If,     // if
+    If, // if
     Else,   // else
     Let,    // let
     Def,    // def
