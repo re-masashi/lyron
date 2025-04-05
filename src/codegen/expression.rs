@@ -281,13 +281,15 @@ impl Visitor {
                                         });
                                     }
                                 },
-                                _ => return Err(VMError {
-                                    type_: "InvalidInvocation".to_string(),
-                                    cause: format!(
+                                _ => {
+                                    return Err(VMError {
+                                        type_: "InvalidInvocation".to_string(),
+                                        cause: format!(
                                         "Tried to invoke {obj}, which is not an object or a dict."
                                     )
-                                    .to_string(),
-                                }),
+                                        .to_string(),
+                                    })
+                                }
                             }
                         }
                         Value::Dict(d) => {
