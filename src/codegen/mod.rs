@@ -81,6 +81,21 @@ pub enum Value {
     None,
 }
 
+impl Value {
+    fn is_str(&self) -> bool {
+        matches!(self, Value::Str(_))
+    }
+
+    fn as_f64(&self) -> f64 {
+        match self {
+            Value::Float64(f) => *f,
+            Value::Int32(i) => *i as f64,
+            Value::Boolean(b) => *b as i32 as f64,
+            _ => panic!("Non-numeric value"),
+        }
+    }
+}
+
 impl PartialEq for Value {
     fn eq(&self, other: &Value) -> bool {
         match (self, other) {
@@ -226,7 +241,9 @@ impl TryFrom<Value> for () {
 pub struct Visitor {
     pub position: NodePosition,
     pub variables: RefCell<HashMap<String, Value>>,
-    pub objects: RefCell<Vec<Option<Value>>>,
+    pub objects: RefCell<Vec<Value>>,
+    pub scopes: RefCell<Vec<HashMap<String, Value>>>,
+    pub is_tail_call: bool,
 }
 
 #[derive(Debug)]
@@ -253,33 +270,30 @@ impl Callable for VMFunction {
     }
 
     fn call_(&self, visitor: &Visitor, arguments: Vec<Value>) -> Result<Value, VMError> {
-        let Function {
-            name: _,
-            args,
-            expression,
-            return_type: _,
-        } = self.decl.borrow();
-
-        let v = visitor.clone(); // todo: any better way?
-
-        // println!("Called {}", name);
-
-        if args.name.is_empty() {
-        } else if arguments.len() != self.arity() {
-            panic!("Tried to call an invalid function");
+        // Check if this is a tail call
+        if visitor.is_tail_call {
+            // Reuse the current scope for tail recursion
+            visitor.scopes.borrow_mut().last_mut().unwrap().clear();
+            for (i, arg) in self.decl.args.name.iter().enumerate() {
+                visitor.scopes.borrow_mut().last_mut().unwrap().insert(arg.clone(), arguments[i].clone());
+            }
         } else {
-            for (i, arg) in args.name.clone().into_iter().enumerate() {
-                v.variables.borrow_mut().insert(arg, arguments[i].clone());
+            // Normal call: push a new scope
+            visitor.enter_scope();
+            for (i, arg) in self.decl.args.name.iter().enumerate() {
+                visitor.scopes.borrow_mut().last_mut().unwrap().insert(arg.clone(), arguments[i].clone());
             }
         }
 
-        match v.visit_expr(&expression.clone().0) {
-            Ok(v) => Ok(v),
-            Err(e) => {
-                println!("err {:?}", e);
-                Err(e)
-            }
+        // Evaluate the body
+        let result = visitor.visit_expr(&(*self.decl.expression).0);
+
+        // Cleanup if not a tail call
+        if !visitor.is_tail_call {
+            visitor.exit_scope();
         }
+
+        result
     }
 
     fn box_clone(&self) -> Box<dyn Callable> {
@@ -305,8 +319,22 @@ impl Visitor {
                 file: "main".to_string(),
             },
             variables: RefCell::new(HashMap::new()),
-            objects: RefCell::new(Vec::new()),
+            objects: RefCell::new(Vec::with_capacity(1024)),
+            scopes: RefCell::new(Vec::with_capacity(32)),
+            is_tail_call: false,
         }
+    }
+    pub fn enter_scope(&self) {
+        self.scopes.borrow_mut().push(HashMap::new());
+    }
+
+    pub fn exit_scope(&self) {
+        self.scopes.borrow_mut().pop();
+    }
+
+    pub fn with_tail_call(&mut self, is_tail: bool) -> &Self {
+        self.is_tail_call = is_tail;
+        self
     }
     pub fn init(&mut self) {
         self.variables.borrow_mut().insert(
@@ -379,6 +407,7 @@ impl Visitor {
     }
 }
 
+#[inline]
 pub fn uoe(v: Result<Value, VMError>, position: &NodePosition) -> Value {
     // unwrap or exit
     match v {

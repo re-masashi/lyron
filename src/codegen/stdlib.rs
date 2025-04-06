@@ -68,7 +68,7 @@ pub fn __getattr(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError>
             Ok(a[f64::try_from(args[1].clone()).unwrap() as usize].clone())
         }
         Value::Object(_name, _fns, _attrs, pos) => match &_visitor.objects.borrow()[*pos] {
-            Some(Value::Object(_n, _f, a, _)) => match a.get(&args[1].to_string()) {
+            Value::Object(_n, _f, a, _) => match a.get(&args[1].to_string()) {
                 Some(s) => Ok(s.clone()),
                 None => Err(VMError {
                     type_: "AttributError".to_string(),
@@ -109,12 +109,12 @@ pub fn __setattr(args: Vec<Value>, _visitor: &Visitor) -> Result<Value, VMError>
     if let Value::Object(name, fns, attrs, pos) = &args[0] {
         let mut attrs = attrs.clone();
         attrs.insert(att.to_string(), v);
-        _visitor.objects.borrow_mut()[*pos] = Some(Value::Object(
+        _visitor.objects.borrow_mut()[*pos] = Value::Object(
             name.clone(),
             fns.clone(),
             attrs.clone(),
             *pos,
-        ));
+        );
         return Ok(Value::Object(
             name.clone(),
             fns.clone(),

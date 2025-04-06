@@ -117,37 +117,29 @@ impl Visitor {
                             obj_pos,
                         )];
                         {
-                            self.objects.borrow_mut().push(Some(myargs[0].clone()));
+                            self.objects.borrow_mut().push(myargs[0].clone());
                         }
-                        let selfclone = self;
                         // self.objects.borrow().push(Some(myargs[0].clone()));
                         for (_i, a) in args.into_iter().enumerate() {
-                            myargs.push(uoe(selfclone.visit_expr(a), &self.position));
+                            myargs.push(uoe(self.visit_expr(a), &self.position));
                         }
                         match cl.get(n) {
                             Some(f) => {
                                 if f.arity() == 0 {
                                     uoe(f.call_(&self, vec![]), &self.position);
-                                    self.objects.borrow_mut().push(Some(myargs[0].clone()));
+                                    self.objects.borrow_mut().push(myargs[0].clone());
                                     Ok(
-                                        match &self.objects.borrow()
-                                            [self.objects.borrow().len() - 1]
-                                        {
-                                            Some(s) => s.clone(),
-                                            None => unreachable!(),
-                                        },
+                                        self.objects.borrow()
+                                            [self.objects.borrow().len() - 1].clone()
+                                        
                                     )
                                 } else {
                                     let objcons = uoe(f.call_(&self, myargs), &self.position);
                                     if let Value::Object(_, _, _, _) = objcons {
-                                        self.objects.borrow_mut().push(Some(objcons));
+                                        self.objects.borrow_mut().push(objcons);
                                         Ok(
-                                            match &self.objects.borrow()
-                                                [self.objects.borrow().len() - 1]
-                                            {
-                                                Some(s) => s.clone(),
-                                                None => unreachable!(),
-                                            },
+                                            self.objects.borrow()
+                                                [self.objects.borrow().len() - 1].clone()
                                         )
                                     } else {
                                         println!("{:?}", objcons);
@@ -165,12 +157,9 @@ impl Visitor {
                                     HashMap::new(),
                                     self.objects.borrow().len(),
                                 );
-                                self.objects.borrow_mut().push(Some(obj));
+                                self.objects.borrow_mut().push(obj);
                                 Ok(
-                                    match &self.objects.borrow()[self.objects.borrow().len() - 1] {
-                                        Some(s) => s.clone(),
-                                        None => unreachable!(),
-                                    },
+                                    self.objects.borrow()[self.objects.borrow().len() - 1].clone()
                                 )
                             }
                         }
@@ -199,16 +188,15 @@ impl Visitor {
                 }),
             },
             ExprValue::BinOp(lhs, op, rhs) => Ok(match **op {
-                TokenType::Plus => match ((**lhs).clone(), (**rhs).clone()) {
-                    (ExprValue::Str(_), _) | (_, ExprValue::Str(_)) => Value::Str(
-                        uoe(self.visit_expr(&*lhs), &self.position).to_string()
-                            + &uoe(self.visit_expr(&*rhs), &self.position).to_string(),
-                    ),
-                    _ => Value::Float64(
-                        f64::try_from(uoe(self.visit_expr(&*lhs), &self.position)).unwrap()
-                            + f64::try_from(uoe(self.visit_expr(&*rhs), &self.position)).unwrap(),
-                    ),
-                },
+                TokenType::Plus => {
+                    let lhs_val = uoe(self.visit_expr(&*lhs), &self.position);
+                    let rhs_val = uoe(self.visit_expr(&*rhs), &self.position);
+                    if lhs_val.is_str() || rhs_val.is_str() {
+                        Value::Str(lhs_val.to_string() + &rhs_val.to_string())
+                    } else {
+                        Value::Float64(lhs_val.as_f64() + rhs_val.as_f64())
+                    }
+                }
                 TokenType::Minus => Value::Float64(
                     f64::try_from(uoe(self.visit_expr(&*lhs), &self.position)).unwrap()
                         - f64::try_from(uoe(self.visit_expr(&*rhs), &self.position)).unwrap(),
@@ -262,7 +250,7 @@ impl Visitor {
                                 },
                                 ExprValue::FnCall(n, args) => match c.get(&n) {
                                     Some(s) => {
-                                        let mut myargs = Vec::new();
+                                        let mut myargs = Vec::with_capacity(args.len());
                                         if !s.decl.args.name.is_empty() {
                                             myargs.push(obj); // self
                                         }
@@ -431,28 +419,22 @@ impl Visitor {
                 Ok(Value::None)
             }
             ExprValue::While(cond, expr) => {
-                let retval: Result<Value> = Ok(Value::None);
                 let mut exec_count = 0;
+                let mut loop_var = 0; // Example: Track loop variable locally
 
-                while bool::from(uoe(self.visit_expr(&*cond), &self.position))
-                /*&& exec_count < MONITOR_THRESHOLD */
-                {
-                    // println!("loopin");
-                    // println!("{:?}", cond);
-                    let _ = self.visit_expr(&*expr);
+                while {
+                    let cond_val = uoe(self.visit_expr(&*cond), &self.position);
+                    bool::from(cond_val)
+                } {
+                    // Update loop variable directly
+                    loop_var += 1;
+                    self.variables.borrow_mut().insert("i".to_string(), Value::Int32(loop_var));
+
+                    uoe(self.visit_expr(&*expr), &self.position);
                     exec_count += 1;
                 }
 
-                // println!("{:?}", cond);
-                // println!("{:?}", self.variables.borrow().get("i"));
-
-                if exec_count < MONITOR_THRESHOLD {
-                    // loop exit
-                    return retval;
-                }
-                // control comes here if cond is true and monitoring shall start.
-                // todo
-                retval
+                Ok(Value::None)
             }
             ExprValue::Do(expressions) => {
                 // println!("doin");
