@@ -43,7 +43,10 @@ impl Parser {
                                 ast.insert(ast.len(), (AstNode::Expression(result), pos));
                             }
                             Err(e) if e == *"EOF".to_string() => return Ok(ast),
-                            Err(e) => return Err(e),
+                            Err(e) =>{
+                                // println!("{:?}", e);
+                                return Err(e)
+                            }
                         }
                     } // {
                       // 	println!("{:?}", self.tokens.peek());

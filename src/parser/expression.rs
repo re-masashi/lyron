@@ -344,7 +344,7 @@ impl Parser {
             _ => return Err(self.parser_error("Expected an identifier")),
         };
         Ok((
-            ExprValue::VarDecl { name, type_ },
+            ExprValue::VarDecl { name, type_: type_ },
             NodePosition {
                 pos: nx.pos,
                 line_no: nx.line_no,
