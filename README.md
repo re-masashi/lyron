@@ -97,3 +97,17 @@ lyron hello.ly
 2. Create a branch: `git checkout -b feature/YourFeature`  
 3. Make your changes & add tests  
 4. Submit a PR against `main`
+
+## Roadmap
+
+- [x] Core parser improvements (better errors, etc) 
+- [ ] ?Standard library: collections, I/O
+- [x] Module system
+- [ ] Package Manager
+- [ ] Performance Improvements (make it 4x faster than now, 9th April 2025)
+
+*Note: ? indicates half-done stuff*
+
+## License
+
+MIT © Masashi
