@@ -1,10 +1,43 @@
 # Lyron
-A... programming language...
+A simple dynamically typed (with type annotations), lightweight programming language designed to be simple and clear.
+Your feedback and contributions are welcome!
 
-***NOTE:** It is a work in progress..*
+
+## Installation
+
+1. Clone the repo
+   ```bash
+   git clone https://github.com/re-masashi/lyron.git
+   cd lyron
+   ```
+2. Build Lyron
+    ```bash
+    cargo build --release
+    ```
+    or, if you want to have GxHash (a faster hashmap implementation) enabled.
+    ```bash
+    RUSTFLAGS="-C target-cpu=native" cargo build --release --features gxhash
+    ```
+---
+
+## Quickstart
+
+Create `hello.ly`:
+
+```lyron
+# hello.ly
+print("Hello, Lyron!")
+```
+
+Run it:
+
+```bash
+lyron hello.ly
+# → Hello, Lyron!
+```
+---
 
 # Syntax
-* Note: The syntax might (and most probably will) undergo changes.
 * Functions:
     * Defining a function
         ```
@@ -47,7 +80,7 @@ A... programming language...
 * Operations
     * Available operations `=`, `+`, `-`, `*`, `/`, `==`, `!=`, `<`, `>`, `<=`, `>=`, `+=`, `-=`, `*=`, `/=`
         ```
-        let a:i32 = (-b + 5) - 10 / -(5 - -2)
+        let a: i32 = (-b + 5) - 10 / -(5 - -2)
         ```
 * Comments
     * Comments start with `#` and continue until the end of the line
@@ -58,3 +91,9 @@ A... programming language...
 * Programs
     * A program consists of just top-level functions, classes, and expressions.
 
+## Contributing
+
+1. Fork the repo  
+2. Create a branch: `git checkout -b feature/YourFeature`  
+3. Make your changes & add tests  
+4. Submit a PR against `main`
