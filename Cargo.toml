@@ -2,39 +2,17 @@
 name = "lyronc"
 version = "0.0.1"
 authors = ["Nafi Amaan Hossain"]
-edition = "2018"
+edition = "2024"
 
-description = "A simple 'TOY' language."
+description = "meow meow meow"
 license = "MIT"
 readme = "README.md"
 
 [profile.release]
-debug = true
 lto = true
 
-#[[bench]]
-#name = "bench"
-#harness = false
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-libc = "0.2.70"
-clap = { version = "4.5.0", features = ["cargo"] }
-
 log = "0.4.8"
-env_logger = "0.7.1"
-serde = "1.0.188"
-serde_json = "1.0.107"
+clap = { version = "4.5.0", features = ["cargo"] }
 owo-colors = "3.5.0"
-bencher = "0.1.5"
-libloading = "0.8"
-# tokio = { version = "1", features = ["full"] }
-rayon = "1.10"
-httparse = "1.9.4"
-gxhash = {version= "3.4.1", optional = true}
-#futures-lite = "2.3.0"
-#smol = "2.0.0"
 
-[features]
-gxhash = ["dep:gxhash"]

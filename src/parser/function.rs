@@ -1,6 +1,6 @@
 use crate::lexer::tokens::{Token, TokenType};
 use crate::parser::{Args, Function, NodePosition, Parser};
-use crate::{unwrap_some, Result};
+use crate::{Result, unwrap_some};
 
 impl Parser {
     fn parse_type_annot(&mut self) -> Result<(String, String)> {
@@ -35,7 +35,7 @@ impl Parser {
         }
         self.advance();
         self.tokens.next(); // Eat ':'
-                            // Check if type exists
+        // Check if type exists
         match unwrap_some!(self.tokens.peek()) {
             Token {
                 type_: TokenType::Identifier(_),
@@ -137,7 +137,7 @@ impl Parser {
                 self.advance();
                 self.tokens.next(); // Eat the return_type
 
-                let expression = self.parse_expression().unwrap();
+                let expression = self.parse_expression()?;
 
                 match self.tokens.peek() {
                     Some(t) if t.type_ == TokenType::Semicolon => {

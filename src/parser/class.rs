@@ -1,6 +1,6 @@
 use crate::lexer::tokens::TokenType;
 use crate::parser::{Class, Function, NodePosition, Parser};
-use crate::{unwrap_some, Result};
+use crate::{Result, unwrap_some};
 
 impl Parser {
     pub fn parse_class(&mut self) -> Result<(Class, NodePosition)> {

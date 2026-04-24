@@ -1,6 +1,6 @@
+use crate::Result;
 use crate::lexer::tokens::TokenType;
 use crate::parser::{AstNode, NodePosition, Parser};
-use crate::Result;
 
 impl Parser {
     pub fn parse_program(&mut self) -> Result<Vec<(AstNode, NodePosition)>> {
@@ -43,9 +43,9 @@ impl Parser {
                                 ast.insert(ast.len(), (AstNode::Expression(result), pos));
                             }
                             Err(e) if e == *"EOF".to_string() => return Ok(ast),
-                            Err(e) =>{
+                            Err(e) => {
                                 // println!("{:?}", e);
-                                return Err(e)
+                                return Err(e);
                             }
                         }
                     } // {

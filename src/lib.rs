@@ -1,11 +1,7 @@
-pub mod codegen;
 pub mod lexer;
 pub mod parser;
-// pub mod ffi;
-// pub mod vm;
 
-use clap::{arg, command, Command};
-use log::LevelFilter;
+use clap::{arg, command};
 use std::path;
 
 #[macro_export]
@@ -30,8 +26,6 @@ pub struct CLIInput {
     pub print_tokens: bool,
     /// Whether or not raw AST should be printed.
     pub print_ast: bool,
-    /// Whether to filter logs or not.
-    pub verbose: u32,
 
     pub matches: clap::ArgMatches,
 }
@@ -49,22 +43,6 @@ pub fn init_cli() -> CLIInput {
         // )
         .infer_subcommands(true)
         .arg(arg!([input] "Path to the lyron file to run").required(true))
-        // .arg(
-        //     arg!(--print-tokens <PRINTTOKENS> "print tokens")
-        // )
-        // .arg(arg!(
-        //     -t --printtokens ... "Turn debugging information on"
-        // ))
-        // .arg(arg!(
-        //     -a --print-ast ... "Turn debugging information on"
-        // ))
-        // .arg(
-        //     Arg::new("verbose")
-        //         .help("Level of logging (0-2)")
-        //         .short("v")
-        //         .multiple(true),
-        // )
-        .subcommand(Command::new("build-ffi").about("Builds an FFI from a given .cpp file"))
         .get_matches();
 
     let input_path = match matches.get_one::<String>("input") {
@@ -87,20 +65,6 @@ pub fn init_cli() -> CLIInput {
         input_name: String::from(input_name),
         print_tokens: false, // matches.is_present("print tokens"),
         print_ast: false,    // matches.is_present("print AST"),
-        verbose: 0,          // matches.occurrences_of("verbose") as u32,
-        matches: matches,
+        matches,
     }
-}
-
-/// Initialize logger with verbosity filter.
-pub fn init_logger(verbose: u32) {
-    env_logger::builder()
-        .format_timestamp(None)
-        .format_module_path(false)
-        .filter_level(match verbose {
-            0 => LevelFilter::Warn,
-            1 => LevelFilter::Debug,
-            _ => LevelFilter::Trace,
-        })
-        .init()
 }

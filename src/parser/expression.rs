@@ -1,78 +1,76 @@
 use crate::lexer::tokens::TokenType;
 use crate::parser::{ExprValue, NodePosition, Parser};
-use crate::{unwrap_some, Result};
-use log::trace;
+use crate::{Result, unwrap_some};
 
 impl Parser {
     pub fn parse_expression(&mut self) -> Result<(ExprValue, NodePosition)> {
-        trace!("Parsing expression");
-        let l_value: Result<(ExprValue, NodePosition)> =
-            match unwrap_some!(self.tokens.peek()).type_ {
-                TokenType::LParen => {
-                    self.tokens.next();
-                    self.advance();
-                    self.parse_paren_expression()
-                }
-                // Unary
-                TokenType::Plus | TokenType::Minus | TokenType::Not => self.parse_unop(),
+        //trace!("Parsing expression");
+        let l_value: (ExprValue, NodePosition) = match unwrap_some!(self.tokens.peek()).type_ {
+            TokenType::LParen => {
+                self.tokens.next();
+                self.advance();
+                self.parse_paren_expression()?
+            }
+            // Unary
+            TokenType::Plus | TokenType::Minus | TokenType::Not => self.parse_unop()?,
 
-                TokenType::If => self.parse_if_else(),
+            TokenType::If => self.parse_if_else()?,
 
-                TokenType::While => self.parse_while(),
+            TokenType::While => self.parse_while()?,
 
-                TokenType::Let => self.parse_declaration(),
+            TokenType::Let => self.parse_declaration()?,
 
-                TokenType::True => self.parse_true(),
+            TokenType::True => self.parse_true()?,
 
-                TokenType::False => self.parse_false(),
+            TokenType::False => self.parse_false()?,
 
-                TokenType::Identifier(_) => self.parse_identifier(), // Parses identifiers, assignments and function calls as well
+            TokenType::Identifier(_) => self.parse_identifier()?, // Parses identifiers, assignments and function calls as well
 
-                TokenType::Return => self.parse_return(),
+            TokenType::Return => self.parse_return()?,
 
-                TokenType::Use => self.parse_use(),
+            TokenType::Use => self.parse_use()?,
 
-                TokenType::Do => self.parse_do(),
+            TokenType::Do => self.parse_do()?,
 
-                TokenType::Extern => self.parse_extern(),
+            TokenType::Extern => self.parse_extern()?,
 
-                TokenType::None => self.parse_none(),
+            TokenType::None => self.parse_none()?,
 
-                TokenType::Integer(i) => {
-                    let nx = unwrap_some!(self.tokens.next());
-                    self.advance();
-                    Ok((
-                        ExprValue::Integer(i),
-                        NodePosition {
-                            pos: nx.pos,
-                            line_no: nx.line_no,
-                            file: nx.file,
-                        },
-                    ))
-                }
+            TokenType::Integer(i) => {
+                let nx = unwrap_some!(self.tokens.next());
+                self.advance();
+                (
+                    ExprValue::Integer(i),
+                    NodePosition {
+                        pos: nx.pos,
+                        line_no: nx.line_no,
+                        file: nx.file,
+                    },
+                )
+            }
 
-                TokenType::Double(f) => {
-                    let nx = unwrap_some!(self.tokens.next());
-                    self.advance();
-                    Ok((
-                        ExprValue::Double(f),
-                        NodePosition {
-                            pos: nx.pos,
-                            line_no: nx.line_no,
-                            file: nx.file,
-                        },
-                    ))
-                }
+            TokenType::Double(f) => {
+                let nx = unwrap_some!(self.tokens.next());
+                self.advance();
+                (
+                    ExprValue::Double(f),
+                    NodePosition {
+                        pos: nx.pos,
+                        line_no: nx.line_no,
+                        file: nx.file,
+                    },
+                )
+            }
 
-                TokenType::Str(_) => self.parse_string(),
-                TokenType::Async | TokenType::Await => panic!("yet to be implemented"),
-                TokenType::LBrack => self.parse_array(),
+            TokenType::Str(_) => self.parse_string()?,
+            TokenType::Async | TokenType::Await => panic!("yet to be implemented"),
+            TokenType::LBrack => self.parse_array()?,
 
-                _ => {
-                    // println!("{:?}", x);
-                    return Err(self.parser_error("Invalid expression"));
-                }
-            };
+            _ => {
+                // println!("{:?}", x);
+                return Err(self.parser_error("Invalid expression"));
+            }
+        };
 
         // The functions above will eat the value, then we can proceed to check for a bin op.
         loop {
@@ -91,13 +89,10 @@ impl Parser {
                     self.advance();
                     unwrap_some!(self.tokens.next()).type_
                 }
-                _ => return l_value,
+                _ => return Ok(l_value),
             };
-            let r_value = self.parse_expression();
-            match r_value {
-                Ok(_) => {}
-                Err(ref e) => println!("{}", self.parser_error(&e)),
-            }
+            let r_value = self.parse_expression()?;
+
             match unwrap_some!(self.tokens.peek()).type_ {
                 TokenType::Plus
                 | TokenType::Minus
@@ -113,11 +108,7 @@ impl Parser {
                     // println!("{:#?} {:?} {:#?}",l_value,op, r_value );
                     return Ok((
                         // todo: match to avoid unwrap
-                        ExprValue::BinOp(
-                            Box::new(l_value.unwrap().0),
-                            Box::new(op),
-                            Box::new(r_value.unwrap().0),
-                        ),
+                        ExprValue::BinOp(Box::new(l_value.0), Box::new(op), Box::new(r_value.0)),
                         NodePosition {
                             pos: self.pos,
                             line_no: self.line_no,
@@ -170,7 +161,7 @@ impl Parser {
     }
 
     pub fn parse_unop(&mut self) -> Result<(ExprValue, NodePosition)> {
-        trace!("Parsing unop");
+        //trace!("Parsing unop");
         // Eat the operator while working.
         let nx = unwrap_some!(self.tokens.next());
         let start = NodePosition {
@@ -181,14 +172,14 @@ impl Parser {
         self.advance();
         let t = nx.type_;
         let op = Box::new(t);
-        let expr = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
+        let expr = Box::new(self.parse_expression()?.0);
         Ok((ExprValue::UnOp(op, expr), start))
     }
 
     pub fn parse_paren_expression(&mut self) -> Result<(ExprValue, NodePosition)> {
-        trace!("Parsing paren expr");
+        //trace!("Parsing paren expr");
         let expr = self.parse_expression();
-        let expr = expr.unwrap().0; // todo: remove unwrap
+        let expr = expr?.0;
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::RParen {
             self.advance();
             let nx = unwrap_some!(self.tokens.next()); // Eat ')'
@@ -252,17 +243,17 @@ impl Parser {
             self.tokens.next(); // Eat 'end'
         } // No other case
 
-        return Ok((ExprValue::Do(exprs), pos));
+        Ok((ExprValue::Do(exprs), pos))
     }
 
     pub fn parse_if_else(&mut self) -> Result<(ExprValue, NodePosition)> {
-        // trace!("Parsing if else");
+        // //trace!("Parsing if else");
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat 'if'
-                                                   // let type_ = String::from("unavailable");
-                                                   // let hastype = !true;
+        // let type_ = String::from("unavailable");
+        // let hastype = !true;
 
-        let cond = Box::new(self.parse_expression().unwrap().0);
+        let cond = Box::new(self.parse_expression()?.0);
 
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Then {
             self.advance();
@@ -273,13 +264,13 @@ impl Parser {
         }
 
         // println!("{:?} {:?}", self.pos, self.line_no);
-        let (expression_if, _pos) = self.parse_expression().unwrap();
+        let (expression_if, _pos) = self.parse_expression()?;
 
         if unwrap_some!(self.tokens.peek()).type_ == TokenType::Else {
             self.advance();
             self.tokens.next(); // Eat 'else'
 
-            let (expression_else, _pos) = self.parse_expression().unwrap();
+            let (expression_else, _pos) = self.parse_expression()?;
 
             Ok((
                 ExprValue::IfElse {
@@ -294,7 +285,7 @@ impl Parser {
                 },
             ))
         } else {
-            return Ok((
+            Ok((
                 ExprValue::IfElse {
                     cond,
                     if_: Box::new(expression_if),
@@ -305,15 +296,15 @@ impl Parser {
                     line_no: nx.line_no,
                     file: nx.file,
                 },
-            ));
+            ))
         }
     }
 
     pub fn parse_while(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat 'while'
-        let condition = self.parse_expression().unwrap().0; // todo: remove unwrap
-        let expression = self.parse_expression().unwrap().0;
+        let condition = self.parse_expression()?.0; // todo: remove unwrap
+        let expression = self.parse_expression()?.0;
 
         Ok((
             ExprValue::While(Box::new(condition), Box::new(expression)),
@@ -344,7 +335,7 @@ impl Parser {
             _ => return Err(self.parser_error("Expected an identifier")),
         };
         Ok((
-            ExprValue::VarDecl { name, type_: type_ },
+            ExprValue::VarDecl { name, type_ },
             NodePosition {
                 pos: nx.pos,
                 line_no: nx.line_no,
@@ -410,31 +401,31 @@ impl Parser {
             TokenType::Assign => {
                 self.advance();
                 self.tokens.next(); // Eat '='
-                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
+                let value = Box::new(self.parse_expression()?.0); // todo: remove unwrap
                 return Ok((ExprValue::Assign { name, value }, start));
             }
             TokenType::PlusEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '+='
-                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
+                let value = Box::new(self.parse_expression()?.0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::MinusEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '-='
-                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
+                let value = Box::new(self.parse_expression()?.0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::DivEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '/='
-                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
+                let value = Box::new(self.parse_expression()?.0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             TokenType::MulEq => {
                 self.advance();
                 let op = Box::new(unwrap_some!(self.tokens.next()).type_); // Eat '*='
-                let value = Box::new(self.parse_expression().unwrap().0); // todo: remove unwrap
+                let value = Box::new(self.parse_expression()?.0); // todo: remove unwrap
                 return Ok((ExprValue::AugAssign { name, op, value }, start));
             }
             _ => {}
@@ -471,7 +462,7 @@ impl Parser {
     pub fn parse_return(&mut self) -> Result<(ExprValue, NodePosition)> {
         self.advance();
         let nx = unwrap_some!(self.tokens.next()); // Eat `return`
-        let expr = self.parse_expression().unwrap().0; // todo: remove unwrap
+        let expr = self.parse_expression()?.0; // todo: remove unwrap
         Ok((
             ExprValue::Return(Box::new(expr)),
             NodePosition {

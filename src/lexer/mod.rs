@@ -1,7 +1,7 @@
 pub mod tokens;
 
-use crate::lexer::tokens::{Token, TokenType};
 use crate::Result;
+use crate::lexer::tokens::{Token, TokenType};
 
 use std::iter::Peekable;
 use std::vec::IntoIter;
@@ -28,7 +28,7 @@ impl Lexer {
         if contents.as_str() == "" {
             return Ok(Self::from_text("", file_path));
         }
-        if contents.chars().last().unwrap() != ';' {
+        if !contents.ends_with(';') {
             contents += ";";
         }
         Ok(Self::from_text(&contents, file_path))
@@ -79,7 +79,6 @@ impl Lexer {
     /// Identifiers must start with an alphabetic character or underscore, and then can have
     /// alphanumeric characters and underscores.
     ///
-
     fn is_in_identifier(c: char) -> bool {
         c.is_ascii_alphanumeric() || c == '_'
     }
